@@ -11,5 +11,11 @@
       specialArgs = attrs;
       modules = [ ./hosts/home-pc/configuration.nix ];
     };
+
+    nixosConfigurations.nt-laptop = nixpkgs.lib.nixosSystem {
+      system = "x86_linux";
+      specialArgs = attrs;
+      modules = [ ./hosts/nt-laptop/configuration.nix ];
+    };
   };
 }
