@@ -33,6 +33,13 @@ in
   networking.hostName = host.name;
   networking.networkmanager.enable = true;
 
+  # Enable Docker
+  virtualisation.docker = {
+    storageDriver = "btrfs";
+    rootless.enable = true;
+    rootless.setSocketVariable = true;
+  };
+
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
@@ -93,7 +100,7 @@ in
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${host.user.name} = {
     isNormalUser = true;
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       firefox
     #  thunderbird
