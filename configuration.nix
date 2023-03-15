@@ -76,7 +76,11 @@ in
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
-  
+  services.printing.logLevel = "debug";
+  services.printing.drivers = [
+    (pkgs.callPackage ./brother-hl3172cdw.nix {})
+  ];  
+
   services.avahi.nssmdns = false; # Use the settings from below
   
   # settings from avahi-daemon.nix where mdns is replaced with mdns4
