@@ -9,7 +9,7 @@
     nixosConfigurations.home-pc = nixpkgs.lib.nixosSystem {
       system = "x86_linux";
       specialArgs = attrs;
-      modules = [ ./configuration.nix ];
+      modules = [ ./hosts/home-pc/configuration.nix ];
     };
   };
 }

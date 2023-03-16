@@ -6,7 +6,7 @@
 let host = ((import ./host.nix){});
 in
 {
-  imports = [ ./default-packages.nix ] ++ host.imports;
+  imports = [ ../../default-packages.nix ] ++ host.imports;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -21,13 +21,19 @@ in
   # Kernel.
   # boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  # CPU frequence scaling
+  powerManagement = {
+    enable = true;
+    cpuFreqGovernor = "schedutil";
+  };
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
   # Configure wootility support
-  services.udev.extraRules = builtins.readFile ./wootility-udev.rules;
+  services.udev.extraRules = builtins.readFile ../../hardware/Wooting/wootility-udev.rules;
 
   # Enable NTFS support
   boot.supportedFilesystems = [ "ntfs"  ];
@@ -112,7 +118,7 @@ in
   services.printing.enable = true;
   services.printing.logLevel = "debug";
   services.printing.drivers = [
-    (pkgs.callPackage ./brother-hl3172cdw.nix {})
+    (pkgs.callPackage ../../hardware/Brother/hl3172cdw.nix {})
   ];  
 
   services.avahi.nssmdns4 = false; # Use the settings from below
@@ -176,6 +182,13 @@ in
       vlc
       zotero
     ];
+  };
+
+  # Enable Steam
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
   };
 
   # Enable automatic login for the user.
