@@ -117,7 +117,7 @@ in
     isNormalUser = true;
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
-      firefox
+    #  firefox
     #  thunderbird
     ];
   };
