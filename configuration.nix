@@ -155,7 +155,9 @@ in
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  networking.firewall.allowedUDPPorts = [
+    24727  # AusweisApp2
+  ];
   networking.firewall.enable = true;
 
   # Antivirus
