@@ -17,12 +17,16 @@ in
   };
 
   # Kernel.
-  # boot.kernelPackages = pkgs.linuxPackages_latest;  
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
+
+  # Enable libritd
+  virtualisation.libvirtd.enable = true;
+  programs.dconf.enable = true;
 
   # Setup keyfile
   boot.initrd.secrets = {
@@ -120,7 +124,7 @@ in
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${host.user.name} = {
     isNormalUser = true;
-    extraGroups = [ "networkmanager" "wheel" "docker" "adbusers" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "adbusers" "libvirtd" ];
     packages = with pkgs; [
     #  firefox
     #  thunderbird
