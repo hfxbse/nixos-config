@@ -40,6 +40,11 @@ in
     rootless.setSocketVariable = true;
   };
 
+  # Android udev rules
+  services.udev.packages = [
+    pkgs.android-udev-rules
+  ];
+  
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
@@ -115,7 +120,7 @@ in
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${host.user.name} = {
     isNormalUser = true;
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "adbusers" ];
     packages = with pkgs; [
     #  firefox
     #  thunderbird
