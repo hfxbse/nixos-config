@@ -27,6 +27,9 @@ in
   # Enable NTFS support
   boot.supportedFilesystems = [ "ntfs"  ];
 
+  # Enable nix-ld
+  programs.nix-ld.enable = true;
+
   # Enable libritd
   virtualisation.libvirtd.enable = true;
   programs.dconf.enable = true;
