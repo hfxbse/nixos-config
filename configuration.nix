@@ -48,6 +48,9 @@ in
   services.udev.packages = [
     pkgs.android-udev-rules
   ];
+
+  # Enable MTP mounting
+  services.gvfs.enable = true;
   
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
