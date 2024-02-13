@@ -147,8 +147,14 @@ in
     ];
 
     packages = with pkgs; [
-    #  firefox
-    #  thunderbird
+      spotify
+      docker-compose
+      gimp
+      jetbrains.idea-ultimate
+      inkscape
+      nodejs
+      vlc
+      zotero
     ];
   };
 
