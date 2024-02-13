@@ -24,6 +24,9 @@ in
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  # Configure wootility support
+  services.udev.extraRules = builtins.readFile ./wootility-udev.rules;
+
   # Enable NTFS support
   boot.supportedFilesystems = [ "ntfs"  ];
 
@@ -133,7 +136,15 @@ in
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${host.user.name} = {
     isNormalUser = true;
-    extraGroups = [ "networkmanager" "wheel" "docker" "adbusers" "libvirtd" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+      "adbusers"
+      "libvirtd"
+      "wootility"
+    ];
+
     packages = with pkgs; [
     #  firefox
     #  thunderbird
