@@ -143,6 +143,7 @@ in
       "adbusers"
       "libvirtd"
       "wootility"
+      "dialout"    # Non-root access to serial ports for embedded development
     ];
 
     packages = with pkgs; [
