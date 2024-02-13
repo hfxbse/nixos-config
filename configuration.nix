@@ -24,6 +24,9 @@ in
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  # Enable NTFS support
+  boot.supportedFilesystems = [ "ntfs"  ];
+
   # Enable libritd
   virtualisation.libvirtd.enable = true;
   programs.dconf.enable = true;
