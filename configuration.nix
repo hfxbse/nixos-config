@@ -59,9 +59,9 @@ in
 
   # Enable Docker
   virtualisation.docker = {
+    enable = true; # Not rootless as https://github.com/nektos/act is incompatible with it
+
     storageDriver = "btrfs";
-    rootless.enable = true;
-    rootless.setSocketVariable = true;
   };
 
   # Android udev rules
