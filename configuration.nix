@@ -144,6 +144,12 @@ in
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
+  # Setup Neovim
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+  };
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${host.user.name} = {
     isNormalUser = true;
