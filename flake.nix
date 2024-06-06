@@ -8,8 +8,10 @@
   outputs = { self, nixpkgs }@attrs: 
   let
     defaultModules = [
+      ./modules/gnome.nix
       ./modules/localization.nix
       ./modules/text-processing.nix
+      ./modules/docker.nix
       ./modules/security.nix
       ./hardware/Wooting/wootility.nix
     ];

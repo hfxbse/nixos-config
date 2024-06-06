@@ -7,9 +7,6 @@
   imports = [
     ./hardware-configuration.nix
     ./nvidia.nix
-
-    ../../default-packages.nix
-    ../../modules/docker.nix
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -66,13 +63,6 @@
   # Enable MTP mounting
   services.gvfs.enable = true;
   
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-  
-  # Enable the Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
   # Enable CUPS to print documents.
   services.printing.enable = true;
   services.printing.logLevel = "debug";
@@ -143,10 +133,6 @@
   # Enable automatic login for the user.
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = host.user.name;
-
-  # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
-  systemd.services."getty@tty1".enable = false;
-  systemd.services."autovt@tty1".enable = false;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
