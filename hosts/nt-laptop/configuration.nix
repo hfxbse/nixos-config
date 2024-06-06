@@ -30,17 +30,6 @@
 
   # Enable nix-ld
   programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = with pkgs; [
-    gtk3
-    gdk-pixbuf
-    xorg.libXtst
-    xorg.libXxf86vm
-    xorg.libX11
-    glib
-    cairo
-    pango
-    libGL
-   ];
 
   # Enable libritd
   virtualisation.libvirtd.enable = true;
