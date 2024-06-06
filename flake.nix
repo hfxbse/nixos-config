@@ -7,7 +7,10 @@
 
   outputs = { self, nixpkgs }@attrs: 
   let
-    defaultModules = [ ./modules/text-processing.nix ];
+    defaultModules = [ 
+      ./modules/text-processing.nix
+      ./modules/security.nix
+    ];
   in
   {
     nixosConfigurations.home-pc = nixpkgs.lib.nixosSystem {
