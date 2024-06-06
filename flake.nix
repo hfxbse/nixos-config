@@ -7,7 +7,8 @@
 
   outputs = { self, nixpkgs }@attrs: 
   let
-    defaultModules = [ 
+    defaultModules = [
+      ./modules/localization.nix
       ./modules/text-processing.nix
       ./modules/security.nix
       ./hardware/Wooting/wootility.nix
