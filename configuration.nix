@@ -100,9 +100,9 @@ in
   services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
-  services.xserver = {
+  services.xserver.xkb = {
     layout = "de";
-    xkbVariant = "";
+    variant = "";
   };
 
   # Configure console keymap
@@ -115,11 +115,11 @@ in
     (pkgs.callPackage ./brother-hl3172cdw.nix {})
   ];  
 
-  services.avahi.nssmdns = false; # Use the settings from below
+  services.avahi.nssmdns4 = false; # Use the settings from below
   
   # settings from avahi-daemon.nix where mdns is replaced with mdns4
-  system.nssModules = pkgs.lib.optional (!config.services.avahi.nssmdns) pkgs.nssmdns;
-  system.nssDatabases.hosts = with pkgs.lib; optionals (!config.services.avahi.nssmdns) (mkMerge [
+  system.nssModules = pkgs.lib.optional (!config.services.avahi.nssmdns4) pkgs.nssmdns;
+  system.nssDatabases.hosts = with pkgs.lib; optionals (!config.services.avahi.nssmdns4) (mkMerge [
     (mkBefore [ "mdns4_minimal [NOTFOUND=return]" ]) # before resolve
     (mkAfter [ "mdns4" ]) # after dns
   ]);
@@ -179,8 +179,8 @@ in
   };
 
   # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = host.user.name;
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = host.user.name;
 
   # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;

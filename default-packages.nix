@@ -17,7 +17,6 @@
     atomix
     yelp
     polari
-    anjuta
     vinagre
     simple-scan
   ]);
