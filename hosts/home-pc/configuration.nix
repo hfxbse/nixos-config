@@ -11,14 +11,6 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Git
-  programs.git.enable = true;
-  programs.git.config = {
-    init = {
-      defaultBranch = "main";
-    };
-  };
-
   # Kernel.
   # boot.kernelPackages = pkgs.linuxPackages_latest;
 
@@ -145,13 +137,6 @@
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
-
-  # Setup Neovim
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${host.user.name} = {

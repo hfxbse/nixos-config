@@ -5,7 +5,11 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   };
 
-  outputs = { self, nixpkgs }@attrs: {
+  outputs = { self, nixpkgs }@attrs: 
+  let
+    defaultModules = [ ./modules/text-processing.nix ];
+  in
+  {
     nixosConfigurations.home-pc = nixpkgs.lib.nixosSystem {
       specialArgs = with attrs; { 
         host = rec {
@@ -16,7 +20,7 @@
       };
 
       system = "x86_linux";
-      modules = [ ./hosts/home-pc/configuration.nix ];
+      modules = defaultModules ++ [ ./hosts/home-pc/configuration.nix ];
     };
 
     nixosConfigurations.nt-laptop = nixpkgs.lib.nixosSystem {
@@ -29,7 +33,7 @@
       };
 
       system = "x86_linux";
-      modules = [ ./hosts/nt-laptop/configuration.nix ];
+      modules = defaultModules ++ [ ./hosts/nt-laptop/configuration.nix ];
     };
   };
 }
