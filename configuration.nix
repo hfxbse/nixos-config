@@ -8,6 +8,8 @@ in
 {
   imports = [ ./default-packages.nix ] ++ host.imports;
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # Git
   programs.git.enable = true;
   programs.git.config = {
