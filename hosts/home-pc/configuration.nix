@@ -25,9 +25,6 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
-  # Configure wootility support
-  services.udev.extraRules = builtins.readFile ../../hardware/Wooting/wootility-udev.rules;
-
   # Enable NTFS support
   boot.supportedFilesystems = [ "ntfs"  ];
 
@@ -146,7 +143,6 @@
       "wheel"
       "adbusers"
       "libvirtd"
-      "wootility"
       "dialout"    # Non-root access to serial ports for embedded development
     ];
 

@@ -10,6 +10,7 @@
     defaultModules = [ 
       ./modules/text-processing.nix
       ./modules/security.nix
+      ./hardware/Wooting/wootility.nix
     ];
   in
   {
