@@ -2,11 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
-let host = ((import ./host.nix){});
-in
+{ config, pkgs, host, ... }:
 {
-  imports = [ ../../default-packages.nix ] ++ host.imports;
+  imports = [
+    ./hardware-configuration.nix
+    ../../default-packages.nix
+  ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -64,13 +65,6 @@ in
   # Enable networking
   networking.hostName = host.name;
   networking.networkmanager.enable = true;
-
-  # Enable Docker
-  virtualisation.docker = {
-    enable = true; # Not rootless as https://github.com/nektos/act is incompatible with it
-
-    storageDriver = "btrfs";
-  };
 
   # Android udev rules
   services.udev.packages = [
@@ -165,7 +159,6 @@ in
     extraGroups = [
       "networkmanager"
       "wheel"
-      "docker"
       "adbusers"
       "libvirtd"
       "wootility"
@@ -174,7 +167,6 @@ in
 
     packages = with pkgs; [
       spotify
-      docker-compose
       gimp
       jetbrains.idea-ultimate
       inkscape
