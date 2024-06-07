@@ -11,7 +11,7 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Kernel.
-  # boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # CPU frequence scaling
   powerManagement = {
