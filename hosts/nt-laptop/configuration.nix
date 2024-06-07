@@ -14,12 +14,6 @@
   # Kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # CPU frequence scaling
-  powerManagement = {
-    enable = true;
-    cpuFreqGovernor = "schedutil";
-  };
-
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
