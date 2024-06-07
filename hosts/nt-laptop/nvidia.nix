@@ -25,7 +25,10 @@ in
       nvidiaBusId = lib.mkDefault "PCI:1:0:0";
     };
     nvidiaSettings = false;
+    powerManagement.enable = true;
+    powerManagement.finegrained = true;
   };
 
   services.xserver.videoDrivers = lib.mkDefault [ "nvidia" ];
+
 }
