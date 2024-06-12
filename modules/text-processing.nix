@@ -25,6 +25,7 @@
       vimtex.enable = true;
       nvim-autopairs.enable = true;
       gitsigns.enable = true;
+      trim.enable = true;
     };
   };
 }
