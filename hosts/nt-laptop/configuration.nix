@@ -19,6 +19,8 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  services.logind.lidSwitch = "lock";
+
   # Enable NTFS support
   boot.supportedFilesystems = [ "ntfs"  ];
 
