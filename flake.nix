@@ -3,11 +3,19 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs }@attrs: 
+  outputs = { self, nixpkgs, nixvim }@attrs:
   let
     defaultModules = [
+      # Nixvim needs to be an top level import
+      # Will fail due to infinit recursion otherwise
+      nixvim.nixosModules.nixvim
       ./modules/gnome.nix
       ./modules/localization.nix
       ./modules/text-processing.nix

@@ -1,4 +1,6 @@
-{ host, ... }: {
+{ host, nixvim, ... }: {
+# imports = [ nixvim.nixosModules.nixvim ];
+
   programs.git.enable = true;
   programs.git.config = {
     init.defaultBranch = "main";
@@ -6,9 +8,13 @@
     user.name = host.user.description;
   };
 
-  programs.neovim = {
+  programs.nixvim = {
     enable = true;
     defaultEditor = true;
     viAlias = true;
+
+    plugins = {
+      vimtex.enable = true;
+    };
   };
 }
