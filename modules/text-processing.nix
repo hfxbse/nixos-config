@@ -1,4 +1,4 @@
-{ host, nixvim, ... }: {
+{ pkgs, host, nixvim, ... }: {
   programs.git.enable = true;
   programs.git.config = {
     init.defaultBranch = "main";
@@ -27,5 +27,9 @@
       gitsigns.enable = true;
       trim.enable = true;
     };
+
+    extraPlugins = [
+      pkgs.vimPlugins.vim-grammarous
+    ];
   };
 }
