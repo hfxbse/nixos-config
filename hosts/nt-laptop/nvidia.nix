@@ -11,8 +11,8 @@ in
 {
   environment.systemPackages = [ nvidia-offload ];
 
-  hardware.opengl = {
-    driSupport32Bit = true;
+  hardware.graphics = {
+    enable32Bit = true;
     enable = true;
   };
 
