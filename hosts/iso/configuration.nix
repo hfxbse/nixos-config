@@ -24,6 +24,8 @@
     };
   };
 
+  powerManagement.enable = lib.mkForce false;
+
   services.logind.lidSwitch = "ignore";
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
