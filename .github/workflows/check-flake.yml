@@ -1,0 +1,30 @@
+name: check-flake
+run-name: "Check Flake"
+on:
+  push:
+    paths-ignore:
+      - '.editorconfig'
+      - '.gitignore'
+      - '*.md'
+
+jobs:
+  check-flake:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: cachix/install-nix-action@v27
+        name: "Install Nix"
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v4
+        name: "Checkout repository"
+
+      - run: sed -i 's/\/\/ wifi.ssid/wifi.ssid = "ssid";/g' flake.nix
+        name: "Set dummy Wi-Fi SSID"
+
+      - run: sed -i 's/\/\/ wifi.psk/wifi.psk = "password";/g' flake.nix
+        name: "Set dummy Wi-Fi password"
+
+      - run: nix flake check
+        name: "Check Flake"

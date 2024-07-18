@@ -60,6 +60,10 @@
     nixosConfigurations.iso = nixpkgs.lib.nixosSystem {
       specialArgs = with attrs; {
         host.user.description = "Fabian Haas";
+
+        # TODO add your WiFi credentials
+        // wifi.ssid
+        // wifi.psk
       };
 
       modules = [
