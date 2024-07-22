@@ -62,15 +62,28 @@
         host.user.description = "Fabian Haas";
 
         # TODO add your WiFi credentials
-        // wifi.ssid
-        // wifi.psk
+        # wifi.ssid
+        # wifi.psk
       };
 
       modules = [
        nixvim.nixosModules.nixvim
-       disko.nixosModules.disko
        ./modules/text-processing.nix
        ./hosts/iso/configuration.nix
+      ];
+    };
+
+    nixosConfigurations.server = nixpkgs.lib.nixosSystem {
+      specialArgs = with attrs; {
+        host.user.description = "Fabian Haas";
+      };
+
+      system = "x86_64-linux";
+      modules = [
+        nixvim.nixosModules.nixvim
+        disko.nixosModules.disko
+        ./modules/text-processing.nix
+        ./hosts/server/configuration.nix
       ];
     };
   };

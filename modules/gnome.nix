@@ -13,22 +13,22 @@
   environment.gnome.excludePackages = (with pkgs; [
     gnome-tour
     gnome-2048
-  ]) ++ ( with pkgs.gnome; [
     cheese
-    gnome-music
-    gnome-maps
-    gnome-contacts
     epiphany
     geary
     totem
+    yelp
+    simple-scan
+  ]) ++ ( with pkgs.gnome; [
+    gnome-music
+    gnome-maps
+    gnome-contacts
     tali
     iagno
     hitori
     atomix
-    yelp
     polari
     vinagre
-    simple-scan
   ]);
 
   services.xserver.excludePackages = [ pkgs.xterm ];
