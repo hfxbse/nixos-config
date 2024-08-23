@@ -23,6 +23,7 @@
       nixvim.nixosModules.nixvim
       disko.nixosModules.disko
       ./modules/gnome.nix
+      ./modules/networking.nix
       ./modules/localization.nix
       ./modules/text-processing.nix
       ./modules/docker.nix
