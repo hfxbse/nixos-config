@@ -1,55 +1,67 @@
-{ lib, python, buildPythonApplication, fetchPypi, fetchFromGitHub }:
+{ lib, python, buildPythonApplication, fetchPypi, fetchFromGitHub, pythonRelaxDepsHook }:
 let
   py = python.override {
     packageOverrides = final: prev: {
       av = prev.av.overridePythonAttrs rec {
-	pname = prev.av.pname;
-	version = "12.0.5";
+	    pname = prev.av.pname;
+	    version = "13.0.0";
 
-	src = fetchFromGitHub {
-	  owner = prev.av.src.owner;
-	  repo = prev.av.src.repo;
-	  rev = "v${version}";
-	  hash = "sha256-+xbVkNyFg5VKIf+G6AbAAYVqTSwxFE0Hyc52XSmibAw=";
-	};
+	    src = fetchFromGitHub {
+	    owner = prev.av.src.owner;
+	    repo = prev.av.src.repo;
+          rev = "refs/tags/v${version}";
+          hash = "sha256-blvtHSUqSl9xAM4t+dFJWmXiOjtnAUC9nicMaUY1zuU=";
+        };
+
+        patches = [];
 
         # Disable tests that require an internet connection
-        pytestFlagsArray = [
-	  "--deselect=tests/test_codec_context.py::TestCodecContext::test_bits_per_coded_sample"
-	  "--deselect=tests/test_codec_context.py::TestCodecContext::test_codec_delay"
-	  "--deselect=tests/test_codec_context.py::TestCodecContext::test_frame_index"
-	  "--deselect=tests/test_colorspace.py::TestColorSpace::test_penguin_joke"
-	  "--deselect=tests/test_colorspace.py::TestColorSpace::test_sky_timelapse"
-	  "--deselect=tests/test_decode.py::TestDecode::test_decode_close_then_use"
-	  "--deselect=tests/test_decode.py::TestDecode::test_flush_decoded_video_frame_count"
-	] ++ prev.av.pytestFlagsArray;
+        disabledTests = [
+          "test_pts_assertion_same_rate"
+          "test_filter_flush"
+          "test_filter_h264_mp4toannexb"
+          "test_filter_output_parameters"
+          "test_bits_per_coded_sample"
+          "test_codec_delay"
+          "test_flush_decoded_video_frame_count"
+        ] ++ prev.av.disabledTests;
 
-	disabledTestPaths = [
-	  "tests/test_open.py"
-	  "tests/test_packet.py"
-	  "tests/test_streams.py"
-	] ++ [
-	  # prev.av.disabledTestPaths gets returned as a string
-	  # Removing the quotes around the entries fixes this when placing it in an array
-	  ( builtins.replaceStrings ["'"] [""] prev.av.disabledTestPaths )
-	];
+        disabledTestPaths = [
+          "tests/test_colorspace.py"
+          "tests/test_open.py"
+          "tests/test_packet.py"
+          "tests/test_streams.py"
+          "tests/test_subtitles.py"
+        ] ++ [
+    	  ( builtins.replaceStrings ["'"] [""] prev.av.disabledTestPaths )
+        ];
       };
     };
   };
 in
 buildPythonApplication rec {
   pname = "auto-editor";
-  version = "24.19.1";
+  version = "25.3.0";
 
   src = fetchPypi {
     pname = "auto_editor";
     inherit version;
-    hash = "sha256-SFPshD9LTBR2osElFkHTXKsJPWqpOWyLFtGUuTVtQDE=";
+    hash = "sha256-KlPFOaAK+OCdxXVmw1E1fTUPRRSnIQlK1rauuYz1p3k=";
   };
 
   format = "pyproject";
 
-  propagatedBuildInputs = with py.pkgs; [ av numpy setuptools ];
+  dependencies = with py.pkgs; [ av numpy ];
+
+  build-system = with py.pkgs; [
+    setuptools
+  ];
+
+  nativeBuildInputs = [ pythonRelaxDepsHook ];
+  pythonRemoveDeps = [
+    "pyav"
+    "ae-ffmpeg"
+  ];
 
   meta = with lib; {
     description = "Auto-Editor: Effort free video editing!";
