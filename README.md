@@ -1,9 +1,15 @@
 # Auto-Editor
 
-A Nix-Derivation for [Auto-Editor](https://github.com/WyattBlue/auto-editor).
+A Nix derivation for [Auto-Editor](https://github.com/WyattBlue/auto-editor).
 
-To build this derivation from the command line for debugging purposes, run
+Can be run directly from this repository as [Nix flake](https://wiki.nixos.org/wiki/Flakes).
 
 ```sh
-nix-build -E 'with import <nixpkgs> {}; with pkgs.python310Packages; callPackage ./auto-editor.nix {}'
+nix run github:hfxbse/nixos-config/derivation/auto-editor
+```
+
+On systems without enabled flake support, run this instead:
+
+```sh
+nix --experimental-features "nix-command flakes" run github:hfxbse/nixos-config/derivation/auto-editor
 ```

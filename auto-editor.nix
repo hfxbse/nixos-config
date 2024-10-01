@@ -3,38 +3,20 @@ let
   py = python.override {
     packageOverrides = final: prev: {
       av = prev.av.overridePythonAttrs rec {
-	    pname = prev.av.pname;
-	    version = "13.0.0";
+        pname = prev.av.pname;
+        version = "13.0.0";
 
-	    src = fetchFromGitHub {
-	    owner = prev.av.src.owner;
-	    repo = prev.av.src.repo;
+        src = fetchFromGitHub {
+          owner = prev.av.src.owner;
+          repo = prev.av.src.repo;
           rev = "refs/tags/v${version}";
           hash = "sha256-blvtHSUqSl9xAM4t+dFJWmXiOjtnAUC9nicMaUY1zuU=";
         };
 
-        patches = [];
-
         # Disable tests that require an internet connection
         disabledTests = [
           "test_pts_assertion_same_rate"
-          "test_filter_flush"
-          "test_filter_h264_mp4toannexb"
-          "test_filter_output_parameters"
-          "test_bits_per_coded_sample"
-          "test_codec_delay"
-          "test_flush_decoded_video_frame_count"
         ] ++ prev.av.disabledTests;
-
-        disabledTestPaths = [
-          "tests/test_colorspace.py"
-          "tests/test_open.py"
-          "tests/test_packet.py"
-          "tests/test_streams.py"
-          "tests/test_subtitles.py"
-        ] ++ [
-    	  ( builtins.replaceStrings ["'"] [""] prev.av.disabledTestPaths )
-        ];
       };
     };
   };
