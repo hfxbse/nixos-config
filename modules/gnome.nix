@@ -19,7 +19,6 @@
     totem
     yelp
     simple-scan
-  ]) ++ ( with pkgs.gnome; [
     gnome-music
     gnome-maps
     gnome-contacts
@@ -28,7 +27,6 @@
     hitori
     atomix
     polari
-    vinagre
   ]);
 
   services.xserver.excludePackages = [ pkgs.xterm ];
