@@ -3,17 +3,16 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, flake-utils }: flake-utils.lib.eachDefaultSystem (system:
   let
-    pkgs = nixpkgs.legacyPackages.x86_64-linux;
+    pkgs = nixpkgs.legacyPackages.${system};
   in
   {
+    packages.auto-editor = with pkgs; with pkgs.python3Packages; callPackage (import ./auto-editor.nix) {};
 
-    packages.x86_64-linux.auto-editor = with pkgs; with pkgs.python3Packages; callPackage (import ./auto-editor.nix) {};
-
-    packages.x86_64-linux.default = self.packages.x86_64-linux.auto-editor;
-
-  };
+    packages.default = self.packages.${system}.auto-editor;
+  });
 }
