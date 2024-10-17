@@ -23,6 +23,22 @@
       shiftwidth = 4;
     };
 
+    colorschemes.catppuccin = {
+      enable = true;
+      settings = {
+        background = {
+          light = "latte";
+          dark = "mocha";
+        };
+        flavor = "auto";
+
+        integrations = {
+          gitsigns = true;
+          treesitter = true;
+        };
+      };
+    };
+
     plugins = {
       vimtex.enable = true;
       nvim-autopairs.enable = true;
@@ -34,6 +50,14 @@
         enable = true;
         extensions = {
           live-grep-args.enable = true;
+        };
+      };
+
+      treesitter = {
+        enable = true;
+        settings = {
+          highlight.enable = true;
+          indent.enable = true;
         };
       };
     };
