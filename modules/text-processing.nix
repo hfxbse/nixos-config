@@ -14,6 +14,8 @@
     opts = {
       number = true;
 
+      wildmode = "list:longest";
+
       expandtab = true;
       autoindent = true;
       smarttab = true;
@@ -26,10 +28,27 @@
       nvim-autopairs.enable = true;
       gitsigns.enable = true;
       trim.enable = true;
+
+      web-devicons.enable = true;
+      telescope = {
+        enable = true;
+        extensions = {
+          live-grep-args.enable = true;
+        };
+      };
     };
 
-    extraPlugins = [
-      pkgs.vimPlugins.vim-grammarous
+    extraPlugins = with pkgs.vimPlugins; [
+      vim-grammarous
+    ];
+
+    extraPackages = with pkgs; [
+      ripgrep
     ];
   };
+
+
+  fonts.packages = with pkgs; [
+    (nerdfonts.override { fonts = [ "JetBrainsMono"]; })
+  ];
 }
