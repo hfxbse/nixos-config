@@ -1,4 +1,4 @@
-{ ... }: {
+{ pkgs, ... }: {
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
@@ -25,4 +25,21 @@
 
   # Configure console keymap
   console.keyMap = "de";
+
+  fonts = {
+    packages = with pkgs; [
+      (nerdfonts.override { fonts = [ "JetBrainsMono" "Noto"]; })
+      noto-fonts
+      noto-fonts-emoji
+      noto-fonts-cjk
+    ];
+
+    fontconfig = {
+      defaultFonts = {
+        serif = [ "Noto Serif" ];
+        sansSerif = [ "Noto Sans" ];
+        monospace = [ "JetBrainsMonoNerdFontMono"];
+      };
+    };
+  };
 }
