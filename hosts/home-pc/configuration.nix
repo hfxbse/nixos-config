@@ -47,13 +47,6 @@
   # Enable MTP mounting
   services.gvfs.enable = true;
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-  services.printing.logLevel = "debug";
-  services.printing.drivers = [
-    (pkgs.callPackage ../../hardware/Brother/hl3172cdw.nix {})
-  ];
-
   services.avahi.nssmdns4 = false; # Use the settings from below
 
   # settings from avahi-daemon.nix where mdns is replaced with mdns4

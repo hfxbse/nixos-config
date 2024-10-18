@@ -28,7 +28,8 @@
       ./modules/text-processing.nix
       ./modules/docker.nix
       ./modules/security.nix
-      ./hardware/Wooting/wootility.nix
+      ./modules/hardware/printers.nix
+      ./modules/hardware/Wooting/wootility.nix
     ];
   in
   {
