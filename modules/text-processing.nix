@@ -11,6 +11,24 @@
     defaultEditor = true;
     viAlias = true;
 
+    keymaps = [
+      {
+        mode = [ "n" ];
+        key = "T";
+        action = "<cmd>Telescope find_files<cr>";
+      }
+      {
+        mode = [ "n" ];
+        key = "sT";
+        action = "<cmd>Telescope git_status<cr>";
+      }
+      {
+        mode = [ "n" ];
+        key = "gT";
+        action = "<cmd>Telescope live_grep<cr>";
+      }
+    ];
+
     opts = {
       number = true;
 
