@@ -4,8 +4,12 @@
     daemon.enable = true;
   };
 
-  networking.firewall.enable = true;
-  networking.firewall.allowedUDPPorts = [
-    24727   # AusweisApp2
-  ];
+  networking.firewall = {
+    enable = true;
+    checkReversePath = "loose";
+
+    allowedUDPPorts = [
+      24727   # AusweisApp2
+    ];
+  };
 }
