@@ -1,8 +1,11 @@
 {
+  autoPatchelfHook,
   binutils,
+  fetchurl,
   gnutar,
+  networkmanager,
   stdenv,
-  fetchurl
+  webkitgtk_4_1,
 }:
 let
   version = "1.3.5";
@@ -26,7 +29,28 @@ stdenv.mkDerivation {
       tar -xf $out/control.tar.xz -C $out/control;
       tar -xf $out/data.tar.xz -C $out/data;
 
-      rm $out/*.tar.xz
+      rm $out/*.tar.xz;
     '';
   };
+
+  nativeBuildInputs = [
+    autoPatchelfHook
+  ];
+
+  buildInputs = [
+    networkmanager
+    webkitgtk_4_1
+  ];
+
+  installPhase = ''
+    cp -r $src/data $out;
+
+    chmod 700 $out;
+    mkdir -p $out/bin;
+
+    ln -s $out/usr/share/easyroam_connect_desktop/easyroam_connect_desktop $out/bin/easyroam;
+    chmod +x $out/bin/easyroam
+
+    ls -r $out;
+  '';
 }
