@@ -1,20 +1,21 @@
 {
-  alsa-lib,
-  autoPatchelfHook,
-  dbus,
+  electron,
   fetchzip,
-  gtk3,
-  libgcc,
-  libxkbcommon,
-  libXext,
-  makeFontsConf,
-  mesa,
-  nss,
-  pango,
-  stdenv
+  lib,
+  makeDesktopItem,
+  makeWrapper,
+  stdenv,
 }:
 let
   version = "6.5.46";
+  desktopItem = makeDesktopItem {
+    name = "easyeda";
+    desktopName = "EasyEDA";
+    comment = "A simple and powerful electronic circuit design tool";
+    icon = "easyeda";
+    exec = "easyeda %f";
+    categories = [ "Development" "Electronics" ];
+  };
 in
 stdenv.mkDerivation {
   pname = "easyeda";
@@ -26,30 +27,22 @@ stdenv.mkDerivation {
     stripRoot = false;
   };
 
-  nativeBuildInputs = [
-    autoPatchelfHook
-  ];
-
-  buildInputs = [
-    alsa-lib
-    dbus
-    gtk3
-    libgcc
-    libxkbcommon
-    libXext
-    mesa
-    nss
-    pango
-  ];
-
+  nativeBuildInputs = [ makeWrapper ];
   installPhase = ''
-    mkdir -p $out/opt $out/bin $out/share/applications;
+    app=$src/easyeda-linux-x64;
 
-    cp -r $src/easyeda-linux-x64 $out/opt/easyeda;
-    cp $src/easyeda-linux-x64/EASYEDA.dkt $out/share/applications/easyeda.desktop;
-    ln -s $out/opt/easyeda/easyeda $out/bin/easyeda;
+    mkdir -p $out/bin $out/share/easyeda;
 
-    chmod -R 755 $out/opt/easyeda;
-    chmod 755 $out/bin/easyeda;
+    cp -r $app/resources/* $out/share/easyeda;
+
+    makeWrapper ${electron}/bin/electron $out/bin/easyeda \
+      --add-flags $out/share/easyeda/app.asar \
+      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland}}";
+
+    install -m 444 -D ${desktopItem}/share/applications/* -t $out/share/applications/;
+
+    for size in 16 32 48 64 128 256; do
+      install -m 444 -D $app/icon/''${size}x''${size}/easyeda.png -t $out/share/icons/hicolor/''${size}x''${size}/apps/;
+    done;
   '';
 }
