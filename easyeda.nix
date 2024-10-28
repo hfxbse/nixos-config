@@ -1,4 +1,5 @@
 {
+  asar,
   electron,
   fetchzip,
   lib,
@@ -27,9 +28,23 @@ stdenv.mkDerivation {
     stripRoot = false;
   };
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [
+    asar
+    makeWrapper
+  ];
+
+  patchPhase = ''
+    app=easyeda-linux-x64;
+
+    asar extract $app/resources/app.asar patched-asar;
+
+    sed -i "s#process\.resourcesPath#'$out/share/easyeda'#g" patched-asar/index.bundle.js;
+
+    asar pack patched-asar $app/resources/app.asar;
+  '';
+
   installPhase = ''
-    app=$src/easyeda-linux-x64;
+    app=easyeda-linux-x64;
 
     mkdir -p $out/bin $out/share/easyeda;
 
