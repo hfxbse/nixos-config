@@ -19,7 +19,12 @@ writeShellScriptBin "compile-latex" ''
     esac
   done
 
+  pdflatexOptions=$(echo "$@" |  awk -F'--' '{print $2}');
+
   if [ $HELP = true ]; then
+    echo "Usage";
+    echo "compile-latex [OPTIONS ...] [-- PDF_LATEX_OPTIONS]"
+    echo "";
     echo "Options";
     echo "-f <PATH>           Path to the main LaTeX file.";
     echo "-h                  Shows this help.";
@@ -37,8 +42,8 @@ writeShellScriptBin "compile-latex" ''
   # Required to get relative paths inside LaTeX to work
   cd $DOC_DIR;
 
-  ${latex}/bin/pdflatex -output-directory="$OUT" "$DOC";
+  ${latex}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
   ${latex}/bin/biber --output-directory="$OUT" "$OUT"/*.bcf;
-  ${latex}/bin/pdflatex -output-directory="$OUT" "$DOC";
-  ${latex}/bin/pdflatex -output-directory="$OUT" "$DOC";
+  ${latex}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
+  ${latex}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
 ''
