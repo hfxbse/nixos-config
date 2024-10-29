@@ -1,14 +1,12 @@
 {
   latex,
-  mainFile ? "main.tex",
-  outputDirectory ? ".",
   writeShellScriptBin
 }:
 writeShellScriptBin "compile-latex" ''
   set -e;
 
-  DOC="$(pwd)/${mainFile}";
-  OUT="$(pwd)/${outputDirectory}";
+  DOC="$(pwd)/main.tex";
+  OUT="$(pwd)";
   HELP=false;
 
   while getopts "f:o:h" OPT; do
