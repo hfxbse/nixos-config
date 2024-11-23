@@ -39,11 +39,6 @@
   networking.hostName = host.name;
   networking.networkmanager.enable = true;
 
-  # Android udev rules
-  services.udev.packages = [
-    pkgs.android-udev-rules
-  ];
-
   # Enable MTP mounting
   services.gvfs.enable = true;
 
@@ -85,7 +80,6 @@
       "wheel"
       "adbusers"
       "libvirtd"
-      "dialout"    # Non-root access to serial ports for embedded development
     ];
 
     packages = with pkgs; [

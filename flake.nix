@@ -30,6 +30,7 @@
       ./modules/security.nix
       ./modules/hardware/printers.nix
       ./modules/hardware/Wooting/wootility.nix
+      ./modules/embedded-development.nix
     ];
   in
   {

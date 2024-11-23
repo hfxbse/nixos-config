@@ -38,10 +38,6 @@
   networking.hostName = host.name;
   networking.networkmanager.enable = true;
   networking.networkmanager.enableStrongSwan = true;
-  # Android udev rules
-  services.udev.packages = [
-    pkgs.android-udev-rules
-  ];
 
   # Enable MTP mounting
   services.gvfs.enable = true;
