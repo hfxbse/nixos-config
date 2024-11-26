@@ -6,4 +6,5 @@
   ];
 
   users.groups.dialout.members = [ host.user.name ];  # Non-root access to serial ports
+  users.groups.adbuser.members = [ host.user.name ];
 }
