@@ -1,4 +1,13 @@
-{ lib, python, buildPythonApplication, fetchPypi, fetchFromGitHub, pythonRelaxDepsHook }:
+{
+  buildPythonApplication,
+  fetchFromGitHub,
+  fetchPypi,
+  ffmpeg,
+  lib,
+  makeWrapper,
+  python,
+  pythonRelaxDepsHook
+}:
 let
   py = python.override {
     packageOverrides = final: prev: {
@@ -39,11 +48,21 @@ buildPythonApplication rec {
     setuptools
   ];
 
-  nativeBuildInputs = [ pythonRelaxDepsHook ];
+  nativeBuildInputs = [
+    pythonRelaxDepsHook
+    makeWrapper
+  ];
+
   pythonRemoveDeps = [
     "pyav"
     "ae-ffmpeg"
   ];
+
+  buildInputs = [ ffmpeg ];
+
+  postFixup = ''
+    wrapProgram $out/bin/auto-editor --set PATH ${lib.makeBinPath [ ffmpeg ]};
+  '';
 
   meta = with lib; {
     description = "Auto-Editor: Effort free video editing!";
