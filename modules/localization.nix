@@ -28,11 +28,13 @@
 
   fonts = {
     packages = with pkgs; [
-      (nerdfonts.override { fonts = [ "JetBrainsMono" "Noto"]; })
       noto-fonts
       noto-fonts-emoji
-      noto-fonts-cjk
-    ];
+      noto-fonts-cjk-sans
+    ] ++ ( with pkgs.nerd-fonts; [
+      jetbrains-mono
+      noto
+    ]);
 
     fontconfig = {
       defaultFonts = {
