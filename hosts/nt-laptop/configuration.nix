@@ -19,13 +19,16 @@
 
   services.logind.lidSwitch = "lock";
 
-  # Enable NTFS support
+  # Workplace compliance.
+  workplace-compliance.enable = true;
+
+  # Enable NTFS support.
   boot.supportedFilesystems = [ "ntfs"  ];
 
-  # Enable nix-ld
+  # Enable nix-ld.
   programs.nix-ld.enable = true;
 
-  # Enable libritd
+  # Enable libritd.
   virtualisation.libvirtd.enable = true;
   programs.dconf.enable = true;
 

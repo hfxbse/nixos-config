@@ -27,7 +27,7 @@
       ./modules/localization.nix
       ./modules/text-processing.nix
       ./modules/docker.nix
-      ./modules/security.nix
+      ./modules/workplace-compliance.nix
       ./modules/hardware/printers.nix
       ./modules/hardware/Wooting/wootility.nix
       ./modules/embedded-development.nix
