@@ -25,7 +25,7 @@
   services.logind.lidSwitch = "lock";
 
   # Workplace compliance.
-  workplace-compliance = {
+  workplaceCompliance = {
     enable = true;
     ikev2.enable = true;
   };

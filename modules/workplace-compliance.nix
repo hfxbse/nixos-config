@@ -1,9 +1,9 @@
 { config, lib, pkgs, ... }:
 let
-  cfg = config.workplace-compliance;
+  cfg = config.workplaceCompliance;
   types = lib.types;
 in {
-  options.workplace-compliance = {
+  options.workplaceCompliance = {
     enable = lib.mkEnableOption "workplace compliance";
 
     av.enable = lib.mkOption {
