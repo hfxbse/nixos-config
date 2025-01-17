@@ -1,6 +1,6 @@
 {
   asar,
-  electron,
+  electron_24,
   fetchzip,
   lib,
   makeDesktopItem,
@@ -17,6 +17,8 @@ let
     exec = "easyeda %f";
     categories = [ "Development" "Electronics" ];
   };
+
+  electron = electron_24;
 in
 stdenv.mkDerivation {
   pname = "easyeda";
