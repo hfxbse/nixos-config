@@ -25,11 +25,10 @@
       ./modules/gnome.nix
       ./modules/localization.nix
       ./modules/text-processing.nix
-      ./modules/docker.nix
       ./modules/workplace-compliance.nix
       ./modules/hardware/printers.nix
       ./modules/hardware/Wooting/wootility.nix
-      ./modules/embedded-development.nix
+      ./modules/development.nix
     ];
   in
   {

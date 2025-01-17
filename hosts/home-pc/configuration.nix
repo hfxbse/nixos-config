@@ -15,25 +15,29 @@
     cpuFreqGovernor = "schedutil";
   };
 
+  # Setup keyfile
+  boot.initrd.secrets = {
+    "/crypto_keyfile.bin" = null;
+  };
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  # Development setup.
+  development = {
+    container.enable = true;
+    embedded.enable = true;
+    js.enable = true;
+  };
+
   # Enable NTFS support
   boot.supportedFilesystems = [ "ntfs"  ];
-
-  # Enable nix-ld
-  programs.nix-ld.enable = true;
 
   # Enable libritd
   virtualisation.libvirtd.enable = true;
   programs.dconf.enable = true;
-
-  # Setup keyfile
-  boot.initrd.secrets = {
-    "/crypto_keyfile.bin" = null;
-  };
 
   # Enable networking
   networking.hostName = host.name;

@@ -22,11 +22,15 @@
   # Workplace compliance.
   workplace-compliance.enable = true;
 
+  # Development setup.
+  development = {
+    container.enable = true;
+    embedded.enable = true;
+    js.enable = true;
+  };
+
   # Enable NTFS support.
   boot.supportedFilesystems = [ "ntfs"  ];
-
-  # Enable nix-ld.
-  programs.nix-ld.enable = true;
 
   # Enable libritd.
   virtualisation.libvirtd.enable = true;
@@ -81,9 +85,7 @@
     extraGroups = [
       "networkmanager"
       "wheel"
-      "adbusers"
       "libvirtd"
-      "dialout"    # Non-root access to serial ports for embedded development
     ];
 
     packages = with pkgs; [
