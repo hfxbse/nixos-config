@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
@@ -18,7 +18,7 @@
   };
 
   # Configure keymap in X11
-  services.xserver.xkb = {
+  services.xserver.xkb = lib.mkIf config.desktop.enable {
     layout = "de";
     variant = "";
   };

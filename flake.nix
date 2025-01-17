@@ -22,7 +22,7 @@
       # Will fail due to infinit recursion otherwise
       nixvim.nixosModules.nixvim
       disko.nixosModules.disko
-      ./modules/gnome.nix
+      ./modules/desktop/desktop.nix
       ./modules/localization.nix
       ./modules/text-processing.nix
       ./modules/workplace-compliance.nix
