@@ -1,6 +1,9 @@
 # Laptop model: Lenovo Thinkpad P15 Gen 1
 
-{ config, pkgs, host, ... }:
+{ config, pkgs, ... }:
+let
+  user = config.user;
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -23,6 +26,10 @@
   };
 
   services.logind.lidSwitch = "lock";
+
+  # Setup user and machine naming.
+  networking.hostName = "nt-${user.name}";
+  user.name = "fhs";
 
   # Workplace compliance.
   workplaceCompliance = {
@@ -48,7 +55,7 @@
   programs.dconf.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.${host.user.name} = {
+  users.users.${user.name} = {
     isNormalUser = true;
     extraGroups = [
       "networkmanager"

@@ -1,7 +1,7 @@
-{ config, lib, pkgs, host, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.development;
-  username = host.user.name;
+  username = config.user.name;
 in
 {
   options.development = {

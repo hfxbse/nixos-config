@@ -1,4 +1,7 @@
-{ config, pkgs, host, ... }:
+{ config, pkgs, ... }:
+let
+  user = config.user;
+in
 {
   imports = [ ./hardware-configuration.nix ];
 
@@ -23,11 +26,17 @@
     cpuFreqGovernor = "schedutil";
   };
 
+  # Setup user and machine naming.
+  networking.hostName = "ice-cube";
+  user.name = "fxbse";
+
   # Desktop setup.
   desktop = {
     enable = true;
     login = "auto";   # No need to login againt to reach the desktop after LUKS decryption
   };
+
+  hardware.wooting.enable = true;
 
   # Development setup.
   development = {
@@ -41,7 +50,7 @@
   programs.dconf.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.${host.user.name} = {
+  users.users.${user.name} = {
     isNormalUser = true;
     extraGroups = [
       "networkmanager"

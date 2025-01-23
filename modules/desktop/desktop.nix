@@ -1,8 +1,7 @@
-{ config, host, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.desktop;
-  hostname = host.name;
-  username = host.user.name;
+  user = config.user;
 in
 {
   imports = [ ./gnome.nix ];
@@ -29,8 +28,12 @@ in
     };
   };
 
+  options.user.name = lib.mkOption {
+    description = "The username of the user of the maschine";
+    type = lib.types.str;
+  };
+
   config = lib.mkIf cfg.enable {
-    networking.hostName = lib.mkDefault hostname;
     networking.networkmanager.enable = lib.mkDefault true;
 
     # not to sure why this is done, but this is what the installer set up
@@ -52,12 +55,13 @@ in
     };
 
     services.libinput.enable = lib.mkDefault cfg.touchpad.enable;
+    users.groups.input.members = lib.optional config.hardware.wooting.enable user.name;
 
     services.printing.enable = true;
 
     # Enable automatic login for the user.
     services.displayManager.autoLogin.enable = cfg.login == "auto";
-    services.displayManager.autoLogin.user = lib.mkDefault username;
+    services.displayManager.autoLogin.user = lib.mkDefault user.name;
 
     boot.supportedFilesystems = [ "ntfs"  ];
     # Support mounting MTP devices
