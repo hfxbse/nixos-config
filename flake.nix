@@ -33,11 +33,11 @@
       nixvim.nixosModules.nixvim
       disko.nixosModules.disko
       ./modules/desktop/desktop.nix
+      ./modules/development.nix
       ./modules/localization.nix
+      ./modules/printing.nix
       ./modules/text-processing.nix
       ./modules/workplace-compliance.nix
-      ./modules/printing.nix
-      ./modules/development.nix
     ];
   in
   {

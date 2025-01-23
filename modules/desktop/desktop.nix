@@ -4,7 +4,11 @@ let
   user = config.user;
 in
 {
-  imports = [ ./gnome.nix ];
+  imports = [
+    ./gaming.nix
+    ./gnome.nix
+    ./multimedia.nix
+  ];
 
   options.desktop = {
     enable = lib.mkEnableOption "desktop environment";

@@ -36,6 +36,7 @@ in
     login = "auto";   # No need to login againt to reach the desktop after LUKS decryption
   };
 
+  # Setup peripherals.
   hardware.wooting.enable = true;
 
   # Development setup.
@@ -44,6 +45,13 @@ in
     embedded.enable = true;
     js.enable = true;
   };
+
+  # Setup multimedia tooling.
+  multimedia.enable = true;
+  multimedia.videoRecording.enable = true;
+
+  # Enable gaming.
+  gaming.enable = true;
 
   # Enable libritd
   virtualisation.libvirtd.enable = true;
@@ -59,25 +67,11 @@ in
     ];
 
     packages = with pkgs; [
-      spotify
-      gimp
       jetbrains.idea-ultimate
-      inkscape
       nodejs
-      vlc
       zotero
     ];
   };
-
-  # Enable Steam
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-  };
-
-  hardware.steam-hardware.enable = true;
-
 
   environment.systemPackages = with pkgs; [];
 
