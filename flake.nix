@@ -13,9 +13,14 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    cups-brother-hl3172cdw = {
+      url = "github:hfxbse/nixos-config?ref=derivation/cups-brother-hl3172cdw";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nixvim, disko }@attrs:
+  outputs = { self, cups-brother-hl3172cdw, disko, nixpkgs, nixvim }@attrs:
   let
     defaultModules = [
       # Nixvim needs to be an top level import
@@ -26,7 +31,7 @@
       ./modules/localization.nix
       ./modules/text-processing.nix
       ./modules/workplace-compliance.nix
-      ./modules/hardware/printers.nix
+      ./modules/printing.nix
       ./modules/hardware/Wooting/wootility.nix
       ./modules/development.nix
     ];
@@ -34,6 +39,7 @@
   {
     nixosConfigurations.home-pc = nixpkgs.lib.nixosSystem {
       specialArgs = with attrs; {
+        cups-brother-hl3172cdw = cups-brother-hl3172cdw.packages.x86_64-linux.default;
         host = {
           user.name = "fxbse";
           user.description = "Fabian Haas";
@@ -47,6 +53,7 @@
 
     nixosConfigurations.nt-laptop = nixpkgs.lib.nixosSystem {
       specialArgs = with attrs; {
+        cups-brother-hl3172cdw = cups-brother-hl3172cdw.packages.x86_64-linux.default;
         host = rec {
           user.name = "fhs";
           user.description = "Fabian Haas";

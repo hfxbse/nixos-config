@@ -53,11 +53,14 @@ in
 
     services.libinput.enable = lib.mkDefault cfg.touchpad.enable;
 
+    services.printing.enable = true;
+
     # Enable automatic login for the user.
     services.displayManager.autoLogin.enable = cfg.login == "auto";
     services.displayManager.autoLogin.user = lib.mkDefault username;
 
     boot.supportedFilesystems = [ "ntfs"  ];
+    # Support mounting MTP devices
     services.gvfs.enable = lib.mkDefault true;
 
     nixpkgs.config.allowUnfree = true;
