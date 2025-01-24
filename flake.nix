@@ -60,12 +60,7 @@
     };
 
     nixosConfigurations.iso = nixpkgs.lib.nixosSystem {
-      specialArgs = with attrs; {
-        # TODO add your WiFi credentials
-        # wifi.ssid
-        # wifi.psk
-      };
-
+      # Set wifi and ssh key via the setup options defined in the configuration file
       modules = [
        fullName
        nixvim.nixosModules.nixvim

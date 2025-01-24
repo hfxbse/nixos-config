@@ -1,45 +1,64 @@
-{ lib, pkgs, modulesPath, wifi, ... }:
+{ config, lib, modulesPath, pkgs, ... }:
 let
- keys = [
-    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZ+E9Z/v59BvCIy1araM9vc4NBPSCZn4KHNOCh6z1WmHiptIXmXh1yDXEXw3VmNC8wqzXkGjgDP4fph+W9yzOM3XPfndMa0kyYdC15qk8vP9qliYye0dB49z5zdo0xvkJR9/Z1amQNzH+RitwpSlwDZeQIDAoWYqWCkzQhyYY96NzbjLCoJ8QWXouPfMKPQ6sDqtNN2WUd5w8ISctj/892aEPOGovryjeJy3fB0d116Oe1R1FsAfMqw4o2meDjoiaoHGdN0E9cWWOclipTZInuGZiSprLT86hk8t5YsYQv/UDlbqh/2IcnKrD4dUpNqkCPxHH/ICEFzmaolcE0VyrV nixos"
- ];
- in
+  cfg = config.setup;
+  useSSH = cfg.authorizedKey != null;
+in
 {
   imports = [
     "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
   ];
 
-  hardware.cpu.intel.updateMicrocode = true;
+  options.setup = {
+    wifi.ssid = lib.mkOption {
+      description = "WiFi SSID used for setting up the device";
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+    };
 
-  console.keyMap = "de";
+    wifi.psk = lib.mkOption {
+      description = "WiFi password used for setting up the device";
+      type = lib.types.nullOr (lib.types.strMatching "[[:print:]]{8,63}");
+      default = null;
+    };
 
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-    settings.KbdInteractiveAuthentication = false;
-  };
-
-  users.users.nixos.openssh.authorizedKeys.keys = keys;
-  users.users.root.openssh.authorizedKeys.keys = keys;
-
-  networking.wireless = {
-    enable = true;
-    userControlled.enable = lib.mkForce false;
-
-    networks."${wifi.ssid}" = {
-      psk = wifi.psk;
+    authorizedKey = lib.mkOption {
+      description = "SSH key used for setting up the device";
+      type = lib.types.nullOr lib.types.str;
+      default = null;
     };
   };
 
-  powerManagement.enable = lib.mkForce false;
+  config = {
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  services.logind.lidSwitch = "ignore";
+    hardware.cpu.intel.updateMicrocode = true;
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+    console.keyMap = "de";
 
-  nixpkgs.hostPlatform = "x86_64-linux";
+    services.openssh = lib.mkIf useSSH {
+      enable = true;
+      settings.PasswordAuthentication = false;
+      settings.KbdInteractiveAuthentication = false;
+    };
 
-  environment.systemPackages = with pkgs; [
-    htop
-  ];
+    users.users.nixos.openssh.authorizedKeys.keys = lib.optional useSSH cfg.authorziedKey;
+    users.users.root.openssh.authorizedKeys.keys = lib.optional useSSH cfg.authorziedKey;
+
+    networking.wireless = lib.mkIf (cfg.wifi.ssid != null) {
+      enable = true;
+      userControlled.enable = lib.mkForce false;
+
+      networks."${cfg.wifi.ssid}" = {
+        psk = lib.mkif (cfg.wifi.psk != null) cfg.wifi.psk;
+      };
+    };
+
+    powerManagement.enable = lib.mkForce false;
+
+    services.logind.lidSwitch = "ignore";
+
+    nixpkgs.hostPlatform = "x86_64-linux";
+
+    environment.systemPackages = with pkgs; [ htop ];
+  };
 }

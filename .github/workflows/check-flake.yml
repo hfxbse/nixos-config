@@ -20,11 +20,5 @@ jobs:
       - uses: actions/checkout@v4
         name: "Checkout repository"
 
-      - run: sed -i 's/# wifi.ssid/wifi.ssid = "ssid";/g' flake.nix
-        name: "Set dummy Wi-Fi SSID"
-
-      - run: sed -i 's/# wifi.psk/wifi.psk = "password";/g' flake.nix
-        name: "Set dummy Wi-Fi password"
-
       - run: nix flake check
         name: "Check Flake"
