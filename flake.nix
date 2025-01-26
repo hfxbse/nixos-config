@@ -7,7 +7,10 @@
 
   outputs = { self, nixpkgs }:
   let
-    pkgs = nixpkgs.legacyPackages.x86_64-linux;
+    pkgs = import nixpkgs {
+      system = "x86_64-linux";
+      config.allowUnfree = true;
+    };
   in
   {
     packages.x86_64-linux.cups-brother-hl3172cdw = pkgs.callPackage (import ./cups-brother-hl3172cdw.nix) {};
