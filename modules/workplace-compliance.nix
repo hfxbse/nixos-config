@@ -35,15 +35,6 @@ in {
         cfg.ikev2.enable ||
         config.networking.networkmanager.enableStrongSwan
       ) "loose";
-
-      allowedTCPPorts = [
-        53      # DNS
-      ];
-
-      allowedUDPPorts = [
-        53      # DNS
-        67      # DHCP
-      ];
     };
   };
 }

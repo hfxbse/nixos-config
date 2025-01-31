@@ -40,6 +40,20 @@ in
   config = lib.mkIf cfg.enable {
     networking.networkmanager.enable = lib.mkDefault true;
 
+    # Allow sharing the network connection
+    networking.firewall = {
+      enable = true;
+
+      allowedTCPPorts = [
+        53      # DNS
+      ];
+
+      allowedUDPPorts = [
+        53      # DNS
+        67      # DHCP
+      ];
+    };
+
     # not to sure why this is done, but this is what the installer set up
     # settings from avahi-daemon.nix where mdns is replaced with mdns4
     services.avahi.nssmdns4 = false; # Use the settings from below
