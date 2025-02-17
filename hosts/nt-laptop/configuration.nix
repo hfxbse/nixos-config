@@ -48,6 +48,7 @@ in
     container.enable = true;
     embedded.enable = true;
     js.enable = true;
+
     vagrant.enable = true;
   };
 
