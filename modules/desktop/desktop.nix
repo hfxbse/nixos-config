@@ -42,7 +42,7 @@ in
 
     # Allow sharing the network connection
     networking.firewall = {
-      enable = true;
+      enable = lib.mkDefault true;
 
       allowedTCPPorts = [
         53      # DNS
