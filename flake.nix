@@ -18,9 +18,14 @@
       url = "github:hfxbse/nixos-config?ref=derivation/cups-brother-hl3172cdw";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    quick-template = {
+      url = "github:hfxbse/nixos-config?ref=derivation/quick-template";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, cups-brother-hl3172cdw, disko, nixpkgs, nixvim }@attrs:
+  outputs = { self, disko, nixpkgs, nixvim, ... }@attrs:
   let
     fullName = {
       user.fullName = "Fabian Haas";
@@ -44,6 +49,7 @@
     nixosConfigurations.home-pc = nixpkgs.lib.nixosSystem {
       specialArgs = with attrs; {
         cups-brother-hl3172cdw = cups-brother-hl3172cdw.packages.x86_64-linux.default;
+        quick-template = quick-template.packages.x86_64-linux.quick;
       };
 
       system = "x86_64-linux";
@@ -53,6 +59,7 @@
     nixosConfigurations.nt-laptop = nixpkgs.lib.nixosSystem {
       specialArgs = with attrs; {
         cups-brother-hl3172cdw = cups-brother-hl3172cdw.packages.x86_64-linux.default;
+        quick-template = quick-template.packages.x86_64-linux.quick;
       };
 
       system = "x86_64-linux";
