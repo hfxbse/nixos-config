@@ -1,0 +1,499 @@
+{
+  "packages": [
+    {
+      "url": "https://pub.dev/api/archives/_fe_analyzer_shared-74.0.0.tar.gz",
+      "hash": "sha256-B+LXMzGpolW56QqIuvQeitbKuHb6zsgS/VGtSG3VzUM=",
+      "name": "_fe_analyzer_shared-74.0.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/analyzer-6.9.0.tar.gz",
+      "hash": "sha256-oHTsbv/Nf0Xikf8PaSpCt7JiJWpFF5KGSe+gUnDJek0=",
+      "name": "analyzer-6.9.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/archive-3.6.1.tar.gz",
+      "hash": "sha256-h4BBEEnEFvBWrFvp5h5v70TSfqh/buhE7VaF1Ne/v0I=",
+      "name": "archive-3.6.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/args-2.5.0.tar.gz",
+      "hash": "sha256-Uzp9hderVMHIDBZ5gCG4dVIkHsgBV2PGgbtBPAO2tK0=",
+      "name": "args-2.5.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/async-2.11.0.tar.gz",
+      "hash": "sha256-eLywxSVHXOUAhRQmEiKE8pedZn7QoIAMr4KVK5Xcz0E=",
+      "name": "async-2.11.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/boolean_selector-2.1.1.tar.gz",
+      "hash": "sha256-ss5AkGvn3FbgnbxNaTg83nWZt0uf9pB0wgktKA5AuEM=",
+      "name": "boolean_selector-2.1.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/browser_launcher-1.1.2.tar.gz",
+      "hash": "sha256-sVQs4hzubRbzyOln+HFUfUufHnIfa5g5CMUzwMT149U=",
+      "name": "browser_launcher-1.1.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/built_collection-5.1.1.tar.gz",
+      "hash": "sha256-Y0MwWbb4Xe/9f3t054YeFKCSGbFjQxsSJwgLkjtUEi8=",
+      "name": "built_collection-5.1.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/built_value-8.9.2.tar.gz",
+      "hash": "sha256-Gq2jGlNn4vseyVDRiLGm1VeippuE2qDguQ8g7VsEGkI=",
+      "name": "built_value-8.9.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/characters-1.3.0.tar.gz",
+      "hash": "sha256-x+skbE8quZkzWWNhRWSqC+w6vfuk4NhDw17smvgU9Cs=",
+      "name": "characters-1.3.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/cli_config-0.2.0.tar.gz",
+      "hash": "sha256-iX089SSeXojCoXHqYdRcE8RNYl95sNqTbSYko2jAZiE=",
+      "name": "cli_config-0.2.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/clock-1.1.1.tar.gz",
+      "hash": "sha256-E56htbnn1g1h2rT5mCOZrDqThy+0rA0ET7yZdVq9Nfw=",
+      "name": "clock-1.1.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/collection-1.19.0.tar.gz",
+      "hash": "sha256-1eYQ16bqmb6kp2jmxuG4SoypXoHcNfDIhDX8CQrXCfo=",
+      "name": "collection-1.19.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/completion-1.0.1.tar.gz",
+      "hash": "sha256-Fb5pfv1y7xIyntdDpfEqNtgumjg0Jup2qKXorLHjhxE=",
+      "name": "completion-1.0.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/convert-3.1.1.tar.gz",
+      "hash": "sha256-MTMzkWNa1Cxb8ZMSnXHkj0qPGxI3pGliGCzQMeWLuik=",
+      "name": "convert-3.1.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/coverage-1.9.2.tar.gz",
+      "hash": "sha256-KT817vKcXzmt9EdafCEvODTGdettCd0gXFSbqZBOTl8=",
+      "name": "coverage-1.9.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/crypto-3.0.5.tar.gz",
+      "hash": "sha256-FCtTIHZsWMXQjWntiyySPrODdePzLjBQP03E1DW017w=",
+      "name": "crypto-3.0.5"
+    },
+    {
+      "url": "https://pub.dev/api/archives/csslib-1.0.0.tar.gz",
+      "hash": "sha256-0Ge08ME+Nj8Bno+bTCnKDeJ/FLxDbEVVMul/4MtLpGg=",
+      "name": "csslib-1.0.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/dap-1.3.0.tar.gz",
+      "hash": "sha256-zzo9YBKKcdf9H6vQdgqwL66LeZaJcJqcbQAQXO0Z8+U=",
+      "name": "dap-1.3.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/dds-4.2.7.tar.gz",
+      "hash": "sha256-xoDVjcRUjXR4s/f5ZAgFnE5ecvUHxksmBon9KYKo0eU=",
+      "name": "dds-4.2.7"
+    },
+    {
+      "url": "https://pub.dev/api/archives/dds_service_extensions-2.0.0.tar.gz",
+      "hash": "sha256-F8K+9iFIWyXAq41r1PNQZlIfb+owm66Ak5nD1A/YQAI=",
+      "name": "dds_service_extensions-2.0.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/devtools_shared-10.0.2.tar.gz",
+      "hash": "sha256-Pv9jIa5k/H32YBMV3pTk7HbJ7Vj1so5D/1hNN1VonyQ=",
+      "name": "devtools_shared-10.0.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/dtd-2.3.0.tar.gz",
+      "hash": "sha256-UfQ1//EQPJ+SYlRIw1cY1AI8L6KiobBgWtR83OHHs6E=",
+      "name": "dtd-2.3.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/dwds-24.1.0.tar.gz",
+      "hash": "sha256-90KfkTiSIa0v0y5paCKYZ0u1yNkzRZuTrrLzuXIyRDk=",
+      "name": "dwds-24.1.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/extension_discovery-2.1.0.tar.gz",
+      "hash": "sha256-ZWDkPVV13WZyA5zHnxuK/sPsELfqfnH7fT7ymM96eQ8=",
+      "name": "extension_discovery-2.1.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/fake_async-1.3.1.tar.gz",
+      "hash": "sha256-81x+qGk/dABb+Goceo5oD0DLwUc6YAcx0Pa4I2vj2nc=",
+      "name": "fake_async-1.3.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/ffi-2.1.3.tar.gz",
+      "hash": "sha256-CTcMeumG7ojr+Ah4gRt1twK89VR9A4Xq4XbMExq9kac=",
+      "name": "ffi-2.1.3"
+    },
+    {
+      "url": "https://pub.dev/api/archives/file-7.0.0.tar.gz",
+      "hash": "sha256-GvxS42x7em5wwmwhBiQwRMSdsD1eOZiX52EGFFSoCug=",
+      "name": "file-7.0.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/fixnum-1.1.0.tar.gz",
+      "hash": "sha256-52tVWIqA7YkmSuQsIYUDcqsg3QQZnB5cvw1pH4j8GVs=",
+      "name": "fixnum-1.1.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/flutter_template_images-4.2.0.tar.gz",
+      "hash": "sha256-BHCqfx+RLo5tEVUoz88g4J5sNbsQZW8mubGjK6mDKK0=",
+      "name": "flutter_template_images-4.2.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/frontend_server_client-4.0.0.tar.gz",
+      "hash": "sha256-0kNwkjSLRSTM+7vvxdsaTXemGnsawY+hgAXpCowltg8=",
+      "name": "frontend_server_client-4.0.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/glob-2.1.2.tar.gz",
+      "hash": "sha256-suOY+Ov5HB8EfQJnucErD9mFXrTczGqGqvOj/tVYyjk=",
+      "name": "glob-2.1.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/graphs-2.3.2.tar.gz",
+      "hash": "sha256-zYk1iLbuIXgKDJFB1ZAY/zHNVVSBWThza8SOxpYqIMc=",
+      "name": "graphs-2.3.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/html-0.15.4.tar.gz",
+      "hash": "sha256-IXdLBEzutf2oOADYZN83gr4Hd4RYs0U06cnpQW/F72g=",
+      "name": "html-0.15.4"
+    },
+    {
+      "url": "https://pub.dev/api/archives/http-1.2.2.tar.gz",
+      "hash": "sha256-vNTb7CBFrdaStc5sf+CzwW8q3k2xrZmSqxM6UeOdfC8=",
+      "name": "http-1.2.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/http_multi_server-3.2.1.tar.gz",
+      "hash": "sha256-FO92DhiquRcsSx46BxPhk5wEc0EaHw3FgkoW9AmorP0=",
+      "name": "http_multi_server-3.2.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/http_parser-4.1.0.tar.gz",
+      "hash": "sha256-2SC/cbc/4EJQILraNzBAc4ithihpiUbkONGCWXWBqIM=",
+      "name": "http_parser-4.1.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/intl-0.19.0.tar.gz",
+      "hash": "sha256-+sJpyv/ocv21Iq8EI7zgEjNzfNtZsxL644KNDylQSns=",
+      "name": "intl-0.19.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/io-1.0.4.tar.gz",
+      "hash": "sha256-pAGG+Cjv8aX5OdmWS2Y7c9y8JhjhlhpypW8bwTNoM4A=",
+      "name": "io-1.0.4"
+    },
+    {
+      "url": "https://pub.dev/api/archives/js-0.7.1.tar.gz",
+      "hash": "sha256-xzjxAecnV4Ed0CyqBIgEJIvlDqv9pXM8KxTWG9muU6k=",
+      "name": "js-0.7.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/json_rpc_2-3.0.2.tar.gz",
+      "hash": "sha256-VDDpPWFIfaXreSgvmeAKP41AhHBquatUowUzf6XqhPE=",
+      "name": "json_rpc_2-3.0.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/leak_tracker-10.0.7.tar.gz",
+      "hash": "sha256-WVQDvxGdshNSwCSAXYsMPqdTlottAxf0vjbVaTQ+Wug=",
+      "name": "leak_tracker-10.0.7"
+    },
+    {
+      "url": "https://pub.dev/api/archives/leak_tracker_flutter_testing-3.0.8.tar.gz",
+      "hash": "sha256-FoGUQ3VksFimTq8Nu/MsVfGG1UB9eaQMaFFI2yzx5BY=",
+      "name": "leak_tracker_flutter_testing-3.0.8"
+    },
+    {
+      "url": "https://pub.dev/api/archives/leak_tracker_testing-3.0.1.tar.gz",
+      "hash": "sha256-bjAQwskSlatPwI2w3r1Di9fFWk8aDEDZGoIoMHs3REs=",
+      "name": "leak_tracker_testing-3.0.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/logging-1.2.0.tar.gz",
+      "hash": "sha256-7zCPLzr5RGewRvAkG9P0xvhXvSu+umZFumBkY7R0kIg=",
+      "name": "logging-1.2.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/macros-0.1.3-main.0.tar.gz",
+      "hash": "sha256-boKCDMnzVMXLkSrko0x0prUvOVsbhZWU7oiIZjL5czs=",
+      "name": "macros-0.1.3-main.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/matcher-0.12.16+1.tar.gz",
+      "hash": "sha256-w6I4tHoyRsZoqD+0WNaokqaykEMoMfuAveHjUCM4Z7Y=",
+      "name": "matcher-0.12.16+1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/material_color_utilities-0.11.1.tar.gz",
+      "hash": "sha256-oo/FrOcgjt+CFsxrprGcDCfCw2AgVRN1Ym4MRAkMqls=",
+      "name": "material_color_utilities-0.11.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/meta-1.15.0.tar.gz",
+      "hash": "sha256-4ZcZdOVzWxdlt8y5HJ4PGR1KM8llDBxDCxrWvwPtFpc=",
+      "name": "meta-1.15.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/mime-1.0.6.tar.gz",
+      "hash": "sha256-YK5PTcakpHf8Z+ESPEZqPC5k2lJledQIHBJtwuxtOFY=",
+      "name": "mime-1.0.6"
+    },
+    {
+      "url": "https://pub.dev/api/archives/multicast_dns-0.3.2+7.tar.gz",
+      "hash": "sha256-W/k33wvApdjnMgOW29LbYKh58EX/ED3+CcZPs8mwN8w=",
+      "name": "multicast_dns-0.3.2+7"
+    },
+    {
+      "url": "https://pub.dev/api/archives/mustache_template-2.0.0.tar.gz",
+      "hash": "sha256-n0kx+jGLq++Ntcj/MBqJIinT0hi7IQtkOx4tpSzrhDY=",
+      "name": "mustache_template-2.0.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/native_assets_builder-0.8.3.tar.gz",
+      "hash": "sha256-2kzHouiMZs0oXYW3T6HN9yhvfG6CXGEmks+/RFSBRcM=",
+      "name": "native_assets_builder-0.8.3"
+    },
+    {
+      "url": "https://pub.dev/api/archives/native_assets_cli-0.8.0.tar.gz",
+      "hash": "sha256-V9UKjW5IcZUajvI7ht8z+iKw1saH8QEHfnYn3DK5vhU=",
+      "name": "native_assets_cli-0.8.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/native_stack_traces-0.6.0.tar.gz",
+      "hash": "sha256-ZCvxbT+1yJZ7NqfW7n2NNxokMmfxKQSaGZVnlNqdXJE=",
+      "name": "native_stack_traces-0.6.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/node_preamble-2.0.2.tar.gz",
+      "hash": "sha256-CHpoaxGsgzabWmC4gdnX4X2tx7Kr073VxBWrlM15Uok=",
+      "name": "node_preamble-2.0.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/package_config-2.1.0.tar.gz",
+      "hash": "sha256-7K6jYIDvUAAxBn0OYGWIgc8rXoa6uELkJ2T4xUgElLQ=",
+      "name": "package_config-2.1.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/path-1.9.0.tar.gz",
+      "hash": "sha256-vxQp7jhZL4YmjKuLYEEEhSvejPbuUx5P8rdnrEl9AEY=",
+      "name": "path-1.9.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/petitparser-6.0.2.tar.gz",
+      "hash": "sha256-2E2SWhDS6JnpYokLx8DlVACGZrA9vC5tU5YDP3qM+ys=",
+      "name": "petitparser-6.0.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/platform-3.1.5.tar.gz",
+      "hash": "sha256-RhVWWZt2Tr6+vbN3mVFvZF3Stx54GpSvOOx+hINQpTI=",
+      "name": "platform-3.1.5"
+    },
+    {
+      "url": "https://pub.dev/api/archives/pool-1.5.1.tar.gz",
+      "hash": "sha256-pIPCxqew4gYr1+QnLN7MCR/1+6Hlhgy9GvtrCQ3Rv3I=",
+      "name": "pool-1.5.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/process-5.0.2.tar.gz",
+      "hash": "sha256-2ZEHROMBktLGf6a91BMPl1+T83/1DV/9IrtlWaAMIdQ=",
+      "name": "process-5.0.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/pub_semver-2.1.4.tar.gz",
+      "hash": "sha256-4aflPK2VlGw1cm4kG/hGKgu6Cb3hVBSqXDf2zMJ37HI=",
+      "name": "pub_semver-2.1.4"
+    },
+    {
+      "url": "https://pub.dev/api/archives/shelf-1.4.2.tar.gz",
+      "hash": "sha256-MQIOEL/CTqB5U+O4yRXsgVkFcysIBcPyVdHmVu+P3Os=",
+      "name": "shelf-1.4.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/shelf_packages_handler-3.0.2.tar.gz",
+      "hash": "sha256-Pex6Bz/Xth7nzNiqzBH+uO5LiamCLH9sB1kl56wgGsE=",
+      "name": "shelf_packages_handler-3.0.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/shelf_proxy-1.0.4.tar.gz",
+      "hash": "sha256-7vltAwXpw2sgqVeGj+XK5xM31atAqCDLGbgrqKIC96k=",
+      "name": "shelf_proxy-1.0.4"
+    },
+    {
+      "url": "https://pub.dev/api/archives/shelf_static-1.1.3.tar.gz",
+      "hash": "sha256-Mei4Mudl/dMrHfdOsNSARiWl8toL+7LzxN8HLM36+gI=",
+      "name": "shelf_static-1.1.3"
+    },
+    {
+      "url": "https://pub.dev/api/archives/shelf_web_socket-2.0.0.tar.gz",
+      "hash": "sha256-H4gLLbP/aFy3K+9oEv5SwUt2RFze0GqdSnmOlz3jREw=",
+      "name": "shelf_web_socket-2.0.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/source_map_stack_trace-2.1.2.tar.gz",
+      "hash": "sha256-u5wdem+RwjbIqNMEDWe/Ahs+aGZN2wQ22OKEdMuYfhU=",
+      "name": "source_map_stack_trace-2.1.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/source_maps-0.10.12.tar.gz",
+      "hash": "sha256-R3GdQ5NiYoyofmUFo0t/W8fZnMtQ/sOb7E8FoKZjlAA=",
+      "name": "source_maps-0.10.12"
+    },
+    {
+      "url": "https://pub.dev/api/archives/source_span-1.10.0.tar.gz",
+      "hash": "sha256-hrQMdTPCRAS8kRkfTglBvnqYX7YYfubIpRqyQo+zy9s=",
+      "name": "source_span-1.10.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/sprintf-7.0.0.tar.gz",
+      "hash": "sha256-VRtsm8kMIFuuWCtFO5rwLsTir7wcv9eXzsne/kMTZK4=",
+      "name": "sprintf-7.0.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/sse-4.1.6.tar.gz",
+      "hash": "sha256-QClmB5u+O5IdSk8LZfNICBcsv58wcqmcolCePtpKjWo=",
+      "name": "sse-4.1.6"
+    },
+    {
+      "url": "https://pub.dev/api/archives/stack_trace-1.12.0.tar.gz",
+      "hash": "sha256-B6+ClT27HE+uIaspC7leyLVjnK29fNXeUsDhzFfn6nM=",
+      "name": "stack_trace-1.12.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/standard_message_codec-0.0.1+4.tar.gz",
+      "hash": "sha256-CJtY4ghjvCs1KPJizUggt1BpXF3At9otozBegHQ3Q6A=",
+      "name": "standard_message_codec-0.0.1+4"
+    },
+    {
+      "url": "https://pub.dev/api/archives/stream_channel-2.1.2.tar.gz",
+      "hash": "sha256-GtWl+lk6T7wCl/Soi/BxY0ec9FszTxSQsfYxzb7hNFs=",
+      "name": "stream_channel-2.1.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/string_scanner-1.3.0.tar.gz",
+      "hash": "sha256-hTmxpbo4E9l9y1jTdFVgcKMpqsuTrHGHGal1reZL+QM=",
+      "name": "string_scanner-1.3.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/sync_http-0.3.1.tar.gz",
+      "hash": "sha256-sRn+RjEOVjd79sudKyVuI4rYUHwyEEGYscxWbadr3Is=",
+      "name": "sync_http-0.3.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/term_glyph-1.2.1.tar.gz",
+      "hash": "sha256-CXbKc4omicY/DeJxI+Fu3Zdy/QDnViW7BpoypvrVFvU=",
+      "name": "term_glyph-1.2.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/test-1.25.8.tar.gz",
+      "hash": "sha256-chqKQYF/RrlNkFFkBV9noMOKS5FaEw5U4lheMcn5Mz4=",
+      "name": "test-1.25.8"
+    },
+    {
+      "url": "https://pub.dev/api/archives/test_api-0.7.3.tar.gz",
+      "hash": "sha256-qWn/kXmbWbQVqQLE758XrLqtLoIwbrAh439HxEY4+MY=",
+      "name": "test_api-0.7.3"
+    },
+    {
+      "url": "https://pub.dev/api/archives/test_core-0.6.5.tar.gz",
+      "hash": "sha256-jyJcQp8H+bCG6DPpeh2vIDX2NsNw1Acmt/YJMBZiHDE=",
+      "name": "test_core-0.6.5"
+    },
+    {
+      "url": "https://pub.dev/api/archives/typed_data-1.3.2.tar.gz",
+      "hash": "sha256-gXYt5ifLxiavyNpCqN+GgiTPTzkwGazwRPm6LQp7z2A=",
+      "name": "typed_data-1.3.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/unified_analytics-6.1.4.tar.gz",
+      "hash": "sha256-BBUtoklNjYNNFrBrGqjU0FUefpreu1iOxvw7eqLlkPo=",
+      "name": "unified_analytics-6.1.4"
+    },
+    {
+      "url": "https://pub.dev/api/archives/usage-4.1.1.tar.gz",
+      "hash": "sha256-VLc0G8ZwqHTOmasVBuqB5MLQNvPZD1A6Ut+5/1oPYUQ=",
+      "name": "usage-4.1.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/uuid-4.5.1.tar.gz",
+      "hash": "sha256-EabXpaYZCYxJXNNyV1V5khQPcHdZRL4EnxPGLWIrmYA=",
+      "name": "uuid-4.5.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/vector_math-2.1.4.tar.gz",
+      "hash": "sha256-vtJJ/iWguKy+y2cL4zuNEhFpock5lzD6mxDWAGKjd+Y=",
+      "name": "vector_math-2.1.4"
+    },
+    {
+      "url": "https://pub.dev/api/archives/vm_service-14.3.0.tar.gz",
+      "hash": "sha256-MT6fHF+Lwo2KEB/U/yxzygmOcd5kpVVq1ZiRZ0vkq8w=",
+      "name": "vm_service-14.3.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/vm_service_interface-1.1.0.tar.gz",
+      "hash": "sha256-O3/hpxbLyOHn+Ld8V0xQn4bHa4WfZvgY99C5tpApI34=",
+      "name": "vm_service_interface-1.1.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/vm_snapshot_analysis-0.7.6.tar.gz",
+      "hash": "sha256-kPXxsynK8XLOehuJLJAkkNTBdWW2l1zYkNdRxETBucU=",
+      "name": "vm_snapshot_analysis-0.7.6"
+    },
+    {
+      "url": "https://pub.dev/api/archives/watcher-1.1.0.tar.gz",
+      "hash": "sha256-uq3RA6ssEkFWPw9eT8KMJaXNbRwE+Vz0PWTTtJSnzkg=",
+      "name": "watcher-1.1.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/web-1.1.0.tar.gz",
+      "hash": "sha256-eNthllVXtUOxJUht4KKIp/ZbqQMlaXFqClv20M2afo4=",
+      "name": "web-1.1.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/web_socket-0.1.6.tar.gz",
+      "hash": "sha256-Vzl/sFrzBsP0VDzrUdlEVsTS6pA019cuO/ZvlXm/S4c=",
+      "name": "web_socket-0.1.6"
+    },
+    {
+      "url": "https://pub.dev/api/archives/web_socket_channel-3.0.1.tar.gz",
+      "hash": "sha256-PPd0hSxd50qPSEtPmZ6stzX+/sZd3zj/b6xcQDDidYY=",
+      "name": "web_socket_channel-3.0.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/webdriver-3.0.4.tar.gz",
+      "hash": "sha256-a7fMfHECIKHY5Cc0J9FQPCaDHTZlRjsRmudrNcBhxd4=",
+      "name": "webdriver-3.0.4"
+    },
+    {
+      "url": "https://pub.dev/api/archives/webkit_inspection_protocol-1.2.1.tar.gz",
+      "hash": "sha256-snRxYVDcx47eFLn14BAOzVD6gnpFB5HsngxLcSxX0ac=",
+      "name": "webkit_inspection_protocol-1.2.1"
+    },
+    {
+      "url": "https://pub.dev/api/archives/xml-6.5.0.tar.gz",
+      "hash": "sha256-qJLnoG1Z69OAsx36iHO6wiCgsEKKPbB5Irl/QneIxRE=",
+      "name": "xml-6.5.0"
+    },
+    {
+      "url": "https://pub.dev/api/archives/yaml-3.1.2.tar.gz",
+      "hash": "sha256-ql2g6rLCdCo+4fwHfT03K1nvV/dRff0+wjTDZX1LkCs=",
+      "name": "yaml-3.1.2"
+    },
+    {
+      "url": "https://pub.dev/api/archives/yaml_edit-2.2.1.tar.gz",
+      "hash": "sha256-Uf9HIa31XA0f8JCpTgk1aOH4a0pBRShe6yKEjVV9l9g=",
+      "name": "yaml_edit-2.2.1"
+    }
+  ]
+}
