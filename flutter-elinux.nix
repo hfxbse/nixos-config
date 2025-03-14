@@ -1,6 +1,5 @@
 {
   fetchFromGitHub,
-  fetchurl,
   fetchzip,
   flutter327,
   lib,
@@ -12,8 +11,9 @@ let
   version = "3.27.1";
 
   flutter = flutter327;
-  engineArtifactHash = "cb4b5fff73";
-  engineArtifactBaseUrl = "https://github.com/sony/flutter-embedded-linux/releases/download/${engineArtifactHash}";
+  engineArtifactShortHash = "cb4b5fff73";
+  engineArtifactHash = "cb4b5fff73850b2e42bd4de7cb9a4310a78ac40d";
+  engineArtifactBaseUrl = "https://github.com/sony/flutter-embedded-linux/releases/download/${engineArtifactShortHash}";
 in
 stdenv.mkDerivation {
   inherit pname;
@@ -27,40 +27,47 @@ stdenv.mkDerivation {
       tag = version;
       hash = "sha256-4gnrFvRu40Q9ejDwkcaunTTw77jpxP8NzSmszDjex+g=";
     })
-    (fetchFromGitHub {
-      name = "flutter";
-      owner = "flutter";
-      repo = "flutter";
-      tag = version;
-      hash = "sha256-WK6Ecaxs2MAlqOyKDPfXg1d4mqyAi7NZ/lFdMZwqkzQ=";
-    })
-    (fetchurl {
+    (fetchzip {
       url = "${engineArtifactBaseUrl}/elinux-arm64-debug.zip";
-      hash = "sha256-C9KCA2iQ9CEAIRJN2fGf21Nu5oy+7ekt+eAiPfO6s1M=";
+      hash = "sha256-M0IcOoeVtVb02Lx6YVhV4eLhHgc1XEZs1mGNrUr77Ew=";
+      stripRoot = false;
+      name = "elinux-arm64-debug";
     })
-    (fetchurl {
+    (fetchzip {
       url = "${engineArtifactBaseUrl}/elinux-arm64-profile.zip";
-      hash = "sha256-tAtnmtd+7N1OifVArweuA4SEg1WHyPmfyEMTF+wT9ZY=";
+      hash = "sha256-awxmWQ83Sb5b8/djfcJUhMXaLCWdU04Vp/nuPr0jwJk=";
+      stripRoot = false;
+      name = "elinux-arm64-profile";
     })
-    (fetchurl {
+    (fetchzip {
       url = "${engineArtifactBaseUrl}/elinux-arm64-release.zip";
-      hash = "sha256-qoqfQVPhnrDryYXa0fGwvcrm1u2wnTHWNIrTt8GknPo=";
+      hash = "sha256-yvzV0Bf4QxFLfZvTaONn9q4GQmRRW8GLNtwEjqGeMWg=";
+      stripRoot = false;
+      name = "elinux-arm64-release";
     })
-    (fetchurl {
+    (fetchzip {
       url = "${engineArtifactBaseUrl}/elinux-common.zip";
-      hash = "sha256-ogR0W6cU8gzHni6dYqRA9+lS1xG14AnY8QDjAwSyP6g=";
+      hash = "sha256-KmRa8bdEXoK3PIjYxpEe5IyIXcmjRF55FFjVpXad92I=";
+      stripRoot = false;
+      name = "elinux-common";
     })
-    (fetchurl {
+    (fetchzip {
       url = "${engineArtifactBaseUrl}/elinux-x64-debug.zip";
-      hash = "sha256-TfGzsAiK9czbgGU1LSzSKOhonJAUl2CZo6MyOhus6VY=";
+      hash = "sha256-Eqe97gZ3LAwKaBjltC7vFduYKDuhu50BjNyj/xuGoO0=";
+      stripRoot = false;
+      name = "elinux-x64-debug";
     })
-    (fetchurl {
+    (fetchzip {
       url = "${engineArtifactBaseUrl}/elinux-x64-profile.zip";
-      hash = "sha256-ycM4Ix2h8mRGjaddJMaIWRFqk6+NuKstHw4Gn7XVgYQ=";
+      hash = "sha256-wlRvyucuFACR903/NzkqS9DFGng5LlK5sf3PCpKCQYE=";
+      stripRoot = false;
+      name = "elinux-x64-profile";
     })
-    (fetchurl {
+    (fetchzip {
       url = "${engineArtifactBaseUrl}/elinux-x64-release.zip";
-      hash = "sha256-Je/jqnsnZ2xZoreEtH50DNPspCrdDh0322bp29ZZKZs=";
+      hash = "sha256-oPtu0/XlrScPoppGzXuitDREEm8ldeCcCEFm9JcRXVM=";
+      stripRoot = false;
+      name = "elinux-x64-release";
     })
   ] ++ (map ( {url, hash, name, ...}: fetchzip {
     inherit url;
@@ -78,11 +85,11 @@ stdenv.mkDerivation {
     done;
 
     chmod -R 755 .
-    mv flutter flutter-elinux/
+    ln -s ${flutter} flutter-elinux/flutter;
     mkdir flutter-elinux/.dart_tool
 
     mkdir engine-artifacts;
-    mv *.zip engine-artifacts;
+    mv elinux* engine-artifacts;
 
     PACKAGE_TARGET=".pub-cache/hosted/pub.dev"
     mkdir -p "$PACKAGE_TARGET";
@@ -102,12 +109,12 @@ stdenv.mkDerivation {
 
     export PUB_CACHE="../.pub-cache"
     export XDG_CONFIG_HOME=../.config;
-    export ELINUX_ENGINE_BASE_LOCAL_DIRECTORY=../engine-artifacts;
     flutter config --no-cli-animations --no-analytics;
     flutter pub get --no-precompile --offline;
     mkdir -p bin/cache/;
     dart --disable-dart-dev \
          --no-enable-mirrors \
+         --define=NIX_FLUTTER_HOST_PLATFORM=${stdenv.hostPlatform.system} \
          --snapshot="bin/cache/flutter-elinux.snapshot" \
          --packages=".dart_tool/package_config.json" \
          "bin/flutter_elinux.dart";
@@ -116,12 +123,40 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    target="$out/opt/flutter-elinux"
+
     mkdir -p $out/opt $out/bin;
     mv flutter-elinux $out/opt;
-    mkdir -p $out/opt/flutter-elinux/flutter/bin/cache;
+
+    rm $target/flutter;
+    mkdir $target/flutter;
+    ln -s ${flutter}/* $target/flutter/;
+
+    rm $target/flutter/bin;
+    mkdir $target/flutter/bin;
+    ln -s ${flutter}/bin/* $target/flutter/bin/;
+
+    rm $target/flutter/bin/cache;
+    mkdir $target/flutter/bin/cache;
+    ln -s ${flutter}/bin/cache/* $target/flutter/bin/cache/;
+
+    rm $target/flutter/bin/cache/artifacts;
+    mkdir $target/flutter/bin/cache/artifacts;
+    ln -s ${flutter}/bin/cache/artifacts/* \
+          $target/flutter/bin/cache/artifacts;
+
+    rm $target/flutter/bin/cache/artifacts/engine;
+    mkdir $target/flutter/bin/cache/artifacts/engine;
+    ln -s ${flutter}/bin/cache/artifacts/engine/* \
+          $target/flutter/bin/cache/artifacts/engine;
+
+    mv engine-artifacts/* $target/flutter/bin/cache/artifacts/engine/;
+
+    echo "${engineArtifactHash}" > "$target/flutter/bin/cache/elinux-sdk.stamp";
 
     makeWrapper ${flutter}/bin/dart $out/bin/flutter-elinux \
       --add-flags "--disable-dart-dev" \
+      --add-flags "--define=NIX_FLUTTER_HOST_PLATFORM=${stdenv.hostPlatform.system}" \
       --add-flags "--packages=$out/opt/flutter-elinux/.dart_tool/package_config.json" \
       --add-flags "$out/opt/flutter-elinux/bin/cache/flutter-elinux.snapshot"
   '';
