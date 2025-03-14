@@ -1,10 +1,14 @@
 {
+  clang,
+  cmake,
   fetchFromGitHub,
   fetchzip,
   flutter327,
   lib,
   makeWrapper,
-  stdenv
+  ninja,
+  pkg-config,
+  stdenv,
 }:
 let
   pname = "flutter-elinux";
@@ -14,6 +18,14 @@ let
   engineArtifactShortHash = "cb4b5fff73";
   engineArtifactHash = "cb4b5fff73850b2e42bd4de7cb9a4310a78ac40d";
   engineArtifactBaseUrl = "https://github.com/sony/flutter-embedded-linux/releases/download/${engineArtifactShortHash}";
+
+  buildTools = [
+    clang
+    cmake
+    flutter
+    ninja
+    pkg-config
+  ];
 in
 stdenv.mkDerivation {
   inherit pname;
@@ -76,6 +88,8 @@ stdenv.mkDerivation {
     stripRoot = false;
   } ) ( builtins.fromJSON ( builtins.readFile ./package-sources.json ) ).packages );
 
+  patches = [ ./disable-precaching.patch ];
+
   sourceRoot = ".";
   unpackPhase = ''
     for src in $srcs; do
@@ -97,7 +111,6 @@ stdenv.mkDerivation {
     mv "$PACKAGE_TARGET/flutter-elinux" "$PACKAGE_TARGET/engine-artifacts" .
   '';
 
-  buildInputs = [ flutter ];
   nativeBuildInputs = [
     flutter
     makeWrapper
@@ -155,6 +168,8 @@ stdenv.mkDerivation {
     echo "${engineArtifactHash}" > "$target/flutter/bin/cache/elinux-sdk.stamp";
 
     makeWrapper ${flutter}/bin/dart $out/bin/flutter-elinux \
+      --suffix PATH : "${lib.makeBinPath (buildTools)}" \
+      --prefix "FLUTTER_ALREADY_LOCKED=true" \
       --add-flags "--disable-dart-dev" \
       --add-flags "--define=NIX_FLUTTER_HOST_PLATFORM=${stdenv.hostPlatform.system}" \
       --add-flags "--packages=$out/opt/flutter-elinux/.dart_tool/package_config.json" \
