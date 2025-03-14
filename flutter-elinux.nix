@@ -12,6 +12,7 @@
   glib,
   gnumake,
   gdm,
+  gitMinimal,
   gtk3,
   harfbuzz,
   lib,
@@ -27,18 +28,24 @@
   ninja,
   pango,
   pkg-config,
+  runCommand,
   stdenv,
   xorgproto,
   wayland,
+  which,
   zlib
 }:
 let
   pname = "flutter-elinux";
   version = "3.27.1";
 
-  flutter = flutter327;
+  flutter = flutter327.wrapFlutter (flutter327.mkFlutter ({
+      patches = flutter327.unwrapped.patches;
+      enginePatches = flutter327.engine.unwrapped.patches;
+    } // (lib.importJSON ./flutter-version.json))
+  );
+
   engineArtifactShortHash = "cb4b5fff73";
-  engineArtifactHash = "cb4b5fff73850b2e42bd4de7cb9a4310a78ac40d";
   engineArtifactBaseUrl = "https://github.com/sony/flutter-embedded-linux/releases/download/${engineArtifactShortHash}";
 
   buildTools = [
@@ -184,11 +191,13 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     autoPatchelfHook
     flutter
+    gitMinimal
     libdrm
     libinput
     libxkbcommon
     makeWrapper
     mesa
+    which
   ] ++ appRuntimeDeps;
   autoPatchelfIgnoreMissingDeps = [ "libflutter_elinux*" ];
 
@@ -260,7 +269,6 @@ stdenv.mkDerivation {
     unlinkFlutter bin/cache/artifacts;
     unlinkFlutter bin/cache/artifacts/engine;
     mv engine-artifacts/* $target/flutter/bin/cache/artifacts/engine/;
-    echo "${engineArtifactHash}" > "$target/flutter/bin/cache/elinux-sdk.stamp";
 
     unlinkFlutter packages;
     unlinkFlutter packages/flutter_tools;
