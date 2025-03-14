@@ -1,14 +1,29 @@
 {
+  atk,
+  cairo,
   clang,
   cmake,
   fetchFromGitHub,
   fetchzip,
   flutter327,
+  fontconfig,
+  gdk-pixbuf,
+  glib,
+  gnumake,
+  gtk3,
+  harfbuzz,
   lib,
+  libepoxy,
+  libdeflate,
+  libGL,
+  libX11,
   makeWrapper,
   ninja,
+  pango,
   pkg-config,
   stdenv,
+  xorgproto,
+  zlib
 }:
 let
   pname = "flutter-elinux";
@@ -23,9 +38,46 @@ let
     clang
     cmake
     flutter
+    gnumake
     ninja
     pkg-config
   ];
+
+  appRuntimeDeps = [
+    atk
+    cairo
+    fontconfig
+    gdk-pixbuf
+    glib
+    gtk3
+    harfbuzz
+    libepoxy
+    libGL
+    libX11
+    libdeflate
+    pango
+  ];
+
+  # Development packages required for compilation.
+  appBuildDeps =
+    let
+      # https://discourse.nixos.org/t/handling-transitive-c-dependencies/5942/3
+      deps =
+        pkg:
+        builtins.filter lib.isDerivation ((pkg.buildInputs or [ ]) ++ (pkg.propagatedBuildInputs or [ ]));
+      collect = pkg: lib.unique ([ pkg ] ++ deps pkg ++ builtins.concatMap collect (deps pkg));
+    in
+    builtins.concatMap collect appRuntimeDeps;
+
+  appStaticBuildDeps = [
+    libX11
+    xorgproto
+    zlib
+  ];
+
+  pkgConfigPackages = map (lib.getOutput "dev") appBuildDeps;
+  includeFlags = map (pkg: "-isystem ${lib.getOutput "dev" pkg}/include") appStaticBuildDeps;
+  linkerFlags = map (pkg: "-rpath,${lib.getOutput "lib" pkg}/lib") appRuntimeDeps;
 in
 stdenv.mkDerivation {
   inherit pname;
@@ -151,6 +203,21 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    for path in ${
+      builtins.concatStringsSep " " (
+        builtins.foldl' (
+          paths: pkg:
+          paths
+          ++ (map (directory: "'${pkg}/${directory}/pkgconfig'") [
+            "lib"
+            "share"
+          ])
+        ) [ ] pkgConfigPackages
+      )
+    }; do
+      addToSearchPath FLUTTER_PKG_CONFIG_PATH "$path"
+    done
+
     target="$out/opt/flutter-elinux"
 
     unlinkFlutter () {
@@ -194,6 +261,12 @@ stdenv.mkDerivation {
     chmod 555 -R $out/opt/;
 
     makeWrapper ${flutter}/bin/dart $out/bin/flutter-elinux \
+      --set-default ANDROID_EMULATOR_USE_SYSTEM_LIBS 1 \
+      --suffix PKG_CONFIG_PATH : "$FLUTTER_PKG_CONFIG_PATH" \
+      --suffix LIBRARY_PATH : '${lib.makeLibraryPath appStaticBuildDeps}' \
+      --prefix CXXFLAGS "''\t" '${builtins.concatStringsSep " " includeFlags}' \
+      --prefix CFLAGS "''\t" '${builtins.concatStringsSep " " includeFlags}' \
+      --prefix LDFLAGS "''\t" '${builtins.concatStringsSep " " (map (flag: "-Wl,${flag}") linkerFlags)}' \
       --prefix FLUTTER_ALREADY_LOCKED : true \
       --suffix PATH : "${lib.makeBinPath (buildTools)}" \
       --suffix "PUB_CACHE=\$HOME/.pub-cache" \
