@@ -88,7 +88,10 @@ stdenv.mkDerivation {
     stripRoot = false;
   } ) ( builtins.fromJSON ( builtins.readFile ./package-sources.json ) ).packages );
 
-  patches = [ ./disable-precaching.patch ];
+  patches = [
+    ./patches/disable-precaching.patch
+    ./patches/template-copying.patch
+  ];
 
   sourceRoot = ".";
   unpackPhase = ''
@@ -97,6 +100,8 @@ stdenv.mkDerivation {
       TARGET=$(cut -d "-" -f2- <<< $(basename "$src"));
       cp -r $src $TARGET;
     done;
+
+    cp -r ${flutter}/packages/flutter_tools .;
 
     chmod -R 755 .
     ln -s ${flutter} flutter-elinux/flutter;
@@ -108,7 +113,10 @@ stdenv.mkDerivation {
     PACKAGE_TARGET=".pub-cache/hosted/pub.dev"
     mkdir -p "$PACKAGE_TARGET";
     mv * "$PACKAGE_TARGET";
-    mv "$PACKAGE_TARGET/flutter-elinux" "$PACKAGE_TARGET/engine-artifacts" .
+    mv "$PACKAGE_TARGET/flutter-elinux" \
+       "$PACKAGE_TARGET/engine-artifacts" \
+       "$PACKAGE_TARGET/flutter_tools" \
+       .;
   '';
 
   nativeBuildInputs = [
@@ -133,43 +141,62 @@ stdenv.mkDerivation {
          "bin/flutter_elinux.dart";
 
     cd -;
+
+    ls;
+    cd flutter_tools/;
+
+    flutter pub get --offline;
+
+    cd -;
   '';
 
   installPhase = ''
     target="$out/opt/flutter-elinux"
 
+    unlinkFlutter () {
+      local path="$1";
+
+      local task="$target/flutter/$path";
+
+      if [ "$path" == "" ] || [ "$path" == "." ]; then
+        rm "$target/flutter";
+      else
+        rm "$task";
+      fi
+
+      mkdir "$task";
+      ln -s ${flutter}/$path/* "$task";
+    }
+
     mkdir -p $out/opt $out/bin;
     mv flutter-elinux $out/opt;
 
-    rm $target/flutter;
-    mkdir $target/flutter;
-    ln -s ${flutter}/* $target/flutter/;
-
-    rm $target/flutter/bin;
-    mkdir $target/flutter/bin;
-    ln -s ${flutter}/bin/* $target/flutter/bin/;
-
-    rm $target/flutter/bin/cache;
-    mkdir $target/flutter/bin/cache;
-    ln -s ${flutter}/bin/cache/* $target/flutter/bin/cache/;
-
-    rm $target/flutter/bin/cache/artifacts;
-    mkdir $target/flutter/bin/cache/artifacts;
-    ln -s ${flutter}/bin/cache/artifacts/* \
-          $target/flutter/bin/cache/artifacts;
-
-    rm $target/flutter/bin/cache/artifacts/engine;
-    mkdir $target/flutter/bin/cache/artifacts/engine;
-    ln -s ${flutter}/bin/cache/artifacts/engine/* \
-          $target/flutter/bin/cache/artifacts/engine;
-
+    unlinkFlutter;
+    unlinkFlutter bin;
+    unlinkFlutter bin/cache;
+    unlinkFlutter bin/cache/artifacts;
+    unlinkFlutter bin/cache/artifacts/engine;
     mv engine-artifacts/* $target/flutter/bin/cache/artifacts/engine/;
-
     echo "${engineArtifactHash}" > "$target/flutter/bin/cache/elinux-sdk.stamp";
 
+    unlinkFlutter packages;
+    unlinkFlutter packages/flutter_tools;
+    unlinkFlutter packages/flutter_tools/templates;
+    unlinkFlutter packages/flutter_tools/templates/app;
+    mv $target/templates/app $target/flutter/packages/flutter_tools/templates/app/elinux.tmpl;
+
+    unlinkFlutter packages/flutter_tools/templates/plugin;
+    mv $target/templates/plugin $target/flutter/packages/flutter_tools/templates/plugin/elinux.tmpl;
+
+    mkdir $target/flutter/packages/flutter_tools/.dart_tool;
+    mv flutter_tools/.dart_tool/package_config.json $target/flutter/packages/flutter_tools/.dart_tool;
+
+    chmod 555 -R $out/opt/;
+
     makeWrapper ${flutter}/bin/dart $out/bin/flutter-elinux \
+      --prefix FLUTTER_ALREADY_LOCKED : true \
       --suffix PATH : "${lib.makeBinPath (buildTools)}" \
-      --prefix "FLUTTER_ALREADY_LOCKED=true" \
+      --suffix "PUB_CACHE=\$HOME/.pub-cache" \
       --add-flags "--disable-dart-dev" \
       --add-flags "--define=NIX_FLUTTER_HOST_PLATFORM=${stdenv.hostPlatform.system}" \
       --add-flags "--packages=$out/opt/flutter-elinux/.dart_tool/package_config.json" \
