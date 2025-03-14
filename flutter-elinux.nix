@@ -1,5 +1,6 @@
 {
   atk,
+  autoPatchelfHook,
   cairo,
   clang,
   cmake,
@@ -10,19 +11,25 @@
   gdk-pixbuf,
   glib,
   gnumake,
+  gdm,
   gtk3,
   harfbuzz,
   lib,
+  libdrm,
   libepoxy,
   libdeflate,
   libGL,
+  libinput,
   libX11,
+  libxkbcommon,
   makeWrapper,
+  mesa,
   ninja,
   pango,
   pkg-config,
   stdenv,
   xorgproto,
+  wayland,
   zlib
 }:
 let
@@ -53,23 +60,26 @@ let
     harfbuzz
     libepoxy
     libGL
-    libX11
     libdeflate
+    libX11
     pango
+    wayland
   ];
 
   # Development packages required for compilation.
   appBuildDeps =
     let
       # https://discourse.nixos.org/t/handling-transitive-c-dependencies/5942/3
-      deps =
-        pkg:
-        builtins.filter lib.isDerivation ((pkg.buildInputs or [ ]) ++ (pkg.propagatedBuildInputs or [ ]));
+      deps = pkg: builtins.filter lib.isDerivation (
+        (pkg.buildInputs or [ ]) ++ (pkg.propagatedBuildInputs or [ ])
+      );
+
       collect = pkg: lib.unique ([ pkg ] ++ deps pkg ++ builtins.concatMap collect (deps pkg));
     in
     builtins.concatMap collect appRuntimeDeps;
 
   appStaticBuildDeps = [
+    fontconfig
     libX11
     xorgproto
     zlib
@@ -77,7 +87,7 @@ let
 
   pkgConfigPackages = map (lib.getOutput "dev") appBuildDeps;
   includeFlags = map (pkg: "-isystem ${lib.getOutput "dev" pkg}/include") appStaticBuildDeps;
-  linkerFlags = map (pkg: "-rpath,${lib.getOutput "lib" pkg}/lib") appRuntimeDeps;
+  linkerFlags = map (pkg: "-rpath,${lib.getOutput "lib" pkg}/lib") ( appRuntimeDeps ++ [ libxkbcommon ]);
 in
 stdenv.mkDerivation {
   inherit pname;
@@ -172,9 +182,15 @@ stdenv.mkDerivation {
   '';
 
   nativeBuildInputs = [
+    autoPatchelfHook
     flutter
+    libdrm
+    libinput
+    libxkbcommon
     makeWrapper
-  ];
+    mesa
+  ] ++ appRuntimeDeps;
+  autoPatchelfIgnoreMissingDeps = [ "libflutter_elinux*" ];
 
   buildPhase = ''
     mkdir .config;
