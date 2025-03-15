@@ -12,7 +12,10 @@
 
     # Refer to the NixOS on how to customize the TexLive installation
     # https://wiki.nixos.org/wiki/TexLive
-    latex = pkgs.texliveFull;
+    latex = pkgs.texliveFull.withPackages (_: [
+      # required by minted
+      pkgs.python3Packages.pygments
+    ]);
   in
   {
     packages.compile-latex = pkgs.callPackage (import ./compile-latex.nix) { inherit latex; };

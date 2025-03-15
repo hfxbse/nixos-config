@@ -2,6 +2,12 @@
   latex,
   writeShellScriptBin
 }:
+let
+  tools = latex.withPackages ( texlivePackages: with texlivePackages; [
+    biber
+    glossaries
+  ]);
+in
 writeShellScriptBin "compile-latex" ''
   set -e;
 
@@ -40,8 +46,14 @@ writeShellScriptBin "compile-latex" ''
   # Required to get relative paths inside LaTeX to work
   cd $DOC_DIR;
 
-  ${latex}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
-  ${latex}/bin/biber --output-directory="$OUT" "$OUT"/*.bcf;
-  ${latex}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
-  ${latex}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
+  ${tools}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
+  ${tools}/bin/biber --output-directory="$OUT" "$OUT"/*.bcf;
+
+  # makeglossaries might fail gracefully if no glossaires exists
+  set +e;
+  ${tools}/bin/makeglossaries -d "$OUT" "$(basename "''${DOC%.*}")";
+  set -e;
+
+  ${tools}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
+  ${tools}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
 ''
