@@ -1,5 +1,6 @@
 {
   atk,
+  buildEnv,
   cairo,
   callPackage,
   clang,
@@ -25,6 +26,7 @@
   pkg-config,
   runCommand,
   stdenv,
+  symlinkJoin,
   xorgproto,
   which,
   writeShellScriptBin,
@@ -43,7 +45,6 @@ let
   buildTools = [
     clang
     cmake
-    flutter
     gnumake
     ninja
     pkg-config
@@ -290,11 +291,17 @@ let
         --add-flags "$out/opt/flutter-elinux/bin/cache/flutter-elinux.snapshot"
     '';
   };
+
+  flutter-elinux-improved = writeShellScriptBin "flutter-elinux" ''
+    if [ "$1" == "custom-devices" ]; then
+      ${flutter-elinux}/opt/flutter-elinux/flutter/bin/flutter "$@";
+    else
+      ${flutter-elinux}/bin/flutter-elinux "$@";
+    fi
+  '';
 in
-writeShellScriptBin "flutter-elinux" ''
-  if [ "$1" == "custom-devices" ]; then
-    ${flutter-elinux}/opt/flutter-elinux/flutter/bin/flutter "$@";
-  else
-    ${flutter-elinux}/bin/flutter-elinux "$@";
-  fi
-''
+symlinkJoin {
+  inherit pname;
+  inherit version;
+  paths = [ flutter-elinux-improved flutter-elinux ];
+}
