@@ -1,0 +1,73 @@
+Subject: [PATCH] cross-compilation switch
+---
+Index: flutter-elinux/lib/elinux_build_target.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/flutter-elinux/lib/elinux_build_target.dart b/flutter-elinux/lib/elinux_build_target.dart
+--- a/flutter-elinux/lib/elinux_build_target.dart	(revision ce310342781df12ed17c61fea9d82ce318674a2f)
++++ b/flutter-elinux/lib/elinux_build_target.dart	(date 1742757037857)
+@@ -353,16 +353,26 @@
+     }
+ 
+     // Run the native build.
++    String? ldEnv = Platform.environment['LD'];
+     final String cmakeBuildType = buildMode.isPrecompiled ? 'Release' : 'Debug';
+     final String targetArch =
+         buildInfo!.targetArch == 'arm64' ? 'aarch64' : 'x86_64';
+     final String hostArch = _getCurrentHostPlatformArchName();
+     final String? targetCompilerTriple = buildInfo!.targetCompilerTriple;
+     final String targetSysroot = buildInfo!.targetSysroot;
+-    final String? targetCompilerFlags = buildInfo!.targetCompilerFlags;
++    String? targetCompilerFlags = buildInfo!.targetCompilerFlags;
+     final String? targetToolchain = buildInfo!.targetToolchain;
+     final String? systemIncludeDirectories =
+         buildInfo!.systemIncludeDirectories;
++
++    final bool crossCompile = buildInfo!.targetArch != hostArch;
++    if (ldEnv != null && crossCompile) {
++      ldEnv = '-fuse-ld=$ldEnv -Qunused-arguments';
++
++      targetCompilerFlags =
++          targetCompilerFlags != null ? '$ldEnv $targetCompilerFlags' : ldEnv;
++    }
++
+     RunResult result = await _processUtils.run(
+       <String>[
+         'cmake',
+@@ -370,8 +380,7 @@
+         '-DFLUTTER_TARGET_BACKEND_TYPE=${buildInfo!.targetBackendType}',
+         '-DFLUTTER_TARGET_PLATFORM=elinux-${buildInfo!.targetArch}',
+         if (targetSysroot != '/') '-DCMAKE_SYSROOT=$targetSysroot',
+-        if (buildInfo!.targetArch != hostArch)
+-          '-DCMAKE_SYSTEM_PROCESSOR=$targetArch',
++        if (crossCompile) '-DCMAKE_SYSTEM_PROCESSOR=$targetArch',
+         if (systemIncludeDirectories != null)
+           '-DFLUTTER_SYSTEM_INCLUDE_DIRECTORIES=$systemIncludeDirectories',
+         if (targetCompilerTriple != null)
+@@ -384,7 +393,7 @@
+         eLinuxDir.path,
+       ],
+       workingDirectory: outputDir.path,
+-      environment: _buildCMakeEnvironment(targetToolchain),
++      environment: _buildCMakeEnvironment(targetToolchain, crossCompile),
+     );
+     if (result.exitCode != 0) {
+       throwToolExit('Failed to cmake:\n$result');
+@@ -427,9 +436,12 @@
+   }
+ }
+ 
+-Map<String, String> _buildCMakeEnvironment(String? targetToolchain) {
+-  final String? ccEnv = Platform.environment['CC'];
+-  final String? cxxEnv = Platform.environment['CXX'];
++Map<String, String> _buildCMakeEnvironment(
++  String? targetToolchain,
++  bool crossCompile,
++) {
++  final String? ccEnv = crossCompile ? Platform.environment['CC'] : null;
++  final String? cxxEnv = crossCompile ? Platform.environment['CXX'] : null;
+ 
+   final String cc = ccEnv ??
+       (targetToolchain != null ? '$targetToolchain/bin/clang' : 'clang');

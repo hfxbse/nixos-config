@@ -46,7 +46,7 @@ let
 
   aarch64 = pkgsCross.aarch64-multiplatform;
   crossClang = aarch64.clangStdenv.cc;
-  linker = "-fuse-ld=${crossClang}/bin/aarch64-unknown-linux-gnu-ld -Qunused-arguments";
+  linker = "${crossClang}/bin/aarch64-unknown-linux-gnu-ld";
 
   buildTools = [
     clang
@@ -182,6 +182,7 @@ let
         extraPrefix = "flutter-elinux/";
         revert = true;
       })
+      ./patches/cross-compilation-switch.patch
     ];
 
     sourceRoot = ".";
@@ -311,10 +312,11 @@ let
         --set-default ANDROID_EMULATOR_USE_SYSTEM_LIBS 1 \
         --suffix PKG_CONFIG_PATH : "$FLUTTER_PKG_CONFIG_PATH" \
         --suffix LIBRARY_PATH : '${lib.makeLibraryPath appStaticBuildDeps}' \
+        --prefix LD "''\t" '${linker}' \
         --prefix CC "''\t" '${crossClang}/bin/aarch64-unknown-linux-gnu-clang' \
         --prefix CXX "''\t" '${crossClang}/bin/aarch64-unknown-linux-gnu-clang++' \
-        --prefix CXXFLAGS "''\t" "$INCLUDE_FLAGS ${linker}" \
-        --prefix CFLAGS "''\t" "$INCLUDE_FLAGS ${linker}" \
+        --prefix CXXFLAGS "''\t" "$INCLUDE_FLAGS" \
+        --prefix CFLAGS "''\t" "$INCLUDE_FLAGS" \
         --prefix LDFLAGS "''\t" "$LINKER_FLAGS" \
         --prefix FLUTTER_ALREADY_LOCKED : true \
         --suffix PATH : "${lib.makeBinPath (buildTools)}" \
