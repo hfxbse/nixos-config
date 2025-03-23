@@ -6,6 +6,7 @@
   clang,
   cmake,
   fetchFromGitHub,
+  fetchpatch,
   fetchzip,
   flutter327,
   gdk-pixbuf,
@@ -24,6 +25,7 @@
   ninja,
   pango,
   pkg-config,
+  pkgsCross,
   runCommand,
   stdenv,
   symlinkJoin,
@@ -41,6 +43,10 @@ let
       enginePatches = flutter327.engine.unwrapped.patches;
     } // (lib.importJSON ./flutter-version.json))
   );
+
+  aarch64 = pkgsCross.aarch64-multiplatform;
+  crossClang = aarch64.clangStdenv.cc;
+  linker = "-fuse-ld=${crossClang}/bin/aarch64-unknown-linux-gnu-ld -Qunused-arguments";
 
   buildTools = [
     clang
@@ -61,7 +67,11 @@ let
     libepoxy
     libX11
     pango
-  ];
+  ] ++ (with aarch64; [
+    fontconfig
+    libGL
+    wayland
+  ]);
 
   # Development packages required for compilation.
   appBuildDeps =
@@ -83,9 +93,15 @@ let
 
   pkgConfigPackages = map (lib.getOutput "dev") appBuildDeps;
   includeFlags = map (pkg: "-isystem ${lib.getOutput "dev" pkg}/include") appStaticBuildDeps;
-  linkerFlags = map (pkg: "-rpath,${lib.getOutput "lib" pkg}/lib") ( appRuntimeDeps );
+  linkerFlags = (map (pkg: "-rpath,${lib.getOutput "lib" pkg}/lib") appRuntimeDeps) ++
+    ["-rpath,${aarch64.libxkbcommon}/lib"];
 
-  artifacts = map ( {architecture, hash, profile, patch ? stdenv.hostPlatform.isLinux}: ( callPackage (import ./artifact.nix) {
+  artifacts = map ( {
+    architecture,
+    hash,
+    profile,
+    patch ? true
+  }: ( callPackage (import ./artifact.nix) {
     inherit architecture;
     inherit hash;
     inherit patch;
@@ -97,19 +113,16 @@ let
       architecture = "arm64";
       hash = "sha256-M0IcOoeVtVb02Lx6YVhV4eLhHgc1XEZs1mGNrUr77Ew=";
       profile = "debug";
-      patch = false;
     }
     {
       architecture = "arm64";
       hash = "sha256-awxmWQ83Sb5b8/djfcJUhMXaLCWdU04Vp/nuPr0jwJk=";
       profile = "profile";
-      patch = false;
     }
     {
       architecture = "arm64";
       hash = "sha256-yvzV0Bf4QxFLfZvTaONn9q4GQmRRW8GLNtwEjqGeMWg=";
       profile = "release";
-      patch = false;
     }
     {
       architecture = "common";
@@ -156,6 +169,19 @@ let
     patches = [
       ./patches/disable-precaching.patch
       ./patches/template-copying.patch
+      (fetchpatch {
+        url = "https://github.com/sony/flutter-elinux/compare/cbc86f6e71e26f20e0f823549d81e1f3cf4a26ae..Losses:flutter-elinux:fbe5d92863a371ce6fccb9dfdff9e4b20b81ab14.diff";
+        hash = "sha256-dByKLzCTVFx7AHIxrqOwCwjB7RLL/1TI/r6nVID41gI=";
+        stripLen = 1;
+        extraPrefix = "flutter-elinux/";
+      })
+      (fetchpatch {
+        url = "https://github.com/sony/flutter-elinux/compare/1df2296fc73a0f66754224aca0b9ea6165970f78...Losses:flutter-elinux:5175f17f1b6eddbe445084b0e91e22f00a321fdf.diff";
+        hash = "sha256-bjaBNsrBALWwJuq1FwNYhBhT2oIM874og5OfS2k9XxA=";
+        stripLen = 1;
+        extraPrefix = "flutter-elinux/";
+        revert = true;
+      })
     ];
 
     sourceRoot = ".";
@@ -203,30 +229,34 @@ let
 
       cd -;
 
-      ls;
       cd flutter_tools/;
-
       flutter pub get --offline;
-
       cd -;
     '';
 
-    passAsFile = [ "artifactPaths" ];
     artifactPaths = builtins.concatStringsSep " " artifacts;
+    linkerFlags = builtins.concatStringsSep " " (map (flag: "-Wl,${flag}") linkerFlags);
+    includeFlags = builtins.concatStringsSep " " includeFlags;
+    flutterPkgConfigPath = builtins.concatStringsSep " " (
+      builtins.foldl' (
+        paths: pkg:
+        paths
+        ++ (map (directory: "'${pkg}/${directory}/pkgconfig'") [
+          "lib"
+          "share"
+        ])
+      ) [ ] pkgConfigPackages
+    );
+
+    passAsFile = [
+      "artifactPaths"
+      "flutterPkgConfigPath"
+      "linkerFlags"
+      "includeFlags"
+    ];
 
     installPhase = ''
-      for path in ${
-        builtins.concatStringsSep " " (
-          builtins.foldl' (
-            paths: pkg:
-            paths
-            ++ (map (directory: "'${pkg}/${directory}/pkgconfig'") [
-              "lib"
-              "share"
-            ])
-          ) [ ] pkgConfigPackages
-        )
-      }; do
+      for path in $(cat $flutterPkgConfigPathPath); do
         addToSearchPath FLUTTER_PKG_CONFIG_PATH "$path"
       done
 
@@ -250,8 +280,7 @@ let
       mkdir -p $out/opt $out/bin;
       mv flutter-elinux $out/opt;
 
-      unlinkFlutter;
-      unlinkFlutter bin;
+      unlinkFlutter; unlinkFlutter bin;
       unlinkFlutter bin/cache;
       unlinkFlutter bin/cache/artifacts;
       unlinkFlutter bin/cache/artifacts/engine;
@@ -275,13 +304,18 @@ let
 
       chmod 555 -R $out/opt/;
 
+      LINKER_FLAGS=$(cat $linkerFlagsPath);
+      INCLUDE_FLAGS=$(cat $includeFlagsPath);
+
       makeWrapper ${flutter}/bin/dart $out/bin/flutter-elinux \
         --set-default ANDROID_EMULATOR_USE_SYSTEM_LIBS 1 \
         --suffix PKG_CONFIG_PATH : "$FLUTTER_PKG_CONFIG_PATH" \
         --suffix LIBRARY_PATH : '${lib.makeLibraryPath appStaticBuildDeps}' \
-        --prefix CXXFLAGS "''\t" '${builtins.concatStringsSep " " includeFlags}' \
-        --prefix CFLAGS "''\t" '${builtins.concatStringsSep " " includeFlags}' \
-        --prefix LDFLAGS "''\t" '${builtins.concatStringsSep " " (map (flag: "-Wl,${flag}") linkerFlags)}' \
+        --prefix CC "''\t" '${crossClang}/bin/aarch64-unknown-linux-gnu-clang' \
+        --prefix CXX "''\t" '${crossClang}/bin/aarch64-unknown-linux-gnu-clang++' \
+        --prefix CXXFLAGS "''\t" "$INCLUDE_FLAGS ${linker}" \
+        --prefix CFLAGS "''\t" "$INCLUDE_FLAGS ${linker}" \
+        --prefix LDFLAGS "''\t" "$LINKER_FLAGS" \
         --prefix FLUTTER_ALREADY_LOCKED : true \
         --suffix PATH : "${lib.makeBinPath (buildTools)}" \
         --suffix "PUB_CACHE=\$HOME/.pub-cache" \

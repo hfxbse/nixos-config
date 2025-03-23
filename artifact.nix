@@ -13,6 +13,7 @@
   libinput,
   libxkbcommon,
   patch,
+  pkgsCross,
   profile ? null,
   stdenv,
   version,
@@ -33,7 +34,7 @@ stdenv.mkDerivation {
   };
 
   autoPatchelfIgnoreMissingDeps = [ "libflutter_elinux*" ];
-  nativeBuildInputs = lib.optionals patch [
+  nativeBuildInputs = lib.optionals patch ([
     autoPatchelfHook
     fontconfig
     glib
@@ -43,7 +44,11 @@ stdenv.mkDerivation {
     libinput
     libxkbcommon
     wayland
-  ];
+  ] ++ (with pkgsCross.aarch64-multiarch; [
+    fontconfig
+    libGL
+    libxkbcommon
+  ]));
 
   installPhase = ''
     TARGET="$out/elinux-${architecture}${profileString}";
