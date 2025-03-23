@@ -1,25 +1,20 @@
 {
   atk,
-  autoPatchelfHook,
   cairo,
+  callPackage,
   clang,
   cmake,
   fetchFromGitHub,
   fetchzip,
   flutter327,
-  fontconfig,
   gdk-pixbuf,
   glib,
   gnumake,
-  gdm,
-  gitMinimal,
   gtk3,
   harfbuzz,
   lib,
-  libdrm,
   libepoxy,
   libdeflate,
-  libGL,
   libinput,
   libX11,
   libxkbcommon,
@@ -31,7 +26,6 @@
   runCommand,
   stdenv,
   xorgproto,
-  wayland,
   which,
   writeShellScriptBin,
   zlib
@@ -46,9 +40,6 @@ let
     } // (lib.importJSON ./flutter-version.json))
   );
 
-  engineArtifactShortHash = "cb4b5fff73";
-  engineArtifactBaseUrl = "https://github.com/sony/flutter-embedded-linux/releases/download/${engineArtifactShortHash}";
-
   buildTools = [
     clang
     cmake
@@ -61,17 +52,14 @@ let
   appRuntimeDeps = [
     atk
     cairo
-    fontconfig
     gdk-pixbuf
     glib
     gtk3
     harfbuzz
-    libepoxy
-    libGL
     libdeflate
+    libepoxy
     libX11
     pango
-    wayland
   ];
 
   # Development packages required for compilation.
@@ -87,7 +75,6 @@ let
     builtins.concatMap collect appRuntimeDeps;
 
   appStaticBuildDeps = [
-    fontconfig
     libX11
     xorgproto
     zlib
@@ -95,7 +82,56 @@ let
 
   pkgConfigPackages = map (lib.getOutput "dev") appBuildDeps;
   includeFlags = map (pkg: "-isystem ${lib.getOutput "dev" pkg}/include") appStaticBuildDeps;
-  linkerFlags = map (pkg: "-rpath,${lib.getOutput "lib" pkg}/lib") ( appRuntimeDeps ++ [ libxkbcommon ]);
+  linkerFlags = map (pkg: "-rpath,${lib.getOutput "lib" pkg}/lib") ( appRuntimeDeps );
+
+  artifacts = map ( {architecture, hash, profile, patch ? stdenv.hostPlatform.isLinux}: ( callPackage (import ./artifact.nix) {
+    inherit architecture;
+    inherit hash;
+    inherit patch;
+    inherit profile;
+    inherit version;
+    engineShortVersion = "cb4b5fff73";
+  }) ) [
+    {
+      architecture = "arm64";
+      hash = "sha256-M0IcOoeVtVb02Lx6YVhV4eLhHgc1XEZs1mGNrUr77Ew=";
+      profile = "debug";
+      patch = false;
+    }
+    {
+      architecture = "arm64";
+      hash = "sha256-awxmWQ83Sb5b8/djfcJUhMXaLCWdU04Vp/nuPr0jwJk=";
+      profile = "profile";
+      patch = false;
+    }
+    {
+      architecture = "arm64";
+      hash = "sha256-yvzV0Bf4QxFLfZvTaONn9q4GQmRRW8GLNtwEjqGeMWg=";
+      profile = "release";
+      patch = false;
+    }
+    {
+      architecture = "common";
+      hash = "sha256-KmRa8bdEXoK3PIjYxpEe5IyIXcmjRF55FFjVpXad92I=";
+      profile = null;
+      patch = false;
+    }
+    {
+      architecture = "x64";
+      hash = "sha256-Eqe97gZ3LAwKaBjltC7vFduYKDuhu50BjNyj/xuGoO0=";
+      profile = "debug";
+    }
+    {
+      architecture = "x64";
+      hash = "sha256-wlRvyucuFACR903/NzkqS9DFGng5LlK5sf3PCpKCQYE=";
+      profile = "profile";
+    }
+    {
+      architecture = "x64";
+      hash = "sha256-oPtu0/XlrScPoppGzXuitDREEm8ldeCcCEFm9JcRXVM=";
+      profile = "release";
+    }
+  ];
 
   flutter-elinux = stdenv.mkDerivation {
     inherit pname;
@@ -108,48 +144,6 @@ let
         repo = "flutter-elinux";
         tag = version;
         hash = "sha256-4gnrFvRu40Q9ejDwkcaunTTw77jpxP8NzSmszDjex+g=";
-      })
-      (fetchzip {
-        url = "${engineArtifactBaseUrl}/elinux-arm64-debug.zip";
-        hash = "sha256-M0IcOoeVtVb02Lx6YVhV4eLhHgc1XEZs1mGNrUr77Ew=";
-        stripRoot = false;
-        name = "elinux-arm64-debug";
-      })
-      (fetchzip {
-        url = "${engineArtifactBaseUrl}/elinux-arm64-profile.zip";
-        hash = "sha256-awxmWQ83Sb5b8/djfcJUhMXaLCWdU04Vp/nuPr0jwJk=";
-        stripRoot = false;
-        name = "elinux-arm64-profile";
-      })
-      (fetchzip {
-        url = "${engineArtifactBaseUrl}/elinux-arm64-release.zip";
-        hash = "sha256-yvzV0Bf4QxFLfZvTaONn9q4GQmRRW8GLNtwEjqGeMWg=";
-        stripRoot = false;
-        name = "elinux-arm64-release";
-      })
-      (fetchzip {
-        url = "${engineArtifactBaseUrl}/elinux-common.zip";
-        hash = "sha256-KmRa8bdEXoK3PIjYxpEe5IyIXcmjRF55FFjVpXad92I=";
-        stripRoot = false;
-        name = "elinux-common";
-      })
-      (fetchzip {
-        url = "${engineArtifactBaseUrl}/elinux-x64-debug.zip";
-        hash = "sha256-Eqe97gZ3LAwKaBjltC7vFduYKDuhu50BjNyj/xuGoO0=";
-        stripRoot = false;
-        name = "elinux-x64-debug";
-      })
-      (fetchzip {
-        url = "${engineArtifactBaseUrl}/elinux-x64-profile.zip";
-        hash = "sha256-wlRvyucuFACR903/NzkqS9DFGng5LlK5sf3PCpKCQYE=";
-        stripRoot = false;
-        name = "elinux-x64-profile";
-      })
-      (fetchzip {
-        url = "${engineArtifactBaseUrl}/elinux-x64-release.zip";
-        hash = "sha256-oPtu0/XlrScPoppGzXuitDREEm8ldeCcCEFm9JcRXVM=";
-        stripRoot = false;
-        name = "elinux-x64-release";
       })
     ] ++ (map ( {url, hash, name, ...}: fetchzip {
       inherit url;
@@ -177,30 +171,18 @@ let
       ln -s ${flutter} flutter-elinux/flutter;
       mkdir flutter-elinux/.dart_tool
 
-      mkdir engine-artifacts;
-      mv elinux* engine-artifacts;
-
       PACKAGE_TARGET=".pub-cache/hosted/pub.dev"
       mkdir -p "$PACKAGE_TARGET";
       mv * "$PACKAGE_TARGET";
       mv "$PACKAGE_TARGET/flutter-elinux" \
-         "$PACKAGE_TARGET/engine-artifacts" \
          "$PACKAGE_TARGET/flutter_tools" \
          .;
     '';
 
     nativeBuildInputs = [
-      autoPatchelfHook
       flutter
-      gitMinimal
-      libdrm
-      libinput
-      libxkbcommon
       makeWrapper
-      mesa
-      which
-    ] ++ appRuntimeDeps;
-    autoPatchelfIgnoreMissingDeps = [ "libflutter_elinux*" ];
+    ];
 
     buildPhase = ''
       mkdir .config;
@@ -227,6 +209,9 @@ let
 
       cd -;
     '';
+
+    passAsFile = [ "artifactPaths" ];
+    artifactPaths = builtins.concatStringsSep " " artifacts;
 
     installPhase = ''
       for path in ${
@@ -269,7 +254,11 @@ let
       unlinkFlutter bin/cache;
       unlinkFlutter bin/cache/artifacts;
       unlinkFlutter bin/cache/artifacts/engine;
-      mv engine-artifacts/* $target/flutter/bin/cache/artifacts/engine/;
+
+      for artifact in $(cat $artifactPathsPath); do
+        echo $artifact;
+        ln -s $artifact/* $target/flutter/bin/cache/artifacts/engine/;
+      done
 
       unlinkFlutter packages;
       unlinkFlutter packages/flutter_tools;
