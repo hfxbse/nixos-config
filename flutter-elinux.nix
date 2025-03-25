@@ -183,6 +183,7 @@ let
         revert = true;
       })
       ./patches/cross-compilation-switch.patch
+      ./patches/custom-devices.patch
     ];
 
     sourceRoot = ".";
@@ -327,17 +328,5 @@ let
         --add-flags "$out/opt/flutter-elinux/bin/cache/flutter-elinux.snapshot"
     '';
   };
-
-  flutter-elinux-improved = writeShellScriptBin "flutter-elinux" ''
-    if [ "$1" == "custom-devices" ]; then
-      ${flutter-elinux}/opt/flutter-elinux/flutter/bin/flutter "$@";
-    else
-      ${flutter-elinux}/bin/flutter-elinux "$@";
-    fi
-  '';
 in
-symlinkJoin {
-  inherit pname;
-  inherit version;
-  paths = [ flutter-elinux-improved flutter-elinux ];
-}
+flutter-elinux

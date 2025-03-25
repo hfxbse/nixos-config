@@ -1,0 +1,35 @@
+Subject: [PATCH] include custom devices command
+---
+Index: flutter-elinux/lib/executable.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/flutter-elinux/lib/executable.dart b/flutter-elinux/lib/executable.dart
+--- a/flutter-elinux/lib/executable.dart	(revision ce310342781df12ed17c61fea9d82ce318674a2f)
++++ b/flutter-elinux/lib/executable.dart	(date 1742905178352)
+@@ -17,6 +17,7 @@
+ import 'package:flutter_tools/src/build_system/build_targets.dart';
+ import 'package:flutter_tools/src/cache.dart';
+ import 'package:flutter_tools/src/commands/config.dart';
++import 'package:flutter_tools/src/commands/custom_devices.dart';
+ import 'package:flutter_tools/src/commands/devices.dart';
+ import 'package:flutter_tools/src/commands/doctor.dart';
+ import 'package:flutter_tools/src/commands/emulators.dart';
+@@ -85,6 +86,16 @@
+     () => <FlutterCommand>[
+       // Commands directly from flutter_tools.
+       ConfigCommand(verboseHelp: verboseHelp),
++      CustomDevicesCommand(
++        customDevicesConfig: globals.customDevicesConfig,
++        operatingSystemUtils: globals.os,
++        terminal: globals.terminal,
++        platform: globals.platform,
++        featureFlags: featureFlags,
++        processManager: globals.processManager,
++        fileSystem: globals.fs,
++        logger: globals.logger,
++      ),
+       DevicesCommand(verboseHelp: verboseHelp),
+       DoctorCommand(verbose: verbose),
+       EmulatorsCommand(),
