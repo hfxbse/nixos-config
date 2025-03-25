@@ -17,9 +17,7 @@
   lib,
   libepoxy,
   libdeflate,
-  libinput,
   libX11,
-  libxkbcommon,
   makeWrapper,
   mesa,
   ninja,
@@ -69,7 +67,12 @@ let
     pango
   ] ++ (with aarch64; [
     fontconfig
+    libdrm
     libGL
+    libgbm
+    libinput
+    libxkbcommon
+    systemdLibs
     wayland
   ]);
 
@@ -93,8 +96,7 @@ let
 
   pkgConfigPackages = map (lib.getOutput "dev") appBuildDeps;
   includeFlags = map (pkg: "-isystem ${lib.getOutput "dev" pkg}/include") appStaticBuildDeps;
-  linkerFlags = (map (pkg: "-rpath,${lib.getOutput "lib" pkg}/lib") appRuntimeDeps) ++
-    ["-rpath,${aarch64.libxkbcommon}/lib"];
+  linkerFlags = (map (pkg: "-rpath,${lib.getOutput "lib" pkg}/lib") appRuntimeDeps);
 
   artifacts = map ( {
     architecture,
