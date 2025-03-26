@@ -311,6 +311,7 @@ let
       LINKER_FLAGS=$(cat $linkerFlagsPath);
       INCLUDE_FLAGS=$(cat $includeFlagsPath);
 
+      ln -s ${flutter}/bin/dart $out/bin/dart;
       makeWrapper ${flutter}/bin/dart $out/bin/flutter-elinux \
         --set-default ANDROID_EMULATOR_USE_SYSTEM_LIBS 1 \
         --suffix PKG_CONFIG_PATH : "$FLUTTER_PKG_CONFIG_PATH" \
