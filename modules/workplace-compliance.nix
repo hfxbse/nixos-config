@@ -28,6 +28,10 @@ in {
     };
 
     networking.networkmanager.enableStrongSwan = lib.mkDefault cfg.ikev2.enable;
+    environment.etc."strongswan.conf" = lib.mkIf cfg.ikev2.enable {
+      # See https://github.com/NixOS/nixpkgs/issues/375352#issue-2800029311
+      text = "";
+    };
 
     networking.firewall = {
       enable = cfg.firewall.enable;
