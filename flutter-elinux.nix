@@ -9,6 +9,7 @@
   fetchpatch,
   fetchzip,
   flutter327,
+  fontconfig,
   gdk-pixbuf,
   glib,
   gnumake,
@@ -18,6 +19,7 @@
   libepoxy,
   libdeflate,
   libX11,
+  libxkbcommon,
   makeWrapper,
   mesa,
   ninja,
@@ -57,6 +59,7 @@ let
   appRuntimeDeps = [
     atk
     cairo
+    fontconfig
     gdk-pixbuf
     glib
     gtk3
@@ -64,14 +67,15 @@ let
     libdeflate
     libepoxy
     libX11
+    libxkbcommon
     pango
   ] ++ (with aarch64; [
-    fontconfig
+    aarch64.fontconfig
     libdrm
     libGL
     libgbm
     libinput
-    libxkbcommon
+    aarch64.libxkbcommon
     systemdLibs
     wayland
   ]);
