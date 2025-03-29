@@ -311,8 +311,11 @@ let
       LINKER_FLAGS=$(cat $linkerFlagsPath);
       INCLUDE_FLAGS=$(cat $includeFlagsPath);
 
-      ln -s ${flutter}/bin/dart $out/bin/dart;
-      makeWrapper ${flutter}/bin/dart $out/bin/flutter-elinux \
+      # See https://github.com/NixOS/nixpkgs/issues/322871
+      makeWrapper ${flutter}/bin/dart $out/bin/dart \
+        --prefix FLUTTER_ROOT : $target/flutter;
+
+      makeWrapper $out/bin/dart $out/bin/flutter-elinux \
         --set-default ANDROID_EMULATOR_USE_SYSTEM_LIBS 1 \
         --suffix PKG_CONFIG_PATH : "$FLUTTER_PKG_CONFIG_PATH" \
         --suffix LIBRARY_PATH : '${lib.makeLibraryPath appStaticBuildDeps}' \
