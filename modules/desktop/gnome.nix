@@ -14,6 +14,9 @@ in
     systemd.services."getty@tty1".enable = false;
     systemd.services."autovt@tty1".enable = false;
 
+    # HEIC thumbnails in GNOME files
+    # See https://github.com/NixOS/nixpkgs/issues/164021
+    environment.systemPackages = [ pkgs.libheif pkgs.libheif.out ];
     environment.gnome.excludePackages = (with pkgs; [
       gnome-tour
       gnome-2048
