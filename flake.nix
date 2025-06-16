@@ -49,34 +49,34 @@
       ./modules/text-processing.nix
       ./modules/workplace-compliance.nix
     ];
+
+    additionalPackages = with attrs; {
+        cups-brother-hl3172cdw = cups-brother-hl3172cdw.packages.x86_64-linux.default;
+        quick-template = quick-template.packages.x86_64-linux.quick;
+    };
   in
   {
     nixosConfigurations.home-pc = nixpkgs.lib.nixosSystem {
-      specialArgs = with attrs; {
-        cups-brother-hl3172cdw = cups-brother-hl3172cdw.packages.x86_64-linux.default;
-        quick-template = quick-template.packages.x86_64-linux.quick;
-      };
-
+      specialArgs = additionalPackages;
       system = "x86_64-linux";
       modules = defaultModules ++ [ ./hosts/home-pc/configuration.nix ];
     };
 
     nixosConfigurations.nt-laptop = nixpkgs.lib.nixosSystem {
-      specialArgs = with attrs; {
-        cups-brother-hl3172cdw = cups-brother-hl3172cdw.packages.x86_64-linux.default;
-        quick-template = quick-template.packages.x86_64-linux.quick;
-      };
-
+      specialArgs = additionalPackages;
       system = "x86_64-linux";
       modules = defaultModules ++ [ ./hosts/nt-laptop/configuration.nix ];
     };
 
     nixosConfigurations.cgi-wsl = nixpkgs.lib.nixosSystem {
+      specialArgs = additionalPackages;
       system = "x86_64-linux";
       modules = [
         fullName
         attrs.nixos-wsl.nixosModules.default
         nixvim.nixosModules.nixvim
+        ./modules/desktop/desktop.nix
+        ./modules/development.nix
         ./modules/text-processing.nix
         ./hosts/cgi-wsl/configuration.nix
       ];

@@ -3,7 +3,7 @@ let
   cfg = config.desktop;
 in
 {
-  config = lib.mkIf (cfg.type == "gnome") {
+  config = lib.mkIf (cfg.enable && cfg.type == "gnome") {
     services.xserver = {
       enable = true;
       displayManager.gdm.enable = lib.mkDefault true;
