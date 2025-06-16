@@ -5,6 +5,8 @@
   security.pki.certificateFiles = [ ./ZscalerRootCertificate-2048-SHA256.crt ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  programs.ssh.startAgent = true;
+
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
   #
