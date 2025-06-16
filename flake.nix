@@ -23,6 +23,11 @@
       url = "github:hfxbse/nixos-config?ref=derivation/quick-template";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, disko, nixpkgs, nixvim, ... }@attrs:
@@ -64,6 +69,17 @@
 
       system = "x86_64-linux";
       modules = defaultModules ++ [ ./hosts/nt-laptop/configuration.nix ];
+    };
+
+    nixosConfigurations.cgi-wsl = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        fullName
+        attrs.nixos-wsl.nixosModules.default
+        nixvim.nixosModules.nixvim
+        ./modules/text-processing.nix
+        ./hosts/cgi-wsl/configuration.nix
+      ];
     };
 
     nixosConfigurations.iso = nixpkgs.lib.nixosSystem {
