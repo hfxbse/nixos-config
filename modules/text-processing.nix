@@ -75,6 +75,27 @@
           extensions = {
             live-grep-args.enable = true;
           };
+
+          settings = let
+            hiddenFiles = [
+              "--hidden"
+              "--glob"
+              "!**/.git/*"
+            ];
+          in {
+            defaults.vimgrep_arguments = [
+              "rg"
+              "--color=never"
+              "--no-heading"
+              "--with-filename"
+              "--line-number"
+              "--column"
+            ] ++ hiddenFiles;
+            pickers.find_files.find_command = [
+              "rg"
+              "--files"
+            ] ++ hiddenFiles;
+          };
         };
 
         treesitter = {
@@ -91,6 +112,7 @@
       ];
 
       extraPackages = with pkgs; [
+        fd
         ripgrep
       ];
     };
