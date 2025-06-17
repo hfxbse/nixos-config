@@ -75,6 +75,7 @@
         fullName
         attrs.nixos-wsl.nixosModules.default
         nixvim.nixosModules.nixvim
+        ./modules/localization.nix
         ./modules/desktop/desktop.nix
         ./modules/development.nix
         ./modules/text-processing.nix
