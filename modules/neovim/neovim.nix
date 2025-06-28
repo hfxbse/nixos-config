@@ -1,4 +1,4 @@
-{...}: {
+{ lib, ... }: {
   imports = [
     ./theme.nix
     ./telescope.nix
@@ -9,10 +9,12 @@
     defaultEditor = true;
     viAlias = true;
 
+    clipboard.providers.wl-copy.enable = lib.mkDefault true;
 
     opts = {
       number = true;
 
+      clipboard = "unnamedplus";
       wildmode = "list:longest";
 
       expandtab = true;
