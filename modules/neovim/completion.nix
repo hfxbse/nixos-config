@@ -1,4 +1,5 @@
-{...}: {
+{ pkgs, ... }:
+{
   programs.nixvim = {
     plugins = {
       blink-cmp = {
@@ -11,7 +12,24 @@
           };
         };
       };
+
+      lspconfig.enable = true;
       nvim-autopairs.enable = true;
     };
+
+    lsp.servers = {
+      ltex.enable = true;
+      nixd = {
+        enable = true;
+        settings.formatting = {
+          command = [ "nixfmt" ];
+        };
+      };
+      texlab.enable = true;
+    };
+
+    extraPackages = with pkgs; [
+      nixfmt-rfc-style
+    ];
   };
 }

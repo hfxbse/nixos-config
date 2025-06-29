@@ -1,4 +1,5 @@
-{ lib, ... }: {
+{ lib, ... }:
+{
   imports = [
     ./theme.nix
     ./telescope.nix
@@ -11,6 +12,14 @@
     viAlias = true;
 
     clipboard.providers.wl-copy.enable = lib.mkDefault true;
+
+    keymaps = [
+      {
+        mode = [ "n" ];
+        key = "<C-A-l>";
+        action = "<cmd>lua vim.lsp.buf.format()<cr>";
+      }
+    ];
 
     opts = {
       number = true;
