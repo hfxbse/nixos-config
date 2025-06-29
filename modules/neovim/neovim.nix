@@ -2,6 +2,7 @@
   imports = [
     ./theme.nix
     ./telescope.nix
+    ./completion.nix
   ];
 
   programs.nixvim = {
@@ -30,5 +31,4 @@
       trim.enable = true;
     };
   };
-
 }
