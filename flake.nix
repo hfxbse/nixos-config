@@ -46,6 +46,7 @@
       ./modules/development.nix
       ./modules/localization.nix
       ./modules/printing.nix
+      ./modules/permissions.nix
       ./modules/text-processing.nix
       ./modules/workplace-compliance.nix
     ];
@@ -78,6 +79,7 @@
         ./modules/localization.nix
         ./modules/desktop/desktop.nix
         ./modules/development.nix
+        ./modules/permissions.nix
         ./modules/text-processing.nix
         ./hosts/cgi-wsl/configuration.nix
       ];
