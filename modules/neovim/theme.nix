@@ -21,6 +21,8 @@ in
     };
 
     plugins = {
+      lualine.enable = true;
+
       treesitter = {
         enable = true;
         settings = {
