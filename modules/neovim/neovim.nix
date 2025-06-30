@@ -44,8 +44,24 @@ in
       }
       {
         mode = [ "n" ];
-        key = "bc";
+        key = "mc";
+        action = "<cmd>bd<cr>";
+      }
+      {
+        mode = [ "n" ];
+        key = "mC";
         action = "<cmd>%bd<cr>";
+      }
+      {
+        mode = [ "n" ];
+        # technically should be mn but mm feels so much better
+        key = "mm";
+        action = "<cmd>bnext<cr>";
+      }
+      {
+        mode = [ "n" ];
+        key = "mp";
+        action = "<cmd>bprevious<cr>";
       }
     ];
 
