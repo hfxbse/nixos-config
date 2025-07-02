@@ -15,6 +15,11 @@ in
   development.container.enable = true;
   virtualisation.docker.storageDriver = lib.mkForce null;
 
+  programs.nixvim.clipboard.providers = {
+    wl-copy.enable = false;
+    xclip.enable = true;
+  };
+
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
   #
