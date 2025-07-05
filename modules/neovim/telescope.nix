@@ -16,6 +16,11 @@
         key = "gT";
         action = "<cmd>Telescope live_grep<cr>";
       }
+      {
+        mode = [ "n" ];
+        key = "mT";
+        action = "<cmd>Telescope buffers<cr>";
+      }
     ];
 
     plugins.telescope = {
