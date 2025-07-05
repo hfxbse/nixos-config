@@ -1,4 +1,10 @@
-{ config, lib, pkgs, ... }: {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
@@ -27,20 +33,23 @@
   console.keyMap = "de";
 
   fonts = {
-    packages = with pkgs; [
-      noto-fonts
-      noto-fonts-emoji
-      noto-fonts-cjk-sans
-    ] ++ ( with pkgs.nerd-fonts; [
-      jetbrains-mono
-      noto
-    ]);
+    packages =
+      with pkgs;
+      [
+        noto-fonts
+        noto-fonts-emoji
+        noto-fonts-cjk-sans
+      ]
+      ++ (with pkgs.nerd-fonts; [
+        jetbrains-mono
+        noto
+      ]);
 
     fontconfig = {
       defaultFonts = {
         serif = [ "Noto Serif" ];
         sansSerif = [ "Noto Sans" ];
-        monospace = [ "JetBrainsMonoNerdFontMono"];
+        monospace = [ "JetBrainsMonoNerdFontMono" ];
       };
     };
   };

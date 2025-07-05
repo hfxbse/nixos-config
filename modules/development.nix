@@ -1,4 +1,10 @@
-{ config, lib, pkgs, quick-template, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  quick-template,
+  ...
+}:
 let
   cfg = config.development;
   username = config.user.name;
@@ -16,7 +22,7 @@ in
 
   config = {
     virtualisation.docker = lib.mkIf cfg.container.enable {
-      enable = true;    # https://github.com/nektos/act is not fully compatible with rootless docker
+      enable = true; # https://github.com/nektos/act is not fully compatible with rootless docker
       storageDriver = "btrfs";
     };
 
@@ -25,26 +31,29 @@ in
       # Some NPM packages contain unpatched binaries, for example Cloudflare's Wrangler CLI
       enable = lib.mkDefault (cfg.openjdk.enable || cfg.js.enable);
 
-      libraries = lib.optionals cfg.openjdk.enable (with pkgs; [
-        gtk3
-        gdk-pixbuf
-        xorg.libXtst
-        xorg.libXxf86vm
-        xorg.libX11
-        glib
-        cairo
-        pango
-        libGL
-      ]);
+      libraries = lib.optionals cfg.openjdk.enable (
+        with pkgs;
+        [
+          gtk3
+          gdk-pixbuf
+          xorg.libXtst
+          xorg.libXxf86vm
+          xorg.libX11
+          glib
+          cairo
+          pango
+          libGL
+        ]
+      );
     };
 
     services.gvfs.enable = lib.mkDefault cfg.android.enable;
     services.udev.packages =
-      lib.optional cfg.android.enable pkgs.android-udev-rules ++
-      lib.optional cfg.embedded.enable pkgs.platformio-core.udev;
+      lib.optional cfg.android.enable pkgs.android-udev-rules
+      ++ lib.optional cfg.embedded.enable pkgs.platformio-core.udev;
 
     users.groups.adbuser.members = lib.optional cfg.android.enable username;
-    users.groups.dialout.members = lib.optional cfg.embedded.enable username;  # Non-root access to serial ports
+    users.groups.dialout.members = lib.optional cfg.embedded.enable username; # Non-root access to serial ports
     users.groups.docker.members = lib.optional cfg.container.enable username;
 
     users.users.${username}.packages = [

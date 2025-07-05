@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.desktop;
 in
@@ -16,25 +21,31 @@ in
 
     # HEIC thumbnails in GNOME files
     # See https://github.com/NixOS/nixpkgs/issues/164021
-    environment.systemPackages = [ pkgs.libheif pkgs.libheif.out ];
-    environment.gnome.excludePackages = (with pkgs; [
-      gnome-tour
-      gnome-2048
-      cheese
-      epiphany
-      geary
-      totem
-      yelp
-      simple-scan
-      gnome-music
-      gnome-maps
-      gnome-contacts
-      tali
-      iagno
-      hitori
-      atomix
-      polari
-    ]);
+    environment.systemPackages = [
+      pkgs.libheif
+      pkgs.libheif.out
+    ];
+    environment.gnome.excludePackages = (
+      with pkgs;
+      [
+        gnome-tour
+        gnome-2048
+        cheese
+        epiphany
+        geary
+        totem
+        yelp
+        simple-scan
+        gnome-music
+        gnome-maps
+        gnome-contacts
+        tali
+        iagno
+        hitori
+        atomix
+        polari
+      ]
+    );
 
     services.xserver.excludePackages = [ pkgs.xterm ];
   };

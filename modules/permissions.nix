@@ -1,4 +1,5 @@
-{...}: {
+{ ... }:
+{
   security.sudo = {
     enable = true;
     extraConfig = ''

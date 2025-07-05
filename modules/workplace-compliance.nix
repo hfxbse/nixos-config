@@ -1,8 +1,13 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  ...
+}:
 let
   cfg = config.workplaceCompliance;
   types = lib.types;
-in {
+in
+{
   options.workplaceCompliance = {
     enable = lib.mkEnableOption "workplace compliance";
 
@@ -36,8 +41,7 @@ in {
     networking.firewall = {
       enable = cfg.firewall.enable;
       checkReversePath = lib.mkIf (
-        cfg.ikev2.enable ||
-        config.networking.networkmanager.enableStrongSwan
+        cfg.ikev2.enable || config.networking.networkmanager.enableStrongSwan
       ) "loose";
     };
   };

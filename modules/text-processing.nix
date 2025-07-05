@@ -1,4 +1,9 @@
-{ config, lib, nixvim, pkgs, ... }: {
+{
+  config,
+  lib,
+  ...
+}:
+{
   imports = [ ./neovim/neovim.nix ];
 
   options.user.fullName = lib.mkOption {

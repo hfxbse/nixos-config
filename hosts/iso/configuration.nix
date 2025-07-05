@@ -1,4 +1,10 @@
-{ config, lib, modulesPath, pkgs, ... }:
+{
+  config,
+  lib,
+  modulesPath,
+  pkgs,
+  ...
+}:
 let
   cfg = config.setup;
   useSSH = cfg.authorizedKey != null;
@@ -29,7 +35,10 @@ in
   };
 
   config = {
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+    nix.settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
 
     hardware.cpu.intel.updateMicrocode = true;
 

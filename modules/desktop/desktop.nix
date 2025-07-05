@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.desktop;
   user = config.user;
@@ -26,7 +31,10 @@ in
     };
 
     login = lib.mkOption {
-      type = lib.types.enum [ "manuel" "auto" ];
+      type = lib.types.enum [
+        "manuel"
+        "auto"
+      ];
       description = "Whether the login should be done manuel by the user or automatic";
       default = "manuel";
     };
@@ -45,12 +53,12 @@ in
       enable = lib.mkDefault true;
 
       allowedTCPPorts = [
-        53      # DNS
+        53 # DNS
       ];
 
       allowedUDPPorts = [
-        53      # DNS
-        67      # DHCP
+        53 # DNS
+        67 # DHCP
       ];
     };
 
@@ -58,10 +66,12 @@ in
     # settings from avahi-daemon.nix where mdns is replaced with mdns4
     services.avahi.nssmdns4 = false; # Use the settings from below
     system.nssModules = pkgs.lib.optional (!config.services.avahi.nssmdns4) pkgs.nssmdns;
-    system.nssDatabases.hosts = with pkgs.lib; optionals (!config.services.avahi.nssmdns4) (mkMerge [
-      (mkBefore [ "mdns4_minimal [NOTFOUND=return]" ]) # before resolve
-      (mkAfter [ "mdns4" ]) # after dns
-    ]);
+    system.nssDatabases.hosts =
+      with pkgs.lib;
+      optionals (!config.services.avahi.nssmdns4) (mkMerge [
+        (mkBefore [ "mdns4_minimal [NOTFOUND=return]" ]) # before resolve
+        (mkAfter [ "mdns4" ]) # after dns
+      ]);
 
     services.pulseaudio.enable = false;
     security.rtkit.enable = true;
@@ -81,7 +91,7 @@ in
     services.displayManager.autoLogin.enable = cfg.login == "auto";
     services.displayManager.autoLogin.user = lib.mkDefault user.name;
 
-    boot.supportedFilesystems = [ "ntfs"  ];
+    boot.supportedFilesystems = [ "ntfs" ];
     # Support mounting MTP devices
     services.gvfs.enable = lib.mkDefault true;
 

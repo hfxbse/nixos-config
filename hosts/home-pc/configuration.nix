@@ -1,11 +1,18 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  ...
+}:
 let
   user = config.user;
 in
 {
   imports = [ ./hardware-configuration.nix ];
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -33,7 +40,7 @@ in
   # Desktop setup.
   desktop = {
     enable = true;
-    login = "auto";   # No need to login againt to reach the desktop after LUKS decryption
+    login = "auto"; # No need to login againt to reach the desktop after LUKS decryption
   };
 
   # Setup peripherals.
@@ -73,7 +80,7 @@ in
     ];
   };
 
-  environment.systemPackages = with pkgs; [];
+  environment.systemPackages = with pkgs; [ ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

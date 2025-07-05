@@ -1,7 +1,10 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  ...
+}:
 let
   cfg = config.gaming;
-  user = config.user;
 in
 {
   options.gaming = {

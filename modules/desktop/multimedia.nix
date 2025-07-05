@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.multimedia;
   user = config.user;
@@ -17,9 +22,17 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    users.users.${user.name}.packages = with pkgs; [ vlc ] ++
-      lib.optional config.nixpkgs.config.allowUnfree pkgs.spotify ++
-      lib.optionals cfg.imageEditing.enable (with pkgs; [ gimp inkscape ]) ++
-      lib.optional cfg.videoRecording.enable pkgs.obs-studio;
+    users.users.${user.name}.packages =
+      with pkgs;
+      [ vlc ]
+      ++ lib.optional config.nixpkgs.config.allowUnfree pkgs.spotify
+      ++ lib.optionals cfg.imageEditing.enable (
+        with pkgs;
+        [
+          gimp
+          inkscape
+        ]
+      )
+      ++ lib.optional cfg.videoRecording.enable pkgs.obs-studio;
   };
 }

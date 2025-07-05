@@ -1,4 +1,8 @@
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  ...
+}:
 let
   username = config.wsl.defaultUser;
 in
@@ -6,7 +10,10 @@ in
   wsl.enable = true;
   wsl.defaultUser = "fabian.haas";
   security.pki.certificateFiles = [ ./ZscalerRootCertificate-2048-SHA256.crt ];
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   user.name = username;
   desktop.enable = false;
