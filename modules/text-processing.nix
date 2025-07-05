@@ -12,6 +12,10 @@
   };
 
   config = {
+    programs.bash.interactiveShellInit = ''
+      set -o vi
+    '';
+
     programs.git.enable = true;
     programs.git.config = {
       init.defaultBranch = "main";
