@@ -1,7 +1,7 @@
 {
   config,
-  cups-brother-hl3172cdw,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -10,6 +10,6 @@ in
 {
   services.printing = {
     logLevel = "debug";
-    drivers = lib.optional allowUnfree cups-brother-hl3172cdw;
+    drivers = lib.optional allowUnfree pkgs.cups-brother-hl3172cdw;
   };
 }

@@ -38,8 +38,17 @@ pkgsi686Linux.stdenv.mkDerivation {
   pname = "cups-brother-${model}";
   version = cupsVersion;
 
-  nativeBuildInputs = [ makeWrapper dpkg autoPatchelfHook ];
-  buildInputs = [ cups ghostscript a2ps glibc ];
+  nativeBuildInputs = [
+    makeWrapper
+    dpkg
+    autoPatchelfHook
+  ];
+  buildInputs = [
+    cups
+    ghostscript
+    a2ps
+    glibc
+  ];
 
   unpackPhase = ''
     tar -xvf ${cupsSrc}
@@ -60,8 +69,22 @@ pkgsi686Linux.stdenv.mkDerivation {
 
     sed -i '/GHOST_SCRIPT=/c\GHOST_SCRIPT=gs' $out/opt/brother/Printers/${model}/lpd/psconvertij2
 
-    wrapProgram $out/opt/brother/Printers/${model}/lpd/psconvertij2 --prefix PATH ":" ${ lib.makeBinPath [ gnused coreutils gawk ] }
-    wrapProgram $out/opt/brother/Printers/${model}/lpd/filter${model} --prefix PATH ":" ${ lib.makeBinPath [ ghostscript a2ps file gnused coreutils ] }
+    wrapProgram $out/opt/brother/Printers/${model}/lpd/psconvertij2 --prefix PATH ":" ${
+      lib.makeBinPath [
+        gnused
+        coreutils
+        gawk
+      ]
+    }
+    wrapProgram $out/opt/brother/Printers/${model}/lpd/filter${model} --prefix PATH ":" ${
+      lib.makeBinPath [
+        ghostscript
+        a2ps
+        file
+        gnused
+        coreutils
+      ]
+    }
 
     ln -s $out/opt/brother/Printers/${model}/lpd/filter${model} $out/lib/cups/filter/brother_lpdwrapper_${model}
 
@@ -74,7 +97,13 @@ pkgsi686Linux.stdenv.mkDerivation {
     cp brcupsconfpt1 $out/opt/brother/Printers/${model}/cupswrapper/
     ln -s $out/opt/brother/Printers/${model}/cupswrapper/brcupsconfpt1 $out/lib/cups/filter/brcupsconfpt1
 
-    wrapProgram $out/opt/brother/Printers/${model}/cupswrapper/cupswrapper${model} --prefix PATH ":" ${ lib.makeBinPath [ gnused coreutils gawk ] }
+    wrapProgram $out/opt/brother/Printers/${model}/cupswrapper/cupswrapper${model} --prefix PATH ":" ${
+      lib.makeBinPath [
+        gnused
+        coreutils
+        gawk
+      ]
+    }
 
     # Install PPD file
     mkdir -p $out/share/cups/model/

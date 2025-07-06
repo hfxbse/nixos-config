@@ -14,11 +14,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    cups-brother-hl3172cdw = {
-      url = "github:hfxbse/nixos-config?ref=derivation/cups-brother-hl3172cdw";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     quick-template = {
       url = "github:hfxbse/nixos-config?ref=derivation/quick-template";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,15 +27,22 @@
 
   outputs =
     {
+      self,
       disko,
       nixpkgs,
       nixvim,
       ...
     }@inputs:
     let
+      system = "x86_64-linux";
       lib = nixpkgs.lib;
+      pkgs = nixpkgs.legacyPackages.${system};
     in
     {
+      packages.${system} = lib.genAttrs [
+        "cups-brother-hl3172cdw"
+      ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { });
+
       nixosConfigurations =
         let
           fullName = {
@@ -48,7 +50,6 @@
           };
 
           additionalPackages = with inputs; {
-            cups-brother-hl3172cdw = cups-brother-hl3172cdw.packages.x86_64-linux.default;
             quick-template = quick-template.packages.x86_64-linux.quick;
           };
 
@@ -58,6 +59,15 @@
             ./hosts/${name}/configuration.nix
             ./modules/permissions.nix
             ./modules/text-processing.nix
+            {
+              nixpkgs.overlays =
+                let
+                  packages = self.packages.${system};
+                in
+                [
+                  (final: prev: lib.genAttrs (builtins.attrNames packages) (name: packages.${name}))
+                ];
+            }
           ];
 
           interactiveSystemModules =
@@ -69,7 +79,6 @@
               ./modules/localization.nix
             ];
 
-          system = "x86_64-linux";
         in
         lib.genAttrs [ "home-pc" "nt-laptop" ] (
           name:

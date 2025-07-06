@@ -1,26 +1,5 @@
 {
   "nodes": {
-    "cups-brother-hl3172cdw": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1737927684,
-        "narHash": "sha256-UIxzjUCJaBN8MH3DeWdU77UNTo1nvTUYJjtitptsNv0=",
-        "owner": "hfxbse",
-        "repo": "nixos-config",
-        "rev": "34ffeb318a631ed8537b4853a24f116a8f85c374",
-        "type": "github"
-      },
-      "original": {
-        "owner": "hfxbse",
-        "ref": "derivation/cups-brother-hl3172cdw",
-        "repo": "nixos-config",
-        "type": "github"
-      }
-    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -230,7 +209,6 @@
     },
     "root": {
       "inputs": {
-        "cups-brother-hl3172cdw": "cups-brother-hl3172cdw",
         "disko": "disko",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs",
