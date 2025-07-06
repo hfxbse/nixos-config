@@ -10,10 +10,12 @@ writeShellScriptBin "quick" ''
     exit 1;
   fi
 
-  if [ "$1" == "latex" ]; then
-    shift;
-    nix flake init -t github:hfxbse/flaketex-base-template $@;
+  type="$1";
+  shift;
+
+  if [ "$type" == "latex" ]; then
+    nix flake init -t github:hfxbse/flaketex-base-template "$@";
   else
-    nix flake init -t github:hfxbse/nixos-config/template/$@;
+    nix flake init -t "github:hfxbse/nixos-config#$type" "$@";
   fi
 ''

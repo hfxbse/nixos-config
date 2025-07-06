@@ -44,6 +44,14 @@
         "quick-template"
       ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { latex = pkgs.texliveFull; });
 
+      templates = {
+        default = self.templates.baseline;
+        baseline = {
+          description = "A baseline flake";
+          path = ./templates/baseline;
+        };
+      };
+
       nixosConfigurations =
         let
           fullName = {
