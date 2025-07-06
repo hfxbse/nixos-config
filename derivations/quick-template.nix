@@ -1,5 +1,6 @@
 {
-  writeShellScriptBin
+  writeShellScriptBin,
+  ...
 }:
 writeShellScriptBin "quick" ''
   set -e;

@@ -186,34 +186,12 @@
         "type": "github"
       }
     },
-    "quick-template": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1741863940,
-        "narHash": "sha256-nJtvSxebtu/Grk32/zp2i6cUO/tiFcr/5dTkvYpJ0Tk=",
-        "owner": "hfxbse",
-        "repo": "nixos-config",
-        "rev": "80fda9e479dfa90a65b0805c6bd08df820540608",
-        "type": "github"
-      },
-      "original": {
-        "owner": "hfxbse",
-        "ref": "derivation/quick-template",
-        "repo": "nixos-config",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "disko": "disko",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs",
-        "nixvim": "nixvim",
-        "quick-template": "quick-template"
+        "nixvim": "nixvim"
       }
     },
     "systems": {

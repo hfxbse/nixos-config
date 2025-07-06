@@ -1,7 +1,7 @@
 # Nix Derivations and OS configurations
 
 Collection of system configurations and derivations for packages not found in
-[Nixpkgs](https://search.nixos.org), accessible via [Nix flake](https://wiki.nixos.org/wiki/Flakes).
+[Nixpkgs](https://search.nixos.org), accessible via a [Nix flake](https://wiki.nixos.org/wiki/Flakes).
 
 ## Derivations
 
@@ -20,3 +20,7 @@ Here is an example which will display the script help.
 # everything after the `--` will be passed to the executed script or program
 nix run github:hfxbse/nixos-config#flaketex -- -h
 ```
+
+### Quick template
+
+Wrapper around `nix flake init` to avoid having to type long URLs manually.

@@ -14,11 +14,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    quick-template = {
-      url = "github:hfxbse/nixos-config?ref=derivation/quick-template";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -36,22 +31,23 @@
     let
       system = "x86_64-linux";
       lib = nixpkgs.lib;
-      pkgs = nixpkgs.legacyPackages.${system};
+
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
     in
     {
       packages.${system} = lib.genAttrs [
         "flaketex"
         "cups-brother-hl3172cdw"
+        "quick-template"
       ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { latex = pkgs.texliveFull; });
 
       nixosConfigurations =
         let
           fullName = {
             user.fullName = "Fabian Haas";
-          };
-
-          additionalPackages = with inputs; {
-            quick-template = quick-template.packages.x86_64-linux.quick;
           };
 
           baseModules = name: [
@@ -85,7 +81,6 @@
           name:
           lib.nixosSystem {
             inherit system;
-            specialArgs = additionalPackages;
             modules = interactiveSystemModules name ++ [
               ./modules/printing.nix
               ./modules/workplace-compliance.nix
@@ -95,7 +90,6 @@
         // {
           cgi-wsl = lib.nixosSystem {
             inherit system;
-            specialArgs = additionalPackages;
             modules = interactiveSystemModules "cgi-wsl" ++ [
               inputs.nixos-wsl.nixosModules.default
             ];

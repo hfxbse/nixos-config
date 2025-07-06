@@ -1,6 +1,7 @@
 {
   latex,
   writeShellScriptBin,
+  ...
 }:
 let
   tools = latex.withPackages (

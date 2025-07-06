@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  quick-template,
   ...
 }:
 let
@@ -56,9 +55,12 @@ in
     users.groups.dialout.members = lib.optional cfg.embedded.enable username; # Non-root access to serial ports
     users.groups.docker.members = lib.optional cfg.container.enable username;
 
-    users.users.${username}.packages = [
-      quick-template
-    ] ++ lib.optional cfg.container.enable pkgs.docker-compose;
+    users.users.${username}.packages =
+      with pkgs;
+      [
+        quick-template
+      ]
+      ++ lib.optional cfg.container.enable pkgs.docker-compose;
 
     development.vagrant.user = lib.mkDefault username;
   };
