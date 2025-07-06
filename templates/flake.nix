@@ -21,13 +21,5 @@
       hello = pkgs.hello;
       default = self.packages.${system}.hello;
     });
-
-    templates = {
-      default = self.templates.baseline;
-      baseline = {
-        description = "A baseline flake";
-        path = ./.;
-      };
-    };
   };
 }

@@ -8,5 +8,5 @@
 To utilize this template run
 
 ```sh
-nix flake init -t github:hfxbse/nixos-config/template/flake
+nix flake init -t github:hfxbse/nixos-config
 ```
