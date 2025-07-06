@@ -25,7 +25,22 @@ nix run github:hfxbse/nixos-config#flaketex -- -h
 
 Wrapper around `nix flake init` to avoid having to type long URLs manually.
 
-## OS configurations
+## Templates
+
+### Baseline flake template
+
+* `.editorconfig` for `.nix` files and enforcing a new line at the end of all files.
+* GitHub Workflow to check the validity of the flake.
+* `system` helper function only using `nixpkgs.lib.genAttrs`.
+* `.gitignore` excluding build output from Nix.
+
+To utilize this template run
+
+```sh
+nix flake init -t github:hfxbse/nixos-config
+```
+
+## Host configurations
 
 ### CGI WSL
 
