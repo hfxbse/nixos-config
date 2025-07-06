@@ -1,12 +1,14 @@
 {
   latex,
-  writeShellScriptBin
+  writeShellScriptBin,
 }:
 let
-  tools = latex.withPackages ( texlivePackages: with texlivePackages; [
-    biber
-    glossaries
-  ]);
+  tools = latex.withPackages (
+    texlivePackages: with texlivePackages; [
+      biber
+      glossaries
+    ]
+  );
 in
 writeShellScriptBin "compile-latex" ''
   set -e;

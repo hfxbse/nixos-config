@@ -40,8 +40,9 @@
     in
     {
       packages.${system} = lib.genAttrs [
+        "flaketex"
         "cups-brother-hl3172cdw"
-      ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { });
+      ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { latex = pkgs.texliveFull; });
 
       nixosConfigurations =
         let
