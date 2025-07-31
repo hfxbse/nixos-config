@@ -19,6 +19,7 @@ in
   desktop.enable = false;
   programs.ssh.startAgent = true;
 
+  wsl.interop.register = true;
   development.container.enable = true;
   virtualisation.docker.storageDriver = lib.mkForce null;
 
