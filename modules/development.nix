@@ -7,7 +7,6 @@
 let
   cfg = config.development;
   username = config.user.name;
-  docker = pkgs.docker;
 in
 {
   imports = [ ./vagrant.nix ];
@@ -21,18 +20,9 @@ in
   };
 
   config = {
-    boot.binfmt.emulatedSystems = lib.optional cfg.container.enable "aarch64-linux";
-    systemd.services.docker-bimfmt = lib.mkIf cfg.container.enable {
-      enable = true;
-      description = "Setup docker multi-arch via qemu-user-static";
-      wants = [ "network-online.target" ];
-      wantedBy = [ "multi-user.target" ];
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${docker}/bin/docker run --rm --privileged multiarch/qemu-user-static --credential yes --persistent yes";
-        Restart = "on-failure";
-        RestartSec = 60;
-      };
+    boot.binfmt = lib.mkIf cfg.container.enable {
+      emulatedSystems = [ "aarch64-linux" ];
+      preferStaticEmulators = true;
     };
 
     virtualisation.docker = lib.mkIf cfg.container.enable {

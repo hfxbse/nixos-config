@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -26,23 +27,29 @@ in
     ikev2.enable = lib.mkEnableOption "IKEv2 VPN connection support";
   };
 
-  config = lib.mkIf cfg.enable {
-    services.clamav = {
-      updater.enable = cfg.av.enable;
-      daemon.enable = cfg.av.enable;
-    };
+  config =
+    let
+      strongswan = pkgs.networkmanager-strongswan;
+    in
+    lib.mkIf cfg.enable {
+      services.clamav = {
+        updater.enable = cfg.av.enable;
+        daemon.enable = cfg.av.enable;
+      };
 
-    networking.networkmanager.enableStrongSwan = lib.mkDefault cfg.ikev2.enable;
-    environment.etc."strongswan.conf" = lib.mkIf cfg.ikev2.enable {
-      # See https://github.com/NixOS/nixpkgs/issues/375352#issue-2800029311
-      text = "";
-    };
+      networking.networkmanager.plugins = lib.optional cfg.ikev2.enable strongswan;
+      environment.etc = lib.mkIf cfg.ikev2.enable {
+        # See https://github.com/NixOS/nixpkgs/issues/375352#issue-2800029311
+        "strongswan.conf".text = "";
+      };
 
-    networking.firewall = {
-      enable = cfg.firewall.enable;
-      checkReversePath = lib.mkIf (
-        cfg.ikev2.enable || config.networking.networkmanager.enableStrongSwan
-      ) "loose";
+      networking.firewall =
+        let
+          strongswan-enabled = builtins.elem strongswan config.networking.networkmanager.plugins;
+        in
+        {
+          enable = cfg.firewall.enable;
+          checkReversePath = lib.mkIf strongswan-enabled "loose";
+        };
     };
-  };
 }
