@@ -50,7 +50,7 @@ in
       {
         mode = [ "n" ];
         key = "mC";
-        action = "<cmd>%bd<cr>";
+        action = "<cmd>bd!<cr>";
       }
       {
         mode = [ "n" ];
