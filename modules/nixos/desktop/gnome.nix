@@ -12,7 +12,13 @@ in
     services.xserver = {
       enable = true;
       displayManager.gdm.enable = lib.mkDefault true;
-      desktopManager.gnome.enable = true;
+      desktopManager.gnome = {
+        enable = true;
+        extraGSettingsOverrides = ''
+          [org.gnome.mutter]
+          experimental-features=['scale-monitor-framebuffer']
+        '';
+      };
     };
 
     # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
