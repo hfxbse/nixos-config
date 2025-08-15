@@ -51,6 +51,7 @@ in
     container.enable = true;
     embedded.enable = true;
     js.enable = true;
+    network.enable = true;
   };
 
   # Setup multimedia tooling.
@@ -79,8 +80,6 @@ in
       zotero
     ];
   };
-
-  environment.systemPackages = with pkgs; [ ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

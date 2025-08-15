@@ -17,6 +17,7 @@ in
     embedded.enable = lib.mkEnableOption "embedded development support";
     js.enable = lib.mkEnableOption "JavaScript development support";
     openjdk.enable = lib.mkEnableOption "OpenJDK development support";
+    network.enable = lib.mkEnableOption "tools helpful for network setups";
   };
 
   config = {
@@ -63,5 +64,11 @@ in
       ++ lib.optional cfg.container.enable pkgs.docker-compose;
 
     development.vagrant.user = lib.mkDefault username;
+
+    services.iperf3 = lib.mkIf cfg.network.enable {
+      enable = true;
+      openFirewall = true;
+      bind = "0.0.0.0";
+    };
   };
 }
