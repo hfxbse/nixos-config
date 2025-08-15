@@ -32,17 +32,31 @@
       system = "x86_64-linux";
       lib = nixpkgs.lib;
 
+      ownPackages =
+        let
+          packages = self.packages.${system};
+        in
+        (final: prev: lib.genAttrs (builtins.attrNames packages) (name: packages.${name}));
+
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
+        overlays = [ ownPackages ];
       };
     in
     {
-      packages.${system} = lib.genAttrs [
-        "flaketex"
-        "cups-brother-hl3172cdw"
-        "quick-template"
-      ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { latex = pkgs.texliveFull; });
+      packages.${system} =
+        lib.genAttrs [
+          "flaketex"
+          "cups-brother-hl3172cdw"
+          "quick-template"
+        ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { latex = pkgs.texliveFull; })
+        // {
+          nixvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
+            inherit pkgs;
+            module = ./modules/neovim/neovim.nix;
+          };
+        };
 
       templates = {
         default = self.templates.baseline;
@@ -62,16 +76,10 @@
             fullName
             nixvim.nixosModules.nixvim
             ./hosts/${name}/configuration.nix
-            ./modules/permissions.nix
-            ./modules/text-processing.nix
+            ./modules/nixos/permissions.nix
+            ./modules/nixos/text-processing.nix
             {
-              nixpkgs.overlays =
-                let
-                  packages = self.packages.${system};
-                in
-                [
-                  (final: prev: lib.genAttrs (builtins.attrNames packages) (name: packages.${name}))
-                ];
+              nixpkgs.overlays = [ ownPackages ];
             }
           ];
 
@@ -79,9 +87,9 @@
             name:
             baseModules name
             ++ [
-              ./modules/desktop/desktop.nix
-              ./modules/development.nix
-              ./modules/localization.nix
+              ./modules/nixos/desktop/desktop.nix
+              ./modules/nixos/development.nix
+              ./modules/nixos/localization.nix
             ];
 
         in
@@ -90,8 +98,8 @@
           lib.nixosSystem {
             inherit system;
             modules = interactiveSystemModules name ++ [
-              ./modules/printing.nix
-              ./modules/workplace-compliance.nix
+              ./modules/nixos/printing.nix
+              ./modules/nixos/workplace-compliance.nix
             ];
           }
         )

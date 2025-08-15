@@ -21,6 +21,13 @@ Here is an example which will display the script help.
 nix run github:hfxbse/nixos-config#flaketex -- -h
 ```
 
+### Nixvim
+
+Neovim configuration on all host machines implemented using
+[NixVim](https://github.com/nix-community/nixvim).
+Can be run as a standalone program, no dependency on NixOS, though
+[Nerd Fonts](https://www.nerdfonts.com/) is needed to display icons correctly.
+
 ### Quick template
 
 Wrapper around `nix flake init` to avoid having to type long URLs manually.
