@@ -46,6 +46,14 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    users.users.${user.name} = {
+      isNormalUser = true;
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+      ];
+    };
+
     networking.networkmanager.enable = lib.mkDefault true;
 
     # Allow sharing the network connection

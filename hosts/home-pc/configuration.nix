@@ -61,18 +61,12 @@ in
   # Enable gaming.
   gaming.enable = true;
 
-  # Enable libritd
+  # Enable libvirtd
   virtualisation.libvirtd.enable = true;
   programs.dconf.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${user.name} = {
-    isNormalUser = true;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "libvirtd"
-    ];
+    extraGroups = [ "libvirtd" ];
 
     packages = with pkgs; [
       jetbrains.idea-ultimate

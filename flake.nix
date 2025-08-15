@@ -18,12 +18,13 @@
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
   };
 
   outputs =
     {
       self,
-      disko,
       nixpkgs,
       nixvim,
       ...
@@ -74,6 +75,8 @@
 
           baseModules = name: [
             fullName
+            inputs.disko.nixosModules.disko
+            inputs.nixos-facter-modules.nixosModules.facter
             nixvim.nixosModules.nixvim
             ./hosts/${name}/configuration.nix
             ./modules/nixos/permissions.nix
@@ -91,9 +94,8 @@
               ./modules/nixos/development.nix
               ./modules/nixos/localization.nix
             ];
-
         in
-        lib.genAttrs [ "home-pc" "nt-laptop" ] (
+        lib.genAttrs [ "home-pc" "nt-laptop" "uni-tablet" ] (
           name:
           lib.nixosSystem {
             inherit system;
@@ -118,9 +120,7 @@
 
           server = lib.nixosSystem {
             inherit system;
-            modules = baseModules "server" ++ [
-              disko.nixosModules.disko
-            ];
+            modules = baseModules "server";
           };
         };
     };

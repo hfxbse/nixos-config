@@ -68,12 +68,7 @@ in
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${user.name} = {
-    isNormalUser = true;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "libvirtd"
-    ];
+    extraGroups = [ "libvirtd" ];
 
     packages = with pkgs; [
       jetbrains.idea-ultimate
@@ -81,8 +76,6 @@ in
       zotero
     ];
   };
-
-  environment.systemPackages = with pkgs; [ ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
