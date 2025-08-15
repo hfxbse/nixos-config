@@ -9,8 +9,7 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.type == "gnome") {
-    services.xserver = {
-      enable = true;
+    services = {
       displayManager.gdm.enable = lib.mkDefault true;
       desktopManager.gnome = {
         enable = true;
