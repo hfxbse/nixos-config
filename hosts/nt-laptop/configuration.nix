@@ -14,11 +14,6 @@ in
     ./nvidia.nix
   ];
 
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
-
   # Kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 

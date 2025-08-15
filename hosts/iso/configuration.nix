@@ -35,11 +35,6 @@ in
   };
 
   config = {
-    nix.settings.experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
-
     hardware.cpu.intel.updateMicrocode = true;
 
     console.keyMap = "de";

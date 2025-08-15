@@ -79,6 +79,7 @@
             inputs.nixos-facter-modules.nixosModules.facter
             nixvim.nixosModules.nixvim
             ./hosts/${name}/configuration.nix
+            ./modules/nixos/nix.nix
             ./modules/nixos/permissions.nix
             ./modules/nixos/text-processing.nix
             {
