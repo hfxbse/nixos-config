@@ -10,6 +10,7 @@ let
 in
 {
   imports = [
+    ./auto-rotate.nix
     ./browser.nix
     ./gaming.nix
     ./gnome.nix

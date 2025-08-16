@@ -1,20 +1,12 @@
-{ pkgs, lib, ... }:
+{ ... }:
 {
   imports = [ ./disk-config.nix ];
   facter.reportPath = ./facter.json;
 
-  hardware.sensor.iio.enable = true;
-  environment.systemPackages = with pkgs; [
-    gnomeExtensions.screen-rotate
-  ];
-  services.desktopManager.gnome.extraGSettingsOverrides = ''
-    [org/gnome/shell]
-    enabled-extensions=['screen-rotate@shyzus.github.io']
-  '';
-
   user.name = "fxbse";
   desktop = {
     enable = true;
+    auto-rotate = true;
     login = "auto"; # No need to login againt to reach the desktop after LUKS decryption
   };
 
