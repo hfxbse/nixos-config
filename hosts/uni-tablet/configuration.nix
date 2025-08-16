@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   imports = [ ./disk-config.nix ];
   facter.reportPath = ./facter.json;

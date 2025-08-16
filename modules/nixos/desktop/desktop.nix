@@ -55,7 +55,8 @@ in
       ];
     };
 
-    networking.networkmanager.enable = lib.mkDefault true;
+    networking.useNetworkd = false;
+    networking.networkmanager.enable = true;
 
     # Allow sharing the network connection
     networking.firewall = {
