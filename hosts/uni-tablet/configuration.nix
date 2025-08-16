@@ -3,10 +3,6 @@
   imports = [ ./disk-config.nix ];
   facter.reportPath = ./facter.json;
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
-
   hardware.sensor.iio.enable = true;
   environment.systemPackages = with pkgs; [
     gnomeExtensions.screen-rotate

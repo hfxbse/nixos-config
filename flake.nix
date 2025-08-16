@@ -101,6 +101,7 @@
           lib.nixosSystem {
             inherit system;
             modules = interactiveSystemModules name ++ [
+              ./modules/nixos/boot.nix
               ./modules/nixos/printing.nix
               ./modules/nixos/workplace-compliance.nix
             ];
@@ -116,12 +117,12 @@
 
           iso = lib.nixosSystem {
             # Set wifi and ssh key via the setup options defined in the configuration file
-            modules = baseModules "iso";
+            modules = baseModules "iso" ++ [ ./modules/nixos/boot.nix ];
           };
 
           server = lib.nixosSystem {
             inherit system;
-            modules = baseModules "server";
+            modules = baseModules "server" ++ [ ./modules/nixos/boot.nix ];
           };
         };
     };
