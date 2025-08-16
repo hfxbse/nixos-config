@@ -10,6 +10,7 @@ let
 in
 {
   imports = [
+    ./browser.nix
     ./gaming.nix
     ./gnome.nix
     ./multimedia.nix
