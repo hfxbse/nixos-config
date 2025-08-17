@@ -56,7 +56,6 @@ in
       ];
     };
 
-    networking.useNetworkd = false;
     networking.networkmanager.enable = true;
 
     # Allow sharing the network connection

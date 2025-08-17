@@ -7,7 +7,8 @@ let
   user = config.user;
 in
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [ ./disk-config.nix ];
+  facter.reportPath = ./facter.json;
 
   # Setup keyfile
   boot.initrd.secrets = {
