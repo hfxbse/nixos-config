@@ -69,60 +69,34 @@
 
       nixosConfigurations =
         let
-          fullName = {
-            user.fullName = "Fabian Haas";
-          };
-
-          baseModules = name: [
-            fullName
+          genericModules = [
             inputs.disko.nixosModules.disko
             inputs.nixos-facter-modules.nixosModules.facter
+            inputs.nixos-wsl.nixosModules.default
             nixvim.nixosModules.nixvim
-            ./hosts/${name}/configuration.nix
-            ./modules/nixos/nix.nix
-            ./modules/nixos/permissions.nix
-            ./modules/nixos/text-processing.nix
+            ./modules/nixos/default.nix
             {
               nixpkgs.overlays = [ ownPackages ];
+              user.fullName = "Fabian Haas";
             }
           ];
 
-          interactiveSystemModules =
-            name:
-            baseModules name
-            ++ [
-              ./modules/nixos/desktop/desktop.nix
-              ./modules/nixos/development.nix
-              ./modules/nixos/localization.nix
-            ];
         in
-        lib.genAttrs [ "home-pc" "nt-laptop" "uni-tablet" ] (
+        lib.genAttrs [ "cgi-wsl" "home-pc" "nt-laptop" "uni-tablet" "server" ] (
           name:
           lib.nixosSystem {
             inherit system;
-            modules = interactiveSystemModules name ++ [
-              ./modules/nixos/boot.nix
-              ./modules/nixos/printing.nix
-              ./modules/nixos/workplace-compliance.nix
+            modules = genericModules ++ [
+              ./hosts/${name}/configuration.nix
             ];
           }
         )
         // {
-          cgi-wsl = lib.nixosSystem {
-            inherit system;
-            modules = interactiveSystemModules "cgi-wsl" ++ [
-              inputs.nixos-wsl.nixosModules.default
-            ];
-          };
-
           iso = lib.nixosSystem {
             # Set wifi and ssh key via the setup options defined in the configuration file
-            modules = baseModules "iso" ++ [ ./modules/nixos/boot.nix ];
-          };
-
-          server = lib.nixosSystem {
-            inherit system;
-            modules = baseModules "server" ++ [ ./modules/nixos/boot.nix ];
+            modules = genericModules ++ [
+              ./hosts/iso/configuration.nix
+            ];
           };
         };
     };

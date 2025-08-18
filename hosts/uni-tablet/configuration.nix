@@ -20,7 +20,7 @@
   user.name = "fxbse";
   desktop = {
     enable = true;
-    auto-rotate = true;
+    auto-rotate.enable = true;
     login = "auto"; # No need to login again to reach the desktop after LUKS decryption
   };
 

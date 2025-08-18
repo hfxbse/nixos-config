@@ -1,6 +1,13 @@
-{ ... }:
+{ config, lib, ... }:
+let
+  cfg = config.desktop.browser;
+in
 {
-  programs.firefox = {
+  options.desktop.browser.enable = lib.mkEnableOption "webbrowsing" // {
+    default = true;
+  };
+
+  config.programs.firefox = lib.mkIf cfg.enable {
     enable = true;
 
     policies = {

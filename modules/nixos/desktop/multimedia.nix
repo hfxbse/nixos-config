@@ -5,16 +5,16 @@
   ...
 }:
 let
-  cfg = config.multimedia;
+  cfg = config.desktop.multimedia;
   user = config.user;
 in
 {
-  options.multimedia = {
-    enable = lib.mkEnableOption "audio streaming and video playback programs";
+  options.desktop.multimedia = {
+    enable = lib.mkEnableOption "audio streaming and video playback programs" // {
+      default = config.desktop.enable;
+    };
 
-    imageEditing.enable = lib.mkOption {
-      description = "bitmap and vector graphic editors";
-      type = lib.types.bool;
+    imageEditing.enable = lib.mkEnableOption "bitmap and vector graphic editors" // {
       default = true;
     };
 

@@ -15,6 +15,7 @@ in
     user = lib.mkOption {
       description = "Username of the Vagrant user.";
       type = lib.types.str;
+      default = config.user.name;
     };
 
     hypervisor = lib.mkOption {

@@ -28,7 +28,9 @@ in
   # Desktop setup.
   desktop = {
     enable = true;
+    gaming.enable = true;
     login = "auto"; # No need to login againt to reach the desktop after LUKS decryption
+    multimedia.videoRecording.enable = true;
   };
 
   # Setup peripherals.
@@ -42,22 +44,13 @@ in
     network.enable = true;
   };
 
-  # Setup multimedia tooling.
-  multimedia.enable = true;
-  multimedia.videoRecording.enable = true;
-
-  # Enable gaming.
-  gaming.enable = true;
-
   # Enable libvirtd
   virtualisation.libvirtd.enable = true;
-  programs.dconf.enable = true;
 
   users.users.${user.name} = {
     extraGroups = [ "libvirtd" ];
 
     packages = with pkgs; [
-      jetbrains.idea-ultimate
       nodejs
       zotero
     ];

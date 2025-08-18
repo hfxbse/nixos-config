@@ -1,12 +1,14 @@
 {
-  lib,
   config,
+  lib,
   ...
 }:
 let
   username = config.wsl.defaultUser;
 in
 {
+  boot.defaults.enable = lib.mkForce false;
+
   wsl.enable = true;
   wsl.defaultUser = "fabian.haas";
   security.pki.certificateFiles = [ ./ZscalerRootCertificate-2048-SHA256.crt ];

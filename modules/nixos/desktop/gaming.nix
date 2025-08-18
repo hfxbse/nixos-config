@@ -4,15 +4,12 @@
   ...
 }:
 let
-  cfg = config.gaming;
+  cfg = config.desktop.gaming;
 in
 {
-  options.gaming = {
-    enable = lib.mkEnableOption "the gaming setup";
-
-    steam.enable = lib.mkOption {
-      description = "Whether to setup Steam";
-      type = lib.types.bool;
+  options.desktop.gaming = {
+    enable = lib.mkEnableOption "gaming";
+    steam.enable = lib.mkEnableOption "Steam support" // {
       default = true;
     };
   };

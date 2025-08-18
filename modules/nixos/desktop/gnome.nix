@@ -11,14 +11,16 @@ in
   config = lib.mkIf (cfg.enable && cfg.type == "gnome") {
     services = {
       displayManager.gdm.enable = lib.mkDefault true;
-      desktopManager.gnome = {
-        enable = true;
-        extraGSettingsOverrides = ''
-          [org.gnome.mutter]
-          experimental-features=['scale-monitor-framebuffer']
-        '';
-      };
+      desktopManager.gnome.enable = true;
     };
+
+    programs.dconf.profiles.user.databases = [
+      {
+        settings = {
+          "org/gnome/mutter".experimental-features = [ "scale-monitor-framebuffer" ];
+        };
+      }
+    ];
 
     # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
     systemd.services."getty@tty1".enable = false;
@@ -30,6 +32,10 @@ in
       pkgs.libheif
       pkgs.libheif.out
     ];
+
+    # Allow mounting MTP devices in Nautilus
+    services.gvfs.enable = true;
+
     environment.gnome.excludePackages = (
       with pkgs;
       [

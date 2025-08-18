@@ -46,9 +46,6 @@ in
     vagrant.enable = true;
   };
 
-  # Setup multimedia tooling.
-  multimedia.enable = true;
-
   # Enable libritd.
   virtualisation.libvirtd.enable = true;
   programs.dconf.enable = true;

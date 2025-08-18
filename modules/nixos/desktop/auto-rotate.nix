@@ -5,12 +5,12 @@
   ...
 }:
 let
-  enable = config.desktop.auto-rotate;
+  cfg = config.desktop.auto-rotate;
 in
 {
-  options.desktop.auto-rotate = lib.mkEnableOption "auto-rotation of the screen using the accelorometer of the device.";
+  options.desktop.auto-rotate.enable = lib.mkEnableOption "auto-rotation of the screen using the accelorometer of the device.";
 
-  config = lib.mkIf enable {
+  config = lib.mkIf cfg.enable {
     hardware.sensor.iio.enable = true;
     environment.systemPackages = with pkgs.gnomeExtensions; [ screen-rotate ];
 
