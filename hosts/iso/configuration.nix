@@ -35,9 +35,10 @@ in
   };
 
   config = {
-    hardware.cpu.intel.updateMicrocode = true;
+    isoImage.squashfsCompression = "gzip -Xcompression-level 1";
 
-    console.keyMap = "de";
+    boot.kernelPackages = pkgs.linuxPackages_6_15;
+    zramSwap.enable = true;
 
     services.openssh = lib.mkIf useSSH {
       enable = true;
@@ -45,8 +46,10 @@ in
       settings.KbdInteractiveAuthentication = false;
     };
 
-    users.users.nixos.openssh.authorizedKeys.keys = lib.optional useSSH cfg.authorziedKey;
-    users.users.root.openssh.authorizedKeys.keys = lib.optional useSSH cfg.authorziedKey;
+    users.users = lib.mkIf useSSH {
+      nixos.openssh.authorizedKeys.keys = lib.optional useSSH cfg.authorziedKey;
+      root.openssh.authorizedKeys.keys = lib.optional useSSH cfg.authorziedKey;
+    };
 
     networking.wireless = lib.mkIf (cfg.wifi.ssid != null) {
       enable = true;
@@ -58,10 +61,7 @@ in
     };
 
     powerManagement.enable = lib.mkForce false;
-
     services.logind.lidSwitch = "ignore";
-
-    nixpkgs.hostPlatform = "x86_64-linux";
 
     environment.systemPackages = with pkgs; [ htop ];
   };

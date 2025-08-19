@@ -20,6 +20,7 @@
     };
 
     nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
+    flake-compat.url = "github:edolstra/flake-compat";
   };
 
   outputs =
@@ -93,8 +94,8 @@
         )
         // {
           iso = lib.nixosSystem {
-            # Set wifi and ssh key via the setup options defined in the configuration file
             modules = genericModules ++ [
+              { nixpkgs.hostPlatform = system; }
               ./hosts/iso/configuration.nix
             ];
           };
