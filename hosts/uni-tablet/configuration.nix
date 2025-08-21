@@ -17,11 +17,12 @@
     platform = "ipu6";
   };
 
+  boot.defaults.secureBoot = true;
+
   user.name = "fxbse";
   desktop = {
     enable = true;
     auto-rotate.enable = true;
-    login = "auto"; # No need to login again to reach the desktop after LUKS decryption
   };
 
   environment.systemPackages = with pkgs.gnomeExtensions; [
