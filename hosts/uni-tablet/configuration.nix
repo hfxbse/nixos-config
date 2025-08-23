@@ -22,6 +22,7 @@
   boot.defaults.secureBoot = true;
 
   user.name = "fxbse";
+  networking.hostName = "ice-skate";
 
   backups = {
     enable = true;
