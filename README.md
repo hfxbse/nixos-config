@@ -49,6 +49,37 @@ nix flake init -t github:hfxbse/nixos-config
 
 ## Host configurations
 
+### Bootstrapping
+
+1. Disable secure boot in the BIOS of your computer and set it into setup mode.
+2. Format the disk from the installer via [disko](https://github.com/nix-community/disko):
+   ```sh
+   sudo nix --experimental-features "nix-command flakes" \
+       run github:nix-community/disko/latest -- \
+       --mode destroy,format,mount \
+       disk-config.nix
+   ```
+3. Install NixOS from the configuration flake:
+   ```sh
+   sudo nixos-install --flake .
+   ```
+   ⚠️ Secure boot needs to be disabled in the configuration at this point ⚠️
+4. Enter the installation via `nixos-enter` and set the password of the normal
+   users.
+5. Boot into the new NixOS installation
+6. Generate secure boot platform keys and enroll them:
+   ```sh
+   nix run nixpkgs#sbctl -- create-keys
+   nix run nixpkgs#sbctl -- enroll-keys
+   ```
+   ⚠️ Omitting Microsoft's platform keys might brick your system ⚠️
+   This has not been an issue on a _Lenovo ThinkPad X12 gen 1._
+7. Enabled secure boot within the BIOS of your computer.
+8. Setup automatic unlocking of the LUKS's encryption via TPM:
+   ```sh
+   sudo systemd-cryptenroll --tpm2-device auto --tpm2-pcrs=0+2+7+12 --wipe-slot=tpm2 /dev/X
+   ```
+
 ### ISO
 
 Minimal live system to create a bootable ISO from with Nix flakes enabled by
