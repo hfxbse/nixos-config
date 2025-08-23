@@ -26,28 +26,35 @@
               settings.allowDiscards = true;
               content = {
                 type = "btrfs";
-                subvolumes = {
-                  "/root" = {
-                    mountpoint = "/";
-                    mountOptions = [
+                subvolumes =
+                  let
+                    systemFileOptions = [
                       "compress-force=zstd:2"
                       "noatime"
                     ];
-                  };
-                  "/home" = {
-                    mountpoint = "/home";
-                    mountOptions = [
+
+                    dataOptions = [
                       "compress=zstd:3"
                     ];
+                  in
+                  {
+                    "/root" = {
+                      mountpoint = "/";
+                      mountOptions = systemFileOptions;
+                    };
+                    "/home" = {
+                      mountpoint = "/home";
+                      mountOptions = dataOptions;
+                    };
+                    "/nix" = {
+                      mountpoint = "/nix";
+                      mountOptions = systemFileOptions;
+                    };
+                    "/var" = {
+                      mountpoint = "/var";
+                      mountOptions = dataOptions;
+                    };
                   };
-                  "/nix" = {
-                    mountpoint = "/nix";
-                    mountOptions = [
-                      "compress-force=zstd:2"
-                      "noatime"
-                    ];
-                  };
-                };
               };
             };
           };
