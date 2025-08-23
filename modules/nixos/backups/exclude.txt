@@ -76,6 +76,7 @@ Android/data/com.netflix.*
 /usr
 /var/cache
 /var/lib/docker
+/var/lib/sbctl
 /var/run
 /var/tmp
 /.cache
