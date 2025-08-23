@@ -21,9 +21,21 @@ in
     cpuFreqGovernor = "schedutil";
   };
 
+  # Setup peripherals.
+  hardware.wooting.enable = true;
+
   # Setup user and machine naming.
   networking.hostName = "ice-cube";
   user.name = "fxbse";
+
+  backups = {
+    enable = true;
+    repositoryUrl = "rest:https://dhb9zrj5:wTTRp721MigoGhcU@dhb9zrj5.repo.borgbase.com";
+    repositoryPasswordFile = "/var/lib/repository-password";
+    rootPaths = [
+      "/home"
+    ];
+  };
 
   # Desktop setup.
   desktop = {
@@ -32,9 +44,6 @@ in
     login = "auto"; # No need to login againt to reach the desktop after LUKS decryption
     multimedia.videoRecording.enable = true;
   };
-
-  # Setup peripherals.
-  hardware.wooting.enable = true;
 
   # Development setup.
   development = {
@@ -49,11 +58,7 @@ in
 
   users.users.${user.name} = {
     extraGroups = [ "libvirtd" ];
-
-    packages = with pkgs; [
-      nodejs
-      zotero
-    ];
+    packages = with pkgs; [ zotero ];
   };
 
   # This value determines the NixOS release from which the default
