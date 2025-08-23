@@ -17,24 +17,34 @@ in
     {
       enable = lib.mkEnableOption "automatic backups";
 
+      cpuLimit = lib.mkOption {
+        type = lib.types.nullOr lib.types.ints.positive;
+        description = "Limit how many CPU cores are used in parallel.";
+        default = null;
+      };
+
       repositoryPasswordFile = lib.mkOption {
         type = absolutePathString;
-        description = "Path to the file containing the repository password";
+        description = "Path to the file containing the repository password.";
       };
 
       repositoryUrl = lib.mkOption {
         type = lib.types.str;
-        description = "The URL to the backup repository";
+        description = "The URL to the backup repository.";
       };
 
       rootPaths = lib.mkOption {
         type = lib.types.listOf absolutePathString;
-        description = "Absolute paths to the backup roots";
+        description = "Absolute paths to the backup roots.";
       };
     };
 
   config.services.restic.backups =
     let
+      environment = "${pkgs.writeText "restic-environment" ''
+        GOMAXPROCS=${builtins.toString cfg.cpuLimit}
+      ''}";
+
       backupPrepareCommand = ''
         set -e;
         mkdir /snapshots;
@@ -59,8 +69,10 @@ in
         passwordFile = cfg.repositoryPasswordFile;
 
         paths = [ "/snapshots" ];
+        environmentFile = lib.mkIf (cfg.cpuLimit != null) environment;
         exclude = [ cfg.repositoryPasswordFile ];
         extraBackupArgs = [
+          "--compression=max"
           "--exclude-caches"
           "--exclude-file=${./exclude.txt}"
         ];
