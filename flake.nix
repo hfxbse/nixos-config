@@ -81,7 +81,7 @@
           ];
 
         in
-        lib.genAttrs [ "cgi-wsl" "home-pc" "nt-laptop" "uni-tablet" "server" ] (
+        lib.genAttrs [ "cgi-wsl" "ice-cube" "nt-laptop" "ice-skate" "server" ] (
           name:
           lib.nixosSystem {
             inherit system;
