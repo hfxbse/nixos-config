@@ -75,6 +75,8 @@ in
           private_browsing = true;
           default_area = "navbar";
         };
+
+        "1094918@gmail.com".installation_mode = "allowed";
       };
 
       FirefoxHome = {
