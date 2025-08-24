@@ -28,9 +28,12 @@ in
         description = "Path to the file containing the repository password.";
       };
 
-      repositoryUrl = lib.mkOption {
-        type = lib.types.str;
-        description = "The URL to the backup repository.";
+      repositoryUrlFile = lib.mkOption {
+        type = absolutePathString;
+        description = ''
+          Path to the file containig the URL to the backup repository.
+          Neccessary as the URL may contain the credentials.
+        '';
       };
 
       rootPaths = lib.mkOption {
@@ -64,13 +67,21 @@ in
       borgbase = {
         inherit backupPrepareCommand backupCleanupCommand;
 
-        repository = cfg.repositoryUrl;
         initialize = true;
+        repositoryFile = cfg.repositoryUrlFile;
         passwordFile = cfg.repositoryPasswordFile;
 
         paths = [ "/snapshots" ];
         environmentFile = lib.mkIf (cfg.cpuLimit != null) environment;
-        exclude = [ cfg.repositoryPasswordFile ];
+
+        exclude = lib.map (path: "*${path}") (
+          with cfg;
+          [
+            repositoryUrlFile
+            repositoryPasswordFile
+          ]
+        );
+
         extraBackupArgs = [
           "--compression=max"
           "--exclude-caches"

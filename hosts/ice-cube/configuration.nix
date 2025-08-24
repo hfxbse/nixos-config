@@ -30,11 +30,9 @@ in
 
   backups = {
     enable = true;
-    repositoryUrl = "rest:https://dhb9zrj5:wTTRp721MigoGhcU@dhb9zrj5.repo.borgbase.com";
-    repositoryPasswordFile = "/var/lib/repository-password";
-    rootPaths = [
-      "/home"
-    ];
+    repositoryUrlFile = "/var/lib/backup-repository/url";
+    repositoryPasswordFile = "/var/lib/backup-repository/password";
+    rootPaths = [ "/home" ];
   };
 
   # Desktop setup.

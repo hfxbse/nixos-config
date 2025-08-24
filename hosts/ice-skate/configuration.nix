@@ -26,8 +26,8 @@
 
   backups = {
     enable = true;
-    repositoryUrl = "rest:https://n65v15sx:D2ai530dU6IBKldB@n65v15sx.repo.borgbase.com";
-    repositoryPasswordFile = "/var/lib/repository-password";
+    repositoryUrlFile = "/var/lib/backup-repository/url";
+    repositoryPasswordFile = "/var/lib/backup-repository/password";
     rootPaths = [
       "/home"
       "/var"
