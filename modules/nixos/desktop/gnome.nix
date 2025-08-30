@@ -9,6 +9,7 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.type == "gnome") {
+    security.pam.services.gdm.enableGnomeKeyring = true;
     services = {
       displayManager.gdm.enable = lib.mkDefault true;
       desktopManager.gnome.enable = true;
