@@ -8,6 +8,7 @@
     ./nix.nix
     ./permissions.nix
     ./user.nix
+    ./windscribe.nix
     ./workplace-compliance.nix
     ./text-processing.nix
   ];

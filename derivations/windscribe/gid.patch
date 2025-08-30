@@ -1,0 +1,35 @@
+diff --git a/client/main_cli.cpp b/client/main_cli.cpp
+index 9de09057..b4037da0 100644
+--- a/client/main_cli.cpp
++++ b/client/main_cli.cpp
+@@ -50,10 +50,6 @@ int main(int argc, char *argv[])
+         return -1;
+     }
+     qCDebug(LOG_BASIC) << "Setting gid to:" << gid;
+-    if (setgid(gid) < 0) {
+-        qCCritical(LOG_BASIC) << "Could not set windscribe group";
+-        return -1;
+-    }
+ #endif
+ #endif
+ 
+diff --git a/client/main_gui.cpp b/client/main_gui.cpp
+index 7f03bd0e..253fe6d3 100644
+--- a/client/main_gui.cpp
++++ b/client/main_gui.cpp
+@@ -74,10 +74,6 @@ int main(int argc, char *argv[])
+         return -1;
+     }
+     qCDebug(LOG_BASIC) << "Setting gid to:" << gid;
+-    if (setgid(gid) < 0) {
+-        qCCritical(LOG_BASIC) << "Could not set windscribe group";
+-        return -1;
+-    }
+ #endif
+ #elif defined(Q_OS_WIN)
+ #ifndef _DEBUG
+@@ -252,4 +248,3 @@ int main(int argc, char *argv[])
+ 
+     return ret;
+ }
+-
