@@ -1,0 +1,13 @@
+diff --git a/libs/wsnet/CMakeLists.txt b/libs/wsnet/CMakeLists.txt
+index 54fcbe5f..3420f7c1 100644
+--- a/libs/wsnet/CMakeLists.txt
++++ b/libs/wsnet/CMakeLists.txt
+@@ -22,7 +22,7 @@ project(wsnet
+ 
+ find_package(c-ares CONFIG REQUIRED)
+ find_package(OpenSSL REQUIRED)
+-find_package(CURL CONFIG REQUIRED)
++find_package(CURL REQUIRED)
+ find_package(spdlog CONFIG REQUIRED)
+ find_package(RapidJSON CONFIG REQUIRED)
+ find_package(skyr-url CONFIG REQUIRED)

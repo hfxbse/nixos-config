@@ -46,15 +46,20 @@
     {
       packages.${system} =
         lib.genAttrs [
-          "flaketex"
+          "advobfuscator"
+          "cpp-base64"
           "cups-brother-hl3172cdw"
+          "flaketex"
           "quick-template"
+          "skyr-url"
         ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { latex = pkgs.texliveFull; })
         // {
           nixvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
             inherit pkgs;
             module = ./modules/neovim/neovim.nix;
           };
+
+          windscribe-desktop-app = pkgs.qt6.callPackage (import ./derivations/windscribe ) {};
         };
 
       templates = {
