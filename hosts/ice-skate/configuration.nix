@@ -23,6 +23,7 @@
 
   user.name = "fxbse";
   networking.hostName = "ice-skate";
+  programs.windscribe.enable = true;
 
   backups = {
     enable = true;

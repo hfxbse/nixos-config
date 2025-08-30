@@ -38,14 +38,18 @@ let
 in
 stdenv.mkDerivation {
   inherit version src;
-  pname = "windscribeDesktopApp";
+  pname = "Windscribe";
 
   patches = [
     ./curl.patch
+    ./gid.patch
     ./install.patch
   ];
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    wrapQtAppsHook
+  ];
 
   buildInputs = [
     advobfuscator
@@ -65,7 +69,6 @@ stdenv.mkDerivation {
     qttools
     qtwayland
     rapidjson
-    wrapQtAppsHook
   ];
 
   cmakeFlags = [
@@ -73,11 +76,6 @@ stdenv.mkDerivation {
     "-DADVOBFUSCATOR_INCLUDE_DIRS=${advobfuscator}/include/advobfuscator"
     "-DCPP_BASE64_INCLUDE_DIRS=${cpp-base64}/include"
     "-DCMAKE_EXE_LINKER_FLAGS=-lcares"
+    "-DDEFINE_CLI_ONLY_MACRO=ON"
   ];
-
-  fixupPhase = ''
-    mkdir $out/bin;
-    mv $out/Windscribe $out/bin/Windscribe;
-    ln -s $out/bin/Windscribe $out/bin/windscribe-desktop-app;
-  '';
 }

@@ -1,7 +1,19 @@
 diff --git a/client/CMakeLists.txt b/client/CMakeLists.txt
-index 7392e4c8..f6e48ae5 100644
+index 7392e4c8..5d921e5d 100644
 --- a/client/CMakeLists.txt
 +++ b/client/CMakeLists.txt
+@@ -228,9 +228,9 @@ if (APPLE)
+     install(FILES ${_OPENSSL_LIBDIR}/libssl.3.dylib DESTINATION Windscribe.app/Contents/Frameworks)
+ else()
+     install(TARGETS Windscribe
+-        RUNTIME DESTINATION .
++        RUNTIME DESTINATION "bin"
+         LIBRARY DESTINATION "lib"
+-        BUNDLE DESTINATION .
++        BUNDLE DESTINATION "bin"
+     )
+ endif()
+ 
 @@ -241,22 +241,4 @@ endif()
  
  if(UNIX AND (NOT APPLE))
