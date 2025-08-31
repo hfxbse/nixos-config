@@ -62,6 +62,13 @@ in
           default_area = "menupanel";
         };
 
+        "sponsorBlocker@ajay.app" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4541835/sponsorblock-latest.xpi";
+          installation_mode = "force_installed";
+          private_browsing = true;
+          default_area = "menupanel";
+        };
+
         "jid1-ZAdIEUB7XOzOJw@jetpack" = {
           install_url = "https://addons.mozilla.org/firefox/downloads/file/4540706/duckduckgo_for_firefox-latest.xpi";
           installation_mode = "force_installed";
