@@ -9,6 +9,7 @@ in
 {
   imports = [ ./disk-config.nix ];
   facter.reportPath = ./facter.json;
+  boot.defaults.secureBoot = true;
 
   # Setup keyfile
   boot.initrd.secrets = {
@@ -39,7 +40,6 @@ in
   desktop = {
     enable = true;
     gaming.enable = true;
-    login = "auto"; # No need to login againt to reach the desktop after LUKS decryption
     multimedia.videoRecording.enable = true;
   };
 

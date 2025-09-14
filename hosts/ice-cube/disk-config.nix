@@ -13,12 +13,18 @@
       };
     };
 
-  boot.initrd.luks.devices."luks-59789c93-fc96-4727-bcd0-a779a7aff0cc".device =
-    "/dev/disk/by-uuid/59789c93-fc96-4727-bcd0-a779a7aff0cc";
-  boot.initrd.luks.devices."luks-4e58cd4b-76ee-49a4-a86c-0ad7985e8a8b".device =
-    "/dev/disk/by-uuid/4e58cd4b-76ee-49a4-a86c-0ad7985e8a8b";
+  boot.initrd.luks.devices =
+    lib.genAttrs
+      (map (uuid: "luks-${uuid}") [
+        "59789c93-fc96-4727-bcd0-a779a7aff0cc"
+        "4e58cd4b-76ee-49a4-a86c-0ad7985e8a8b"
+        "d9afb347-3b4f-4606-8ca1-ddea2f9a43c3"
+      ])
+      (device: {
+        device = "/dev/disk/by-uuid/${lib.strings.removePrefix "luks-" device}";
+      });
 
   swapDevices = [
-    { device = "/dev/disk/by-uuid/e1327672-f03e-47fb-8007-96cf293418e3"; }
+    { device = "/dev/disk/by-uuid/64646ebc-31c3-4808-9a4d-cc72e8ed8572"; }
   ];
 }
