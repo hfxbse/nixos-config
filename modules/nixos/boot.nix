@@ -24,7 +24,10 @@ in
 
   config.environment.systemPackages = with pkgs; lib.optional cfg.secureBoot sbctl;
   config.boot.initrd.systemd.enable = lib.mkIf cfg.secureBoot true;
-  config.boot.loader.systemd-boot.enable = !cfg.secureBoot && !config.wsl.enable;
+  config.boot.loader = {
+    systemd-boot.enable = !cfg.secureBoot && !config.wsl.enable;
+    timeout = 0;
+  };
   config.boot.lanzaboote = lib.mkIf cfg.secureBoot {
     enable = true;
     pkiBundle = "/var/lib/sbctl";
