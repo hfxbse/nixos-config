@@ -19,15 +19,19 @@ in
       {
         settings = {
           "org/gnome/mutter".experimental-features = [ "scale-monitor-framebuffer" ];
+          "org/gnome/shell".enabled-extensions = with pkgs.gnomeExtensions; [
+            hibernate-status-button.extensionUuid
+          ];
         };
       }
     ];
 
     # HEIC thumbnails in GNOME files
     # See https://github.com/NixOS/nixpkgs/issues/164021
-    environment.systemPackages = [
-      pkgs.libheif
-      pkgs.libheif.out
+    environment.systemPackages = with pkgs; [
+      gnomeExtensions.hibernate-status-button
+      libheif
+      libheif.out
     ];
 
     # Allow mounting MTP devices in Nautilus

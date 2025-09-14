@@ -28,8 +28,11 @@
 
         "org/gnome/shell".enabled-extensions = with pkgs.gnomeExtensions; [
           caffeine.extensionUuid
-          screen-rotate.extensionUuid # Does get overridden otherwise
           unblank.extensionUuid
+
+          # Does get overridden otherwise
+          screen-rotate.extensionUuid
+          hibernate-status-button.extensionUuid
         ];
 
         "org/gnome/shell/extensions/unblank".power = false;
