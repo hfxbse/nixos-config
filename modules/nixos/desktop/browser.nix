@@ -4,7 +4,7 @@ let
 in
 {
   options.desktop.browser.enable = lib.mkEnableOption "webbrowsing" // {
-    default = true;
+    default = config.desktop.enable;
   };
 
   config.programs.firefox = lib.mkIf cfg.enable {

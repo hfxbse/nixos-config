@@ -26,7 +26,7 @@ in
   config.boot.initrd.systemd.enable = lib.mkIf cfg.secureBoot true;
   config.boot.loader = {
     systemd-boot.enable = !cfg.secureBoot && !config.wsl.enable;
-    timeout = 0;
+    timeout = lib.mkDefault 0;
   };
   config.boot.lanzaboote = lib.mkIf cfg.secureBoot {
     enable = true;

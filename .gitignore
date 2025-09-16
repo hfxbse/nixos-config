@@ -1,3 +1,4 @@
 result
 *.wsl
 *.log
+authorized_keys

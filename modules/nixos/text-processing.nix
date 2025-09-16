@@ -49,8 +49,11 @@
         variables = lib.genAttrs [ "VISUAL" "EDITOR" ] (name: editorPath);
       };
 
-      fonts.packages = with pkgs; [
-        nerd-fonts.jetbrains-mono
-      ];
+      fonts.packages = lib.mkIf config.desktop.enable (
+        with pkgs;
+        [
+          nerd-fonts.jetbrains-mono
+        ]
+      );
     };
 }

@@ -37,7 +37,7 @@ in
   config = {
     isoImage.squashfsCompression = "gzip -Xcompression-level 1";
 
-    boot.kernelPackages = pkgs.linuxPackages_6_15;
+    boot.kernelPackages = pkgs.linuxPackages_6_12;
     zramSwap.enable = true;
 
     services.openssh = lib.mkIf useSSH {

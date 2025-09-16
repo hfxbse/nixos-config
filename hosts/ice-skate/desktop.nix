@@ -4,7 +4,6 @@
   ...
 }:
 {
-
   desktop = {
     enable = true;
     auto-rotate.enable = true;
