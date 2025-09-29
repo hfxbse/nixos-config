@@ -10,4 +10,11 @@ in
   };
 
   config.users.users.${cfg.name}.isNormalUser = true;
+  config.virtualisation = rec {
+    vmVariantWithBootLoader = vmVariant;
+    vmVariant = {
+      security.sudo.wheelNeedsPassword = false;
+      services.getty.autologinUser = config.user.name;
+    };
+  };
 }

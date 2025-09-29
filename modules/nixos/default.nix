@@ -7,6 +7,7 @@
     ./localization.nix
     ./nix.nix
     ./permissions.nix
+    ./server
     ./user.nix
     ./workplace-compliance.nix
     ./text-processing.nix

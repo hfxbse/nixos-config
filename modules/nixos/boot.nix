@@ -32,4 +32,9 @@ in
     enable = true;
     pkiBundle = "/var/lib/sbctl";
   };
+
+  config.virtualisation.vmVariant.virtualisation = {
+    memorySize = 4096;
+    cores = 4;
+  };
 }
