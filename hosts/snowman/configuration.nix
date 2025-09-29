@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   facter.reportPath = ./facter.json;
   imports = [ ./disk-config.nix ];
@@ -23,6 +23,7 @@
   networking.hostName = "snowman";
   user.name = "maintainer";
 
+  virtualisation.vmVariant.zramSwap.enable = lib.mkForce false;
   zramSwap = {
     enable = true;
     memoryPercent = 250;
@@ -52,6 +53,17 @@
   };
 
   networking.firewall.enable = true;
+
+  virtualisation.vmVariant.networking.nat.externalInterface = lib.mkForce "eth0";
+  server = {
+    enable = true;
+    externalNetworkInterface = "enp1s0";
+
+    immich = {
+      enable = true;
+      systemStateVersion = "25.05";
+    };
+  };
 
   # NEVER CHANGE AFTER INSTALLING THE SYSTEM
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .

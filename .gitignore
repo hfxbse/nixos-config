@@ -2,3 +2,4 @@ result
 *.wsl
 *.log
 authorized_keys
+*.qcow2
