@@ -1,7 +1,10 @@
 { pkgs, ... }:
 {
   facter.reportPath = ./facter.json;
-  imports = [ ./disk-config.nix ];
+  imports = [
+    ./disk-config.nix
+    ./vmVariante.nix
+  ];
 
   boot = {
     defaults.secureBoot = true;
@@ -52,6 +55,16 @@
   };
 
   networking.firewall.enable = true;
+
+  server = {
+    enable = true;
+    externalNetworkInterface = "enp1s0";
+
+    immich = {
+      enable = true;
+      systemStateVersion = "25.05";
+    };
+  };
 
   # NEVER CHANGE AFTER INSTALLING THE SYSTEM
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
