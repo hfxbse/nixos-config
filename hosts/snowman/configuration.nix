@@ -1,10 +1,7 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   facter.reportPath = ./facter.json;
-  imports = [
-    ./disk-config.nix
-    ./vmVariante.nix
-  ];
+  imports = [ ./disk-config.nix ];
 
   boot = {
     defaults.secureBoot = true;
@@ -26,6 +23,7 @@
   networking.hostName = "snowman";
   user.name = "maintainer";
 
+  virtualisation.vmVariant.zramSwap.enable = lib.mkForce false;
   zramSwap = {
     enable = true;
     memoryPercent = 250;
@@ -56,6 +54,7 @@
 
   networking.firewall.enable = true;
 
+  virtualisation.vmVariant.networking.nat.externalInterface = lib.mkForce "eth0";
   server = {
     enable = true;
     externalNetworkInterface = "enp1s0";

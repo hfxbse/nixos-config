@@ -28,21 +28,39 @@ in
     };
   };
 
-  config = lib.mkIf (config.server.enable && cfg.enable) {
-    containers.immich =
-      let
-        mediaLocation = "/var/lib/immich";
-      in
-      {
+  config =
+    let
+      container = config.containers.immich;
+      immich = container.config.services.immich;
+    in
+    lib.mkIf (config.server.enable && cfg.enable) {
+      networking.firewall.allowedTCPPorts = [ immich.port ];
+      networking.nat.forwardPorts = [
+        {
+          sourcePort = immich.port;
+          proto = "tcp";
+          destination = "${container.localAddress}:${builtins.toString immich.port}";
+        }
+      ];
+
+      virtualisation.vmVariant.virtualisation.forwardPorts = [
+        {
+          from = "host";
+          host.port = immich.port;
+          guest.port = immich.port;
+        }
+      ];
+
+      containers.immich = {
         autoStart = true;
         privateNetwork = true;
-        hostAddress = "${config.server.hostAddressSubnet}.1";
-        localAddress = "${config.server.hostAddressSubnet}.2";
+        hostAddress = "10.0.0.1";
+        localAddress = "10.0.0.2";
         # Failes to mount the nix store using this option
         # privateUsers = "pick";
 
         bindMounts.media = lib.mkIf (cfg.mediaLocation != null) {
-          mountPoint = mediaLocation;
+          mountPoint = immich.mediaLocation;
           hostPath = cfg.mediaLocation;
           isReadOnly = false;
         };
@@ -59,14 +77,15 @@ in
           services.postgresql.package = pkgs.postgresql_16;
           services.immich = {
             enable = true;
+
+            host = container.localAddress;
             openFirewall = true;
-            inherit mediaLocation;
+
             inherit (cfg) accelerationDevices;
-            machine-learning.enable = false;
           };
 
           system.stateVersion = cfg.systemStateVersion;
         };
       };
-  };
+    };
 }
