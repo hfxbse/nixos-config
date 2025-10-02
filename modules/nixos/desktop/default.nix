@@ -11,6 +11,7 @@ in
   imports = [
     ./auto-rotate.nix
     ./browser.nix
+    ./email.nix
     ./fonts.nix
     ./gaming.nix
     ./gnome.nix
@@ -47,7 +48,6 @@ in
     users.groups.input.members = lib.optional config.hardware.wooting.enable user.name;
 
     services.printing.enable = true;
-    programs.thunderbird.enable = true;
 
     # Enable automatic login for the user.
     services.displayManager.autoLogin.enable = cfg.login == "auto";
