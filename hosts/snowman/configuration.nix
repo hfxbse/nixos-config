@@ -35,6 +35,12 @@
     cores = 1;
   };
 
+  # No automation due to limited hardware resources
+  nix.settings.auto-optimise-store = lib.mkForce false;
+  nix.gc.automatic = lib.mkForce false;
+  nix.optimise.automatic = lib.mkForce false;
+  system.autoUpgrade.enable = lib.mkForce false;
+
   # Set your time zone.
   time.timeZone = "UTC";
 

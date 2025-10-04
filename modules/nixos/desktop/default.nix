@@ -58,6 +58,7 @@ in
     # Support mounting MTP devices
     services.gvfs.enable = lib.mkDefault true;
 
+    system.autoUpgrade.allowReboot = false;
     nixpkgs.config.allowUnfree = true;
   };
 }
