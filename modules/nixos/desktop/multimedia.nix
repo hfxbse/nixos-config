@@ -22,6 +22,18 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Thumbnailers
+    # See https://wiki.nixos.org/wiki/Thumbnails
+    environment.systemPackages = with pkgs; [
+      ffmpeg-headless
+      ffmpegthumbnailer
+
+      gdk-pixbuf
+
+      libheif
+      libheif.out
+    ];
+
     users.users.${user.name}.packages =
       with pkgs;
       [ vlc ]
