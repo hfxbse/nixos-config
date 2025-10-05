@@ -74,6 +74,7 @@
 
     immich = {
       enable = true;
+      accelerationDevices = [ "/dev/dri/renderD128" ];
       systemStateVersion = "25.05";
     };
   };
