@@ -59,11 +59,19 @@ in
         # Failes to mount the nix store using this option
         # privateUsers = "pick";
 
-        bindMounts.media = lib.mkIf (cfg.mediaLocation != null) {
-          mountPoint = immich.mediaLocation;
-          hostPath = cfg.mediaLocation;
-          isReadOnly = false;
-        };
+        bindMounts =
+          lib.genAttrs cfg.accelerationDevices (path: {
+            mountPoint = path;
+            hostPath = path;
+            isReadOnly = false;
+          })
+          // {
+            media = lib.mkIf (cfg.mediaLocation != null) {
+              mountPoint = immich.mediaLocation;
+              hostPath = cfg.mediaLocation;
+              isReadOnly = false;
+            };
+          };
 
         config = {
           networking = {
@@ -82,6 +90,7 @@ in
             openFirewall = true;
 
             inherit (cfg) accelerationDevices;
+            machine-learning.enable = true;
           };
 
           system.stateVersion = cfg.systemStateVersion;

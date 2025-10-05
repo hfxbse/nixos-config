@@ -67,13 +67,18 @@
 
   networking.firewall.enable = true;
 
-  virtualisation.vmVariant.networking.nat.externalInterface = lib.mkForce "eth0";
+  virtualisation.vmVariant = {
+    networking.nat.externalInterface = lib.mkForce "eth0";
+    server.immich.accelerationDevices = lib.mkForce [];
+  };
+
   server = {
     enable = true;
     externalNetworkInterface = "enp1s0";
 
     immich = {
       enable = true;
+      accelerationDevices = [ "/dev/dri/renderD128" ];
       systemStateVersion = "25.05";
     };
   };
