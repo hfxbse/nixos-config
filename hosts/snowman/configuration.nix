@@ -7,6 +7,9 @@
     defaults.secureBoot = true;
     loader.timeout = 3;
 
+    kernel.sysctl = {
+      "vm.swappiness" = 100;
+    };
     # System frequently freezes completely on newer kernel version
     # Seems to happen when data is read or written to the storage
     # Might be related to https://bugzilla.kernel.org/show_bug.cgi?id=218821
@@ -20,8 +23,9 @@
     ];
   };
 
-  networking.hostName = "snowman";
-  user.name = "maintainer";
+  services.udev.extraRules = ''
+    ACTION=="add|change", KERNEL=="sd[a-z]*[0-9]*|mmcblk[0-9]*p[0-9]*|nvme[0-9]*n[0-9]*p[0-9]*",ATTR{../queue/scheduler}="kyber"
+  '';
 
   virtualisation.vmVariant.zramSwap.enable = lib.mkForce false;
   zramSwap = {
@@ -29,6 +33,9 @@
     memoryPercent = 250;
     writebackDevice = "/dev/mapper/zram-backing-crypted";
   };
+
+  networking.hostName = "snowman";
+  user.name = "maintainer";
 
   nix.settings = {
     max-jobs = 1;
