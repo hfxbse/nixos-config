@@ -16,10 +16,9 @@ in
       default = null;
     };
 
-    mediaLocation = lib.mkOption {
-      description = "Directory to store the media files on the host system via a mount";
-      type = lib.types.nullOr lib.types.path;
-      default = null;
+    dataDir = lib.mkOption {
+      description = "Directory to store the service files on the host system via a mount";
+      type = lib.types.path;
     };
 
     systemStateVersion = lib.mkOption {
@@ -32,6 +31,7 @@ in
     let
       container = config.containers.immich;
       immich = container.config.services.immich;
+      postgresql = container.config.services.postgresql;
     in
     lib.mkIf (config.server.enable && cfg.enable) {
       networking.firewall.allowedTCPPorts = [ immich.port ];
@@ -66,9 +66,15 @@ in
             isReadOnly = false;
           })
           // {
-            media = lib.mkIf (cfg.mediaLocation != null) {
+            media = {
               mountPoint = immich.mediaLocation;
-              hostPath = cfg.mediaLocation;
+              hostPath = "${cfg.dataDir}/media";
+              isReadOnly = false;
+            };
+
+            database = {
+              mountPoint = postgresql.dataDir;
+              hostPath = "${cfg.dataDir}/database";
               isReadOnly = false;
             };
           };
