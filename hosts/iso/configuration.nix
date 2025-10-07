@@ -61,7 +61,7 @@ in
     };
 
     powerManagement.enable = lib.mkForce false;
-    services.logind.lidSwitch = "ignore";
+    services.logind.settings.Login.HandleLidSwitch = "ignore";
 
     environment.systemPackages = with pkgs; [ htop ];
   };
