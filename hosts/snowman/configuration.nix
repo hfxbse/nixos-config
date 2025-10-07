@@ -13,7 +13,7 @@
     # System frequently freezes completely on newer kernel version
     # Seems to happen when data is read or written to the storage
     # Might be related to https://bugzilla.kernel.org/show_bug.cgi?id=218821
-    kernelPackages = pkgs.linuxPackages_6_1_hardened;
+    kernelPackages = pkgs.linuxPackages_6_1;
     blacklistedKernelModules = [
       "hid_asus"
       "asus_nb_wmi"
