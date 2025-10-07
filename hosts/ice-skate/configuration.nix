@@ -10,11 +10,27 @@
   ];
 
   boot.defaults.secureBoot = true;
-  # Regression bug for ipu6 with Linux 6.16
-  # See https://github.com/intel/ipu6-drivers/issues/372
+
+  # Regression bug for ipu6 from nixpkgs starting with Linux 6.16
+  # See https://github.com/intel/ipu6-rivers/issues/372
   # The issue prevents the device to be suspended or rebootet properly.
-  # At the same time the latest LTS kernel (6.12) does not support the volumn butons.
-  boot.kernelPackages = pkgs.linuxPackages_6_15;
+  nixpkgs.overlays = [
+    (final: prev: {
+      linuxPackages_latest = prev.linuxPackages_latest.extend (
+        lpFinal: lpPrev: {
+          ipu6-drivers = lpPrev.ipu6-drivers.overrideAttrs (old: {
+            version = "unstable-2025-10-07";
+            src = prev.fetchFromGitHub {
+              owner = "intel";
+              repo = "ipu6-drivers";
+              rev = "69b2fde9edcbc24128b91541fdf2791fbd4bf7a4";
+              hash = "sha256-pe7lqK+CHpgNWpC8GEZ3FKfYcuVuRUaWlW17D8AsrSk=";
+            };
+          });
+        }
+      );
+    })
+  ];
 
   user.name = "fxbse";
   networking.hostName = "ice-skate";
