@@ -28,6 +28,7 @@
       };
     };
     texlab.enable = true;
+    ts_ls.enable = true;
   };
 
   extraPackages = with pkgs; [

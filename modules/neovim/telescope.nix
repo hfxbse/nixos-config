@@ -37,7 +37,7 @@
         hiddenFiles = [
           "--hidden"
           "--glob"
-          "!**/.git/*"
+          "!**/{.git,node_modules}/*"
         ];
       in
       {
