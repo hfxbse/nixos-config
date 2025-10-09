@@ -3,3 +3,4 @@ result
 *.log
 authorized_keys
 *.qcow2
+/*.patch
