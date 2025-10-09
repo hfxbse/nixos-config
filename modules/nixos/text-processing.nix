@@ -42,6 +42,7 @@
         init.defaultBranch = "main";
         core.editor = editorPath;
         user.name = config.user.fullName;
+        pull.rebase = true;
       };
 
       environment = {
