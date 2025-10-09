@@ -1,6 +1,7 @@
 { lib, pkgs, ... }:
 {
   facter.reportPath = ./facter.json;
+  virtualisation.vmVariant.facter.reportPath = lib.mkForce ./facter-vm.json;
   imports = [ ./disk-config.nix ];
 
   boot = {
