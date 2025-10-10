@@ -20,6 +20,7 @@
   };
 
   lsp.servers = {
+    cssls.enable = true;
     ltex.enable = true;
     nixd = {
       enable = true;
