@@ -27,6 +27,10 @@ in
       description = "System state version used for the container. Do not change it after the container has been created.";
       type = lib.types.str;
     };
+
+    machine-learning.enable = lib.mkEnableOption "machine-learning support" // {
+      default = true;
+    };
   };
 
   config =
@@ -125,11 +129,14 @@ in
 
               inherit (cfg) accelerationDevices;
               machine-learning = {
-                enable = true;
+                enable = cfg.machine-learning.enable;
                 environment = {
                   MPLCONFIGDIR = machine-learning-dir;
                 };
               };
+
+              # List of options https://docs.immich.app/install/config-file/
+              settings.machineLearning.enabled = cfg.machine-learning.enable;
             };
 
             systemd.services."immich-machine-learning".serviceConfig = {

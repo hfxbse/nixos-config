@@ -80,6 +80,7 @@
     immich = {
       enable = true;
       dataDir = "/var/lib/immich";
+      machine-learning.enable = lib.mkForce false;
       accelerationDevices = [ "/dev/dri/renderD128" ];
       systemStateVersion = "25.05";
     };
