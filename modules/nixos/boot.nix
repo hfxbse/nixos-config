@@ -34,6 +34,7 @@ in
   };
 
   config.virtualisation.vmVariant.virtualisation = {
+    diskSize = 4096;
     memorySize = 4096;
     cores = 4;
   };

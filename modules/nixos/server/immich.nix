@@ -20,8 +20,7 @@ in
       # Using StateDir in the service definition results the directory to be created in /var/lib
       # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
       description = "Directory name to store the service files on the host system at /var/lib via a mount";
-      type = lib.types.strMatching ''^/var/lib/[^/.]+(/[^/.]+)*$'';
-      default = "/var/lib/immich";
+      type = lib.types.nullOr (lib.types.strMatching ''^/var/lib/[^/.]+(/[^/.]+)*$'');
     };
 
     systemStateVersion = lib.mkOption {
@@ -35,6 +34,8 @@ in
       container = config.containers.immich;
       immich = container.config.services.immich;
       postgresql = container.config.services.postgresql;
+
+      storeDataOnHost = cfg.dataDir != null;
     in
     lib.mkIf (config.server.enable && cfg.enable) {
       networking.firewall.allowedTCPPorts = [ immich.port ];
@@ -54,7 +55,7 @@ in
         }
       ];
 
-      systemd.services."container@immich".serviceConfig = {
+      systemd.services."container@immich".serviceConfig = lib.mkIf storeDataOnHost {
         StateDirectory =
           let
             relativePath = lib.removePrefix "/var/lib/" cfg.dataDir;
@@ -79,7 +80,7 @@ in
             hostPath = path;
             isReadOnly = false;
           })
-          // {
+          // lib.mkIf storeDataOnHost {
             media = {
               mountPoint = immich.mediaLocation;
               hostPath = "${cfg.dataDir}/media";
@@ -93,28 +94,52 @@ in
             };
           };
 
-        config = {
-          networking = {
-            firewall.enable = true;
+        allowedDevices = builtins.map (node: {
+          inherit node;
+          modifier = "rwm";
+        }) (cfg.accelerationDevices ++ [ "/dev/net/tun" ]);
 
-            # Use systemd-resolved inside the container
-            # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
-            useHostResolvConf = lib.mkForce false;
+        config =
+          let
+            machine-learning-dir = "/var/lib/immich-machine-learning";
+          in
+          {
+            networking = {
+              firewall.enable = true;
+
+              # Use systemd-resolved inside the container
+              # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
+              useHostResolvConf = lib.mkForce false;
+            };
+
+            # DNS is required to download the machine learning models
+            services.resolved.enable = true;
+
+            services.postgresql.package = pkgs.postgresql_16;
+            services.immich = {
+              enable = true;
+              database.enableVectors = false;
+
+              host = container.localAddress;
+              openFirewall = true;
+
+              inherit (cfg) accelerationDevices;
+              machine-learning = {
+                enable = true;
+                environment = {
+                  MPLCONFIGDIR = machine-learning-dir;
+                };
+              };
+            };
+
+            systemd.services."immich-machine-learning".serviceConfig = {
+              StateDirectory = [
+                (lib.removePrefix "/var/lib/" machine-learning-dir)
+              ];
+            };
+
+            system.stateVersion = cfg.systemStateVersion;
           };
-
-          services.postgresql.package = pkgs.postgresql_16;
-          services.immich = {
-            enable = true;
-
-            host = container.localAddress;
-            openFirewall = true;
-
-            inherit (cfg) accelerationDevices;
-            machine-learning.enable = true;
-          };
-
-          system.stateVersion = cfg.systemStateVersion;
-        };
       };
     };
 }

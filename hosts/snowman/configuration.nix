@@ -79,6 +79,7 @@
 
     immich = {
       enable = true;
+      dataDir = "/var/lib/immich";
       accelerationDevices = [ "/dev/dri/renderD128" ];
       systemStateVersion = "25.05";
     };
