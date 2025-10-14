@@ -24,6 +24,14 @@
     ];
   };
 
+  powerManagement.enable = false;
+  powerManagement.cpuFreqGovernor = "schedutil";
+  # Base clock speed of the CPU x5-Z8350
+  # Seems to prevent system from locking up
+  powerManagement.cpufreq.max = 1440000;
+  # Should reboot the system if it the system becomes unreponsive
+  systemd.settings.Manager.RuntimeWatchdogSec = "30s";
+
   services.udev.extraRules = ''
     ACTION=="add|change", KERNEL=="sd[a-z]*[0-9]*|mmcblk[0-9]*p[0-9]*|nvme[0-9]*n[0-9]*p[0-9]*",ATTR{../queue/scheduler}="kyber"
   '';
@@ -70,7 +78,7 @@
 
   virtualisation.vmVariant = {
     networking.nat.externalInterface = lib.mkForce "eth0";
-    server.immich.accelerationDevices = lib.mkForce [];
+    server.immich.accelerationDevices = lib.mkForce [ ];
   };
 
   server = {
