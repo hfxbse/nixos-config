@@ -1,5 +1,7 @@
 {
+  config,
   lib,
+  pkgs,
   ...
 }:
 {
@@ -28,6 +30,8 @@
       "/var"
     ];
   };
+
+  users.users.${config.user.name}.packages = with pkgs; [ xournalpp ];
 
   # DO NOT CHANGE AFTER INSTALLING THE SYSTEM
   system.stateVersion = "25.05"; # Did you read the comment?
