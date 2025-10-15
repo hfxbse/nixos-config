@@ -26,10 +26,9 @@ in
       }
     ];
 
-    # HEIC thumbnails in GNOME files
-    # See https://github.com/NixOS/nixpkgs/issues/164021
     environment.systemPackages = with pkgs; [
       gnomeExtensions.hibernate-status-button
+      papers
     ];
 
     # Allow mounting MTP devices in Nautilus
@@ -42,6 +41,7 @@ in
         gnome-2048
         cheese
         epiphany
+        evince
         geary
         totem
         yelp
