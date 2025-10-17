@@ -83,6 +83,13 @@ in
           default_area = "navbar";
         };
 
+        "redirect-nix-wiki@undesided.me" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4373121/redirectnixwiki-latest.xpi";
+          installation_mode = "force_installed";
+          private_browsing = true;
+          default_area = "menupanel";
+        };
+
         "1094918@gmail.com".installation_mode = "allowed";
       };
 
