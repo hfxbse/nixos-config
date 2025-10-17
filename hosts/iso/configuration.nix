@@ -63,6 +63,11 @@ in
     powerManagement.enable = lib.mkForce false;
     services.logind.settings.Login.HandleLidSwitch = "ignore";
 
-    environment.systemPackages = with pkgs; [ htop ];
+    environment.systemPackages = with pkgs; [
+      btop
+      htop
+      nixos-facter
+      s-tui
+    ];
   };
 }
