@@ -84,10 +84,10 @@ nix flake init -t github:hfxbse/nixos-config
 
 1. Create a file on your local machine at `/tmp/disk.key` containing the
    LUKS password.
-2. Populate the `host/snowman/setup-keys` directory with the `authorized_keys`
-   files.
-   You need this to access the server after the install as no initial password
-   is set.
+2. Populate the `host/<server-name>/setup-keys` directory with the
+   `authorized_keys` files.
+   You need this to access the server after the installation as no initial
+   password is set.
 3. Disable secure boot in the server configuration.
    Secure boot can only be configuration after the initial installation.
    See the guide for desktop machines and laptops for more information.
@@ -95,11 +95,11 @@ nix flake init -t github:hfxbse/nixos-config
    install the NixOS configuration
    ```sh
     nix run github:nix-community/nixos-anywhere -- \
-        --flake .#snowman \
+        --flake .#<server-name> \
         --no-substitute-on-destination \
         --target-host <user>@<host> \
         --disk-encryption-keys /tmp/disk.key /tmp/disk.key \
-        --extra-files hosts/snowman/setup-keys/
+        --extra-files hosts/<server-name>/setup-keys/
    ```
 
 ### ISO
