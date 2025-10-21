@@ -12,7 +12,8 @@ in
 
     gc = {
       automatic = true;
-      options = "--delete-older-than 60d";
+      options = "--delete-older-than 90d";
+      dates = "quarterly";
 
       persistent = true;
       inherit randomizedDelaySec;
