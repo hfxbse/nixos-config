@@ -20,6 +20,7 @@
   };
 
   lsp.servers = {
+    clangd.enable = true;
     cssls.enable = true;
     ltex.enable = true;
     nixd = {
@@ -28,8 +29,10 @@
         command = [ "nixfmt" ];
       };
     };
+    ruff.enable = true;
     texlab.enable = true;
     ts_ls.enable = true;
+    ty.enable = true;
   };
 
   extraPackages = with pkgs; [
