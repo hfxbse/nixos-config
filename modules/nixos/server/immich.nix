@@ -73,8 +73,8 @@ in
       containers.immich = {
         autoStart = true;
         privateNetwork = true;
-        hostAddress = "10.0.0.1";
-        localAddress = "10.0.0.2";
+        hostAddress = "10.0.255.1";
+        localAddress = "10.0.255.2";
         # Failes to mount the nix store using this option
         # privateUsers = "pick";
 

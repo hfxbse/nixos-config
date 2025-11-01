@@ -4,6 +4,7 @@ let
 in
 {
   imports = [
+    ./dns.nix
     ./immich.nix
   ];
 

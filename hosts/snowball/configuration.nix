@@ -41,11 +41,6 @@
 
   networking.firewall.enable = true;
 
-  virtualisation.vmVariant = {
-    networking.nat.externalInterface = lib.mkForce "eth0";
-    server.immich.accelerationDevices = lib.mkForce [ ];
-
-  };
   programs.nixvim.clipboard.providers.wl-copy.enable = false;
   environment.systemPackages = with pkgs; [
     btop
@@ -69,9 +64,19 @@
     ];
   };
 
+  virtualisation.vmVariant = {
+    server.externalNetworkInterface = lib.mkForce "eth0";
+    server.immich.accelerationDevices = lib.mkForce [ ];
+  };
+
   server = {
     enable = true;
     externalNetworkInterface = "eno1";
+
+    dns = {
+      enable = true;
+      systemStateVersion = "25.11";
+    };
 
     immich = {
       enable = true;
