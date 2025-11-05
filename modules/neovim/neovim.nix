@@ -77,6 +77,10 @@ in
     nvim-autopairs.enable = true;
     gitsigns.enable = true;
     trim.enable = true;
+    image = {
+      enable = true;
+      settings.backend = "sixel";
+    };
   };
 
   extraPlugins = [ yeet ];

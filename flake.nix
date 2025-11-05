@@ -42,9 +42,7 @@
 
       overlays = [
         ownPackages
-        (final: prev: {
-          blackbox-terminal = prev.blackbox-terminal.override { sixelSupport = true; };
-        })
+        ((import ./overrides.nix) lib)
       ];
 
       pkgs = import nixpkgs {
@@ -60,6 +58,7 @@
           "quick-template"
         ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { latex = pkgs.texliveFull; })
         // {
+          image-nvim = pkgs.luajitPackages.image-nvim;
           blackbox-terminal = pkgs.blackbox-terminal;
           nixvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
             inherit pkgs;
