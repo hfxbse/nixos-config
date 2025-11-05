@@ -34,13 +34,22 @@
       ownPackages =
         let
           packages = self.packages.${system};
+          packageNames = builtins.filter (
+            name: !(builtins.elem name (builtins.attrNames nixpkgs.legacyPackages.${system}))
+          ) (builtins.attrNames packages);
         in
-        (final: prev: lib.genAttrs (builtins.attrNames packages) (name: packages.${name}));
+        (final: prev: lib.genAttrs packageNames (name: packages.${name}));
+
+      overlays = [
+        ownPackages
+        (final: prev: {
+          blackbox-terminal = prev.blackbox-terminal.override { sixelSupport = true; };
+        })
+      ];
 
       pkgs = import nixpkgs {
-        inherit system;
+        inherit system overlays;
         config.allowUnfree = true;
-        overlays = [ ownPackages ];
       };
     in
     {
@@ -51,6 +60,7 @@
           "quick-template"
         ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { latex = pkgs.texliveFull; })
         // {
+          blackbox-terminal = pkgs.blackbox-terminal;
           nixvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
             inherit pkgs;
             module = ./modules/neovim/neovim.nix;
@@ -75,7 +85,7 @@
             nixvim.nixosModules.nixvim
             ./modules/nixos/default.nix
             {
-              nixpkgs.overlays = [ ownPackages ];
+              nixpkgs.overlays = overlays;
               user.fullName = "Fabian Haas";
             }
           ];
@@ -93,7 +103,12 @@
         // {
           iso = lib.nixosSystem {
             modules = genericModules ++ [
-              { nixpkgs.hostPlatform = system; }
+              {
+                nixpkgs = {
+                  inherit overlays;
+                  hostPlatform = system;
+                };
+              }
               ./hosts/iso/configuration.nix
             ];
           };

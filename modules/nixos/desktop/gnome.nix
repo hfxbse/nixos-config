@@ -27,6 +27,7 @@ in
     ];
 
     environment.systemPackages = with pkgs; [
+      blackbox-terminal
       gnomeExtensions.hibernate-status-button
       papers
     ];
@@ -49,6 +50,7 @@ in
         gnome-music
         gnome-maps
         gnome-contacts
+        gnome-console
         tali
         iagno
         hitori
