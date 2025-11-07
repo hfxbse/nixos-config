@@ -26,6 +26,11 @@ in
       }
     ];
 
+    programs.nautilus-open-any-terminal = {
+      enable = true;
+      terminal = "blackbox";
+    };
+
     environment.systemPackages = with pkgs; [
       blackbox-terminal
       gnomeExtensions.hibernate-status-button
