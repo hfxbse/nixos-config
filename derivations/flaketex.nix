@@ -50,10 +50,11 @@ writeShellScriptBin "compile-latex" ''
   cd $DOC_DIR;
 
   ${tools}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
+  set +e;
+  # biber might fail gracefully if no bibliography exists
   ${tools}/bin/biber --output-directory="$OUT" "$OUT"/*.bcf;
 
   # makeglossaries might fail gracefully if no glossaires exists
-  set +e;
   ${tools}/bin/makeglossaries -d "$OUT" "$(basename "''${DOC%.*}")";
   set -e;
 
