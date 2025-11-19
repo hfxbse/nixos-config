@@ -19,7 +19,7 @@
           dontUnpack = true;
           installPhase = ''
             mkdir -p $out/bin;
-            ln -s ${lib.getExe pkgs.nixvim} $out/bin/nvim;
+            ln -s ${lib.getExe pkgs.nvim} $out/bin/nvim;
             ln -s $out/bin/nvim $out/bin/vi;
           '';
 
