@@ -14,11 +14,12 @@
         };
       };
     };
-
     lspconfig.enable = true;
     nvim-autopairs.enable = true;
+    tiny-inline-diagnostic.enable = true;
   };
 
+  lsp.inlayHints.enable = true;
   lsp.servers = {
     clangd.enable = true;
     cssls.enable = true;

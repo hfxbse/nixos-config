@@ -60,7 +60,7 @@
         // {
           image-nvim = pkgs.luajitPackages.image-nvim;
           blackbox-terminal = pkgs.blackbox-terminal;
-          nixvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
+          nvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
             inherit pkgs;
             module = ./modules/neovim/neovim.nix;
           };
