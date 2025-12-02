@@ -14,7 +14,7 @@ in
       with pkgs;
       [
         noto-fonts
-        noto-fonts-emoji
+        noto-fonts-color-emoji
         noto-fonts-cjk-sans
       ]
       ++ (with pkgs.nerd-fonts; [

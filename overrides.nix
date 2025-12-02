@@ -1,6 +1,4 @@
 lib: final: prev: {
-  blackbox-terminal = prev.blackbox-terminal.override { sixelSupport = true; };
-
   # See https://wiki.nixos.org/wiki/Lua#Override_a_Lua_package_for_all_available_Lua_interpreters
   luaInterpreters =
     let

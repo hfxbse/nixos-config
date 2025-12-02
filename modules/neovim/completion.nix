@@ -26,7 +26,7 @@
     ltex.enable = true;
     nixd = {
       enable = true;
-      settings.formatting = {
+      config.formatting = {
         command = [ "nixfmt" ];
       };
     };
