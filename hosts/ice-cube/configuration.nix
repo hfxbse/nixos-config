@@ -8,7 +8,7 @@ let
 in
 {
   imports = [ ./disk-config.nix ];
-  facter.reportPath = ./facter.json;
+  hardware.facter.reportPath = ./facter.json;
   boot.defaults.secureBoot = true;
 
   # Setup keyfile
