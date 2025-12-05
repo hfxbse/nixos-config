@@ -42,22 +42,15 @@ in
       storeDataOnHost = cfg.dataDir != null;
     in
     lib.mkIf (config.server.enable && cfg.enable) {
-      networking.firewall.allowedTCPPorts = [ immich.port ];
-      networking.nat.forwardPorts = [
-        {
-          sourcePort = immich.port;
-          proto = "tcp";
-          destination = "${container.localAddress}:${builtins.toString immich.port}";
-        }
-      ];
-
-      virtualisation.vmVariant.virtualisation.forwardPorts = [
-        {
-          from = "host";
-          host.port = immich.port;
-          guest.port = immich.port;
-        }
-      ];
+      server.network.immich = {
+        subnetPrefix = "10.0.255";
+        forwardPorts = [
+          {
+            port = immich.port;
+            external = true;
+          }
+        ];
+      };
 
       systemd.services."container@immich".serviceConfig = lib.mkIf storeDataOnHost {
         StateDirectory =
@@ -72,9 +65,6 @@ in
 
       containers.immich = {
         autoStart = true;
-        privateNetwork = true;
-        hostAddress = "10.0.255.1";
-        localAddress = "10.0.255.2";
         # Failes to mount the nix store using this option
         # privateUsers = "pick";
 
@@ -108,17 +98,6 @@ in
             machine-learning-dir = "/var/lib/immich-machine-learning";
           in
           {
-            networking = {
-              firewall.enable = true;
-
-              # Use systemd-resolved inside the container
-              # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
-              useHostResolvConf = lib.mkForce false;
-            };
-
-            # DNS is required to download the machine learning models
-            services.resolved.enable = true;
-
             services.postgresql.package = pkgs.postgresql_16;
             services.immich = {
               enable = true;
