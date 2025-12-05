@@ -44,6 +44,7 @@
   programs.nixvim.clipboard.providers.wl-copy.enable = false;
   environment.systemPackages = with pkgs; [
     btop
+    dnsutils
     htop
     mergerfs
     mergerfs-tools
@@ -91,6 +92,11 @@
       enable = true;
       dataDir = "/var/lib/immich";
       accelerationDevices = [ "/dev/dri/renderD128" ];
+      systemStateVersion = "25.11";
+    };
+
+    reverse-proxy = {
+      enable = true;
       systemStateVersion = "25.11";
     };
   };

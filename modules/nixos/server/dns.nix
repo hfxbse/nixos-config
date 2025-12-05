@@ -127,6 +127,10 @@ in
                   }
                 ];
 
+                customDNS.mapping = {
+                  "immich.fxbse.com" = "192.168.178.60";
+                };
+
                 conditional = {
                   fallbackUpstream = false;
                   mapping."fritz.box" = "192.168.178.1";

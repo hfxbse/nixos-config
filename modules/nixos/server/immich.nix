@@ -47,9 +47,14 @@ in
         forwardPorts = [
           {
             port = immich.port;
-            external = true;
+            external = !config.server.reverse-proxy.enable;
           }
         ];
+      };
+
+      server.reverse-proxy.virtualHosts."immich.fxbse.com" = {
+        target.host = container.localAddress;
+        target.port = immich.port;
       };
 
       systemd.services."container@immich".serviceConfig = lib.mkIf storeDataOnHost {

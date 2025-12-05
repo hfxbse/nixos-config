@@ -6,6 +6,7 @@ in
   imports = [
     ./dns.nix
     ./immich.nix
+    ./reverse-proxy.nix
   ];
 
   options.server = {
