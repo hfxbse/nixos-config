@@ -64,6 +64,15 @@
     ];
   };
 
+  system.autoUpgrade = {
+    operation = lib.mkForce "switch";
+    allowReboot = true;
+    rebootWindow = {
+      lower = "03:00";
+      upper = "04:00";
+    };
+  };
+
   virtualisation.vmVariant = {
     server.externalNetworkInterface = lib.mkForce "eth0";
     server.immich.accelerationDevices = lib.mkForce [ ];
