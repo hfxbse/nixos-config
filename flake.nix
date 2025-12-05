@@ -3,6 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs-container-in-vm-patch = {
+      url = "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/454484.patch";
+      flake = false;
+    };
 
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
@@ -29,7 +33,7 @@
     }@inputs:
     let
       system = "x86_64-linux";
-      lib = nixpkgs.lib;
+      lib = ((import ./nixpkgs-override.nix) (inputs // { inherit system; })).lib;
 
       ownPackages =
         let
@@ -42,7 +46,7 @@
 
       overlays = [
         ownPackages
-        ((import ./overrides.nix) lib)
+        self.overlays.image-nvim
       ];
 
       pkgs = import nixpkgs {
@@ -65,6 +69,8 @@
             module = ./modules/neovim/neovim.nix;
           };
         };
+
+      overlays = lib.genAttrs [ "image-nvim" ] (name: ((import ./overlays/${name}.nix) lib));
 
       templates = {
         default = self.templates.baseline;

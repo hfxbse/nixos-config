@@ -271,6 +271,18 @@
         "type": "github"
       }
     },
+    "nixpkgs-container-in-vm-patch": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-JvDahe9CYyuDlY/lFPexUp2bNw2Jj5Da+DPiMngn9Tw=",
+        "type": "file",
+        "url": "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/454484.patch"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/454484.patch"
+      }
+    },
     "nixvim": {
       "inputs": {
         "flake-parts": "flake-parts_2",
@@ -351,6 +363,7 @@
         "nixos-facter-modules": "nixos-facter-modules",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-container-in-vm-patch": "nixpkgs-container-in-vm-patch",
         "nixvim": "nixvim"
       }
     },
