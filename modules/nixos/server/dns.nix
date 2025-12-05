@@ -25,53 +25,27 @@ in
       unbound = container.config.services.unbound;
     in
     lib.mkIf (config.server.enable && cfg.enable) {
-      networking.firewall =
-        let
-          containerFirewall = container.config.networking.firewall;
-        in
-        {
-          allowedTCPPorts = containerFirewall.allowedTCPPorts;
-          allowedUDPPorts = containerFirewall.allowedUDPPorts;
-        };
-
-      networking.nat.forwardPorts =
-        builtins.map
-          (proto: {
-            inherit proto;
-            sourcePort = blocky.settings.ports.dns;
-            destination = "${container.localAddress}:${builtins.toString blocky.settings.ports.dns}";
-          })
-          [
-            "tcp"
-            "udp"
-          ];
-
-      virtualisation.vmVariant.virtualisation.forwardPorts = [
-        {
-          from = "host";
-          host.port = blocky.settings.ports.dns;
-          guest.port = blocky.settings.ports.dns;
-        }
-      ];
+      server.network.dns = {
+        subnetPrefix = "10.0.254";
+        forwardPorts = [
+          {
+            port = blocky.settings.ports.dns;
+            external = true;
+            protocols = [
+              "tcp"
+              "udp"
+            ];
+          }
+        ];
+      };
 
       containers.dns = {
         autoStart = true;
-        privateNetwork = true;
         privateUsers = "pick";
-        hostAddress = "10.0.254.1";
-        localAddress = "10.0.254.2";
         additionalCapabilities = [ "CAP_NET_ADMIN" ];
 
         config = {
-          networking = {
-            firewall.enable = true;
-            firewall.allowedTCPPorts = [ 53 ];
-            firewall.allowedUDPPorts = [ 53 ];
-
-            # Use systemd-resolved inside the container
-            # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
-            useHostResolvConf = lib.mkForce false;
-          };
+          services.resolved.enable = false;
 
           # Setting up a recursive resolver
           # See https://docs.pi-hole.net/guides/dns/unbound
