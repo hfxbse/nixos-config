@@ -48,10 +48,12 @@ in
       forwardPorts = [
         {
           port = 80;
+          vmHostPort = 8080;
           external = true;
         }
         {
           port = 443;
+          vmHostPort = 8443;
           external = true;
         }
       ];

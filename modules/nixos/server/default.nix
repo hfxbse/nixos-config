@@ -40,6 +40,16 @@ in
                           description = "Port number";
                           type = lib.types.ints.positive;
                         };
+
+                        vmHostPort = lib.mkOption {
+                          description = ''
+                            Port number the port gets mapped to on the host machine when running as the vm variant.
+                            Defaults to the same port used inside the guest machine.
+                          '';
+                          type = lib.types.nullOr lib.types.ints.positive;
+                          default = null;
+                        };
+
                         protocols = lib.mkOption {
                           type = lib.types.listOf (
                             lib.types.enum [
@@ -89,10 +99,15 @@ in
       networking.firewall.allowedUDPPorts = allowedPorts "udp" externallyExposedPorts;
 
       virtualisation.vmVariant.virtualisation.forwardPorts = builtins.concatMap (
-        { port, protocols, ... }:
+        {
+          port,
+          vmHostPort,
+          protocols,
+          ...
+        }:
         builtins.map (protocol: {
           from = "host";
-          host.port = port;
+          host.port = if vmHostPort != null then vmHostPort else port;
           guest.port = port;
           proto = protocol;
         }) protocols

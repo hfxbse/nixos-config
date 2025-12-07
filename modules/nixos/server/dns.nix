@@ -30,6 +30,7 @@ in
         forwardPorts = [
           {
             port = blocky.settings.ports.dns;
+            vmHostPort = 3535;
             external = true;
             protocols = [
               "tcp"

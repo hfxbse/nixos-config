@@ -26,6 +26,7 @@
   };
 
   networking.hostName = "snowball";
+  virtualisation.vmVariant.networking.hostName = lib.mkForce "vm-snowball";
   user.name = "maintainer";
 
   # Set your time zone.
