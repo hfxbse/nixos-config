@@ -31,6 +31,10 @@
     ];
   };
 
+  specialisation.server-virtualisation.configuration.networking.hosts = {
+    "127.0.0.1" = [ "immich.fxbse.com" ];
+  };
+
   users.users.${config.user.name}.packages = with pkgs; [ xournalpp ];
 
   # DO NOT CHANGE AFTER INSTALLING THE SYSTEM

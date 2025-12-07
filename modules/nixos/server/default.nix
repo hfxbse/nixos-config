@@ -16,6 +16,11 @@ in
       type = lib.types.nullOr lib.types.str;
     };
 
+    stateDirectories = lib.mkOption {
+      default = [ ];
+      type = lib.types.attrsOf (lib.types.listOf lib.types.path);
+    };
+
     network = lib.mkOption {
       default = { };
       type = lib.types.attrsOf (
@@ -126,6 +131,20 @@ in
           destination = "${config.containers.${containerName}.localAddress}:${builtins.toString port}";
         }) protocols
       ) externallyExposedPorts;
+
+      systemd.services =
+        let
+          services = builtins.map (name: "container@${name}") (builtins.attrNames cfg.stateDirectories);
+        in
+        lib.genAttrs services (service: {
+          serviceConfig = {
+            StateDirectory =
+              let
+                directories = cfg.stateDirectories.${lib.removePrefix "container@" service};
+              in
+              builtins.map (directory: lib.removePrefix "/var/lib/" directory) directories;
+          };
+        });
 
       containers = lib.genAttrs (lib.attrNames cfg.network) (
         name:

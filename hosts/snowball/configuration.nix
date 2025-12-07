@@ -80,13 +80,16 @@
     server.immich.accelerationDevices = lib.mkForce [ ];
   };
 
-  server = {
+  server = rec {
     enable = true;
     externalNetworkInterface = "eno1";
 
     dns = {
       enable = true;
       systemStateVersion = "25.11";
+      mappings = {
+        ${immich.virtualHostName} = [ "192.168.178.60" ];
+      };
     };
 
     immich = {
@@ -94,11 +97,14 @@
       dataDir = "/var/lib/immich";
       accelerationDevices = [ "/dev/dri/renderD128" ];
       systemStateVersion = "25.11";
+      virtualHostName = "immich.fxbse.com";
     };
 
     reverse-proxy = {
       enable = true;
       systemStateVersion = "25.11";
+
+      virtualHosts.${immich.virtualHostName}.sslCertificateDir = "/var/lib/certs";
     };
   };
 

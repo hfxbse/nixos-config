@@ -12,6 +12,11 @@ in
   options.server.dns = {
     enable = lib.mkEnableOption "a DNS server in a container";
 
+    mappings = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.listOf lib.types.str);
+      default = [];
+    };
+
     systemStateVersion = lib.mkOption {
       description = "System state version used for the container. Do not change it after the container has been created.";
       type = lib.types.str;
@@ -128,9 +133,9 @@ in
                   }
                 ];
 
-                customDNS.mapping = {
-                  "immich.fxbse.com" = "192.168.178.60";
-                };
+                customDNS.mapping = builtins.mapAttrs (
+                  name: value: builtins.concatStringsSep "," value
+                ) cfg.mappings;
 
                 conditional = {
                   fallbackUpstream = false;

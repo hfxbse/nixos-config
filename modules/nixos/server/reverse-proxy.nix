@@ -24,6 +24,11 @@ in
           { ... }:
           {
             options = {
+              sslCertificateDir = lib.mkOption {
+                type = lib.types.nullOr lib.types.path;
+                default = null;
+              };
+
               target = {
                 host = lib.mkOption {
                   type = lib.types.str;
@@ -42,51 +47,77 @@ in
     };
   };
 
-  config = lib.mkIf (config.server.enable && cfg.enable) {
-    server.network.${serverName} = {
-      subnetPrefix = "10.0.253";
-      forwardPorts = [
-        {
-          port = 80;
-          vmHostPort = 8080;
-          external = true;
-        }
-        {
-          port = 443;
-          vmHostPort = 8443;
-          external = true;
-        }
-      ];
-    };
+  config =
+    let
+      sslHosts = builtins.filter (name: cfg.virtualHosts.${name}.sslCertificateDir != null) (
+        builtins.attrNames cfg.virtualHosts
+      );
+    in
+    lib.mkIf (config.server.enable && cfg.enable) {
+      server.stateDirectories.${serverName} = builtins.map (
+        host: cfg.virtualHosts.${host}.sslCertificateDir
+      ) sslHosts;
 
-    containers.${serverName} = {
-      autoStart = true;
-      privateUsers = "pick";
-
-      config = {
-        services.nginx = {
-          enable = true;
-
-          recommendedGzipSettings = true;
-          recommendedOptimisation = true;
-          recommendedProxySettings = true;
-
-          virtualHosts = lib.genAttrs (builtins.attrNames cfg.virtualHosts) (
-            name:
-            let
-              virtualHost = cfg.virtualHosts.${name};
-            in
-            {
-              locations."/" = {
-                proxyPass = "http://${virtualHost.target.host}:${builtins.toString virtualHost.target.port}";
-                proxyWebsockets = true;
-              };
-            }
-          );
-        };
-
-        system.stateVersion = cfg.systemStateVersion;
+      server.network.${serverName} = {
+        subnetPrefix = "10.0.253";
+        forwardPorts = [
+          {
+            port = 80;
+            vmHostPort = 8080;
+            external = true;
+          }
+          {
+            port = 443;
+            vmHostPort = 8443;
+            external = true;
+          }
+        ];
       };
+
+      containers.${serverName} =
+        let
+          mountPoint = name: "/var/lib/certs/${name}/";
+        in
+        {
+          autoStart = true;
+          privateUsers = "pick";
+
+          bindMounts = lib.genAttrs sslHosts (hostName: {
+            mountPoint = "${mountPoint hostName}:idmap";
+            hostPath = cfg.virtualHosts.${hostName}.sslCertificateDir;
+            isReadOnly = false;
+          });
+
+          config = {
+            services.nginx = {
+              enable = true;
+
+              recommendedGzipSettings = true;
+              recommendedOptimisation = true;
+              recommendedProxySettings = true;
+              recommendedTlsSettings = true;
+
+              virtualHosts = lib.genAttrs (builtins.attrNames cfg.virtualHosts) (
+                name:
+                let
+                  virtualHost = cfg.virtualHosts.${name};
+                  useSSL = virtualHost.sslCertificateDir != null;
+                in
+                {
+                  forceSSL = useSSL;
+                  sslCertificate = lib.mkIf useSSL "${mountPoint name}/host.cert";
+                  sslCertificateKey = lib.mkIf useSSL "${mountPoint name}/key.pem";
+
+                  locations."/" = {
+                    proxyPass = "http://${virtualHost.target.host}:${builtins.toString virtualHost.target.port}";
+                    proxyWebsockets = true;
+                  };
+                }
+              );
+            };
+
+            system.stateVersion = cfg.systemStateVersion;
+          };
+        };
     };
-  };
 }

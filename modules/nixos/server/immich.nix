@@ -31,6 +31,11 @@ in
     machine-learning.enable = lib.mkEnableOption "machine-learning support" // {
       default = true;
     };
+
+    virtualHostName = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+    };
   };
 
   config =
@@ -42,30 +47,28 @@ in
       storeDataOnHost = cfg.dataDir != null;
     in
     lib.mkIf (config.server.enable && cfg.enable) {
-      server.network.immich = {
-        subnetPrefix = "10.0.255";
-        forwardPorts = [
-          {
-            port = immich.port;
-            external = !config.server.reverse-proxy.enable;
-          }
+      server = {
+        stateDirectories.immich = [
+          "${cfg.dataDir}/media"
+          "${cfg.dataDir}/database"
         ];
-      };
 
-      server.reverse-proxy.virtualHosts."immich.fxbse.com" = {
-        target.host = container.localAddress;
-        target.port = immich.port;
-      };
-
-      systemd.services."container@immich".serviceConfig = lib.mkIf storeDataOnHost {
-        StateDirectory =
-          let
-            relativePath = lib.removePrefix "/var/lib/" cfg.dataDir;
-          in
-          [
-            "${relativePath}/media"
-            "${relativePath}/database"
+        network.immich = {
+          subnetPrefix = "10.0.255";
+          forwardPorts = [
+            {
+              port = immich.port;
+              external = !config.server.reverse-proxy.enable;
+            }
           ];
+        };
+      };
+
+      server.reverse-proxy.virtualHosts = lib.mkIf (cfg.virtualHostName != null) {
+        ${cfg.virtualHostName} = {
+          target.host = container.localAddress;
+          target.port = immich.port;
+        };
       };
 
       containers.immich = {
