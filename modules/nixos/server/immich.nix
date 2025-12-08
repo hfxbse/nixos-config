@@ -23,6 +23,11 @@ in
       type = lib.types.nullOr (lib.types.strMatching ''^/var/lib/[^/.]+(/[^/.]+)*$'');
     };
 
+    secretSettingsDir = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+    };
+
     systemStateVersion = lib.mkOption {
       description = "System state version used for the container. Do not change it after the container has been created.";
       type = lib.types.str;
@@ -45,12 +50,15 @@ in
       postgresql = container.config.services.postgresql;
 
       storeDataOnHost = cfg.dataDir != null;
+
+      secretSettings = "/run/secrets/immich-settings";
     in
     lib.mkIf (config.server.enable && cfg.enable) {
       server = {
         stateDirectories.immich = [
           "${cfg.dataDir}/media"
           "${cfg.dataDir}/database"
+          cfg.secretSettingsDir
         ];
 
         network.immich = {
@@ -82,17 +90,23 @@ in
             hostPath = path;
             isReadOnly = false;
           })
-          // lib.mkIf storeDataOnHost {
-            media = {
+          // {
+            media = lib.mkIf storeDataOnHost {
               mountPoint = immich.mediaLocation;
               hostPath = "${cfg.dataDir}/media";
               isReadOnly = false;
             };
 
-            database = {
+            database = lib.mkIf storeDataOnHost {
               mountPoint = postgresql.dataDir;
               hostPath = "${cfg.dataDir}/database";
               isReadOnly = false;
+            };
+
+            secret-settings = lib.mkIf (cfg.secretSettingsDir != null) {
+              mountPoint = secretSettings;
+              hostPath = cfg.secretSettingsDir;
+              isReadOnly = true;
             };
           };
 
@@ -106,6 +120,10 @@ in
             machine-learning-dir = "/var/lib/immich-machine-learning";
           in
           {
+            networking.hosts = lib.mkIf (config.server.oidc.enable && config.server.reverse-proxy.enable) {
+              "${config.server.network.reverse-proxy.subnetPrefix}.2" = [ config.server.oidc.virtualHostName ];
+            };
+
             services.postgresql.package = pkgs.postgresql_16;
             services.immich = {
               enable = true;
@@ -124,6 +142,17 @@ in
 
               # List of options https://docs.immich.app/install/config-file/
               settings.machineLearning.enabled = cfg.machine-learning.enable;
+
+              settings.server.publicUsers = false;
+              settings.passwordLogin.enabled = !config.server.oidc.enable;
+              settings.oauth = lib.mkIf config.server.oidc.enable {
+                enabled = true;
+                autoLaunch = true;
+
+                issuerUrl._secret = "${secretSettings}/oauth/issuerUrl";
+                clientId._secret = "${secretSettings}/oauth/clientId";
+                clientSecret._secret = "${secretSettings}/oauth/clientSecret";
+              };
             };
 
             systemd.services."immich-machine-learning".serviceConfig = {

@@ -144,7 +144,7 @@ in
               UI_CONFIG_DISABLED = true;
             };
 
-            environmentFile = "/var/lib/pocket-id-secrets";
+            environmentFile = "/run/secrets/pocket-id";
           };
 
           system.stateVersion = cfg.systemStateVersion;

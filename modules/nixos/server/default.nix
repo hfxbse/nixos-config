@@ -18,7 +18,7 @@ in
     };
 
     stateDirectories = lib.mkOption {
-      default = [ ];
+      default = {};
       type = lib.types.attrsOf (lib.types.listOf lib.types.path);
     };
 

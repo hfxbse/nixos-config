@@ -79,6 +79,11 @@ in
         ];
       };
 
+      services.resolved.enable = true;
+      networking.hosts = {
+        ${config.containers.${serverName}.localAddress} = builtins.attrNames cfg.virtualHosts;
+      };
+
       containers.${serverName} =
         let
           mountPoint = name: "/var/lib/certs/${name}/";

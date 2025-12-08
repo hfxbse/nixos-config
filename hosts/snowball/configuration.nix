@@ -100,6 +100,7 @@
       accelerationDevices = [ "/dev/dri/renderD128" ];
       systemStateVersion = "25.11";
       virtualHostName = "immich.fxbse.com";
+      secretSettingsDir = "/var/lib/immich-secrets";
     };
 
     oidc = {

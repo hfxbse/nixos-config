@@ -86,7 +86,7 @@
     externalNetworkInterface = "enp1s0";
 
     immich = {
-      enable = true;
+      enable = false;
       dataDir = "/var/lib/immich";
       machine-learning.enable = lib.mkForce false;
       accelerationDevices = [ "/dev/dri/renderD128" ];
