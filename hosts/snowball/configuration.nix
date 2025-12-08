@@ -49,6 +49,7 @@
     htop
     mergerfs
     mergerfs-tools
+    openssl
     s-tui
   ];
 
@@ -87,9 +88,10 @@
     dns = {
       enable = true;
       systemStateVersion = "25.11";
-      mappings = {
-        ${immich.virtualHostName} = [ "192.168.178.60" ];
-      };
+      mappings = lib.genAttrs (builtins.map (server: server.virtualHostName) [
+        immich
+        oidc
+      ]) (virtualHostName: [ "192.168.178.60" ]);
     };
 
     immich = {
@@ -100,11 +102,20 @@
       virtualHostName = "immich.fxbse.com";
     };
 
+    oidc = {
+      enable = true;
+      dataDir = "/var/lib/pocket-id";
+      systemStateVersion = "25.11";
+      secretsFile = "/var/lib/pocket-id-secrets";
+      virtualHostName = "auth.fxbse.com";
+    };
+
     reverse-proxy = {
       enable = true;
       systemStateVersion = "25.11";
 
       virtualHosts.${immich.virtualHostName}.sslCertificateDir = "/var/lib/certs";
+      virtualHosts.${oidc.virtualHostName}.sslCertificateDir = "/var/lib/certs";
     };
   };
 

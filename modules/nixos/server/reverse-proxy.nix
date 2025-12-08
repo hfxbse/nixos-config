@@ -29,6 +29,11 @@ in
                 default = null;
               };
 
+              extraConfig = lib.mkOption {
+                type = lib.types.lines;
+                default = '''';
+              };
+
               target = {
                 host = lib.mkOption {
                   type = lib.types.str;
@@ -104,6 +109,7 @@ in
                   useSSL = virtualHost.sslCertificateDir != null;
                 in
                 {
+                  inherit (virtualHost) extraConfig;
                   forceSSL = useSSL;
                   sslCertificate = lib.mkIf useSSL "${mountPoint name}/host.cert";
                   sslCertificateKey = lib.mkIf useSSL "${mountPoint name}/key.pem";

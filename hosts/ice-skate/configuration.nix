@@ -32,7 +32,7 @@
   };
 
   specialisation.server-virtualisation.configuration.networking.hosts = {
-    "127.0.0.1" = [ "immich.fxbse.com" ];
+    "127.0.0.1" = [ "immich.fxbse.com" "auth.fxbse.com" ];
   };
 
   users.users.${config.user.name}.packages = with pkgs; [ xournalpp ];
