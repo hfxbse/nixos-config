@@ -33,7 +33,9 @@
     }@inputs:
     let
       system = "x86_64-linux";
-      lib = ((import ./nixpkgs-override.nix) (inputs // { inherit system; })).lib;
+      lib = nixpkgs.lib;
+      # Needed for server virtualisation but messes with nix shell
+      # lib = ((import ./nixpkgs-override.nix) (inputs // { inherit system; })).lib;
 
       ownPackages =
         let

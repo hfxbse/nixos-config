@@ -55,6 +55,7 @@ in
             {
               port = pocketId.settings.PORT;
               external = !config.server.reverse-proxy.enable;
+              allowVNets = lib.optional config.server.reverse-proxy.enable "reverse-proxy";
             }
           ];
         };

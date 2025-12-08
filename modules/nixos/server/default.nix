@@ -18,7 +18,7 @@ in
     };
 
     stateDirectories = lib.mkOption {
-      default = {};
+      default = { };
       type = lib.types.attrsOf (lib.types.listOf lib.types.path);
     };
 
@@ -45,6 +45,12 @@ in
                         port = lib.mkOption {
                           description = "Port number";
                           type = lib.types.ints.positive;
+                        };
+
+                        allowVNets = lib.mkOption {
+                          description = "Which VNet IP ranges to accept incoming traffic from. Connection from host's LAN are allowed by default.";
+                          type = lib.types.listOf lib.types.str;
+                          default = [ ];
                         };
 
                         vmHostPort = lib.mkOption {
@@ -101,8 +107,69 @@ in
         internalInterfaces = [ "ve-+" ];
       };
 
-      networking.firewall.allowedTCPPorts = allowedPorts "tcp" externallyExposedPorts;
-      networking.firewall.allowedUDPPorts = allowedPorts "udp" externallyExposedPorts;
+      networking.firewall = {
+        allowedTCPPorts = allowedPorts "tcp" externallyExposedPorts;
+        allowedUDPPorts = allowedPorts "udp" externallyExposedPorts;
+
+        extraCommands =
+          let
+            rulePrio = protocol: builtins.toString (if protocol == "tcp" then 1 else 2);
+            rule =
+              {
+                protocol,
+                source,
+                destination,
+                port,
+                ...
+              }:
+              "iptables -I FORWARD ${rulePrio protocol} -s ${source} -d ${destination} -p ${protocol} --dport ${builtins.toString port} -j ACCEPT";
+
+            rules =
+              {
+                port,
+                protocols,
+                allowVNets,
+                virtualHostName,
+                ...
+              }:
+              builtins.concatMap (
+                vnet:
+                builtins.map (
+                  protocol:
+                  rule {
+                    inherit protocol port;
+                    source = "${cfg.network.${vnet}.subnetPrefix}.0/24";
+                    destination = "${cfg.network.${virtualHostName}.subnetPrefix}.0/24";
+                  }
+                ) protocols
+              ) allowVNets;
+
+            vnetConnections = builtins.concatMap (
+              virtualHostName:
+              (builtins.concatMap (
+                forwardPort: rules (forwardPort // { inherit virtualHostName; })
+              ) cfg.network.${virtualHostName}.forwardPorts)
+            ) (builtins.attrNames cfg.network);
+          in
+          ''
+            # Block connections from VNets to host
+            iptables -A INPUT -s 10.0.0.0/8 -j DROP
+
+            # Allow the local network to reach the containers but not in reverse
+            iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+            iptables -A FORWARD -s 10.0.0.0/8 -d 192.168.0.0/16 -m conntrack --ctstate NEW -j DROP
+            iptables -A FORWARD -s 192.168.0.0/16 -d 10.0.0.0/8 -j ACCEPT
+
+            ip6tables -A FORWARD -s fe80::/10 -d 2001:9e8:2e07:f00::/64 -m conntrack --ctstate NEW -j DROP
+            ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+            # Block all traffic between VNets by default
+            iptables -A FORWARD -s 10.0.0.0/8 -d 10.0.0.0/8 -j DROP
+
+            # Allow specific VNet connections
+            ${lib.concatStringsSep "\n" vnetConnections}
+          '';
+      };
 
       virtualisation.vmVariant.virtualisation.forwardPorts = builtins.concatMap (
         {

@@ -67,6 +67,7 @@ in
             {
               port = immich.port;
               external = !config.server.reverse-proxy.enable;
+              allowVNets = lib.mkIf config.server.reverse-proxy.enable [ "reverse-proxy" ];
             }
           ];
         };

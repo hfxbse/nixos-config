@@ -14,7 +14,7 @@ in
 
     mappings = lib.mkOption {
       type = lib.types.attrsOf (lib.types.listOf lib.types.str);
-      default = [];
+      default = [ ];
     };
 
     systemStateVersion = lib.mkOption {
@@ -44,6 +44,16 @@ in
           }
         ];
       };
+
+      # DNS needed for <host>.fritz.box
+      networking.firewall.extraCommands =
+        let
+          container = "${config.server.network.dns.subnetPrefix}.0/24";
+        in
+        ''
+          iptables -I FORWARD 1 -s ${container} -d 192.168.178.1 -p udp --dport 53 -j ACCEPT
+          iptables -I FORWARD 2 -s ${container} -d 192.168.178.1 -p tcp --dport 53 -j ACCEPT
+        '';
 
       containers.dns = {
         autoStart = true;

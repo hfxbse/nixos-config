@@ -63,23 +63,29 @@ in
         host: cfg.virtualHosts.${host}.sslCertificateDir
       ) sslHosts;
 
-      server.network.${serverName} = {
-        subnetPrefix = "10.0.253";
-        forwardPorts = [
-          {
-            port = 80;
-            vmHostPort = 8080;
-            external = true;
-          }
-          {
-            port = 443;
-            vmHostPort = 8443;
-            external = true;
-          }
-        ];
-      };
+      server.network.${serverName} =
+        let
+          oidc = config.server.oidc.enable;
+          immich = oidc && config.server.immich.enable;
+        in
+        {
+          subnetPrefix = "10.0.253";
+          forwardPorts = [
+            {
+              port = 80;
+              vmHostPort = 8080;
+              external = true;
+              allowVNets = lib.optional immich "immich";
+            }
+            {
+              port = 443;
+              vmHostPort = 8443;
+              external = true;
+              allowVNets = lib.optional immich "immich";
+            }
+          ];
+        };
 
-      services.resolved.enable = true;
       networking.hosts = {
         ${config.containers.${serverName}.localAddress} = builtins.attrNames cfg.virtualHosts;
       };
