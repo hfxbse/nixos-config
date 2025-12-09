@@ -116,7 +116,7 @@
       dataDir = "/var/lib/pocket-id";
       systemStateVersion = "25.11";
       secretsFile = "/var/lib/pocket-id-secrets";
-      virtualHostName = "auth.fxbse.com";
+      virtualHostName = "account.fxbse.com";
     };
 
     reverse-proxy = {
