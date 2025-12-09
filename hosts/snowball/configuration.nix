@@ -93,6 +93,21 @@
     enable = true;
     externalNetworkInterface = "eno1";
 
+    monitoring = {
+      enable = true;
+      secretsFile = "/var/lib/beszel-agent.secrets";
+      fileSystems = builtins.map ({name, label}: "/mnt/immich/${name}__${label}") [
+        {
+          name = "memory-card";
+          label = "Memory Card";
+        }
+        {
+          name = "usb-drive";
+          label = "USB Drive";
+        }
+      ];
+    };
+
     dns = {
       enable = true;
       systemStateVersion = "25.11";

@@ -6,6 +6,7 @@ in
   imports = [
     ./dns.nix
     ./immich.nix
+    ./monitoring.nix
     ./oidc.nix
     ./reverse-proxy.nix
   ];
