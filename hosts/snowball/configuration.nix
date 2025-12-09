@@ -96,7 +96,7 @@
     monitoring = {
       enable = true;
       secretsFile = "/var/lib/beszel-agent.secrets";
-      fileSystems = builtins.map ({name, label}: "/mnt/immich/${name}__${label}") [
+      fileSystems = builtins.map ({ name, label }: "/mnt/immich/${name}__${label}") [
         {
           name = "memory-card";
           label = "Memory Card";
@@ -106,6 +106,12 @@
           label = "USB Drive";
         }
       ];
+
+      webUi = {
+        enable = true;
+        dataDir = "/var/lib/beszel-hub";
+        systemStateVersion = "25.11";
+      };
     };
 
     dns = {

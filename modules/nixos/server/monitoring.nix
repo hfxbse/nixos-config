@@ -6,6 +6,9 @@
 }:
 let
   cfg = config.server.monitoring;
+
+  uiServerName = "monitoring-ui";
+  cfgBeszelHub = config.containers.${uiServerName}.config.services.beszel.hub;
 in
 {
   options.server.monitoring = {
@@ -24,13 +27,74 @@ in
     secretsFile = lib.mkOption {
       type = lib.types.path;
     };
+
+    webUi = {
+      enable = lib.mkEnableOption "the monitoring web interface";
+      dataDir = lib.mkOption {
+        type = lib.types.path;
+      };
+
+      systemStateVersion = lib.mkOption {
+        description = "System state version used for the container. Do not change it after the container has been created.";
+        type = lib.types.str;
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = [ config.services.beszel.hub.port ];
-    services.beszel.hub = {
-      enable = true;
-      host = "0.0.0.0";
+    server = lib.mkIf cfg.webUi.enable {
+      stateDirectories.${uiServerName} = [ cfgBeszelHub.dataDir ];
+      network.${uiServerName} = {
+        subnetPrefix = "10.0.251";
+        internetAccess = true; # Needed for notifications
+        forwardPorts = [
+          {
+            port = cfgBeszelHub.port;
+            external = true;
+          }
+        ];
+      };
+    };
+
+    containers.monitoring-ui = lib.mkIf cfg.webUi.enable {
+      autoStart = true;
+      privateUsers = "pick";
+
+      bindMounts.data = {
+        mountPoint = "${cfgBeszelHub.dataDir}:idmap";
+        hostPath = cfg.webUi.dataDir;
+        isReadOnly = false;
+      };
+
+      config =
+        let
+          name = "beszel-hub";
+        in
+        rec {
+          users = {
+            groups.${name} = { };
+            users.${name} = {
+              isSystemUser = true;
+              group = name;
+            };
+          };
+
+          services.beszel.hub = {
+            enable = true;
+            host = "0.0.0.0";
+          };
+
+          systemd.services.beszel-hub.serviceConfig = {
+            User = name;
+            Group = users.users.${name}.group;
+
+            # Enabling those breaks the bind mount
+            DynamicUser = lib.mkForce false;
+            PrivateUsers = lib.mkForce false;
+          };
+
+          system.stateVersion = cfg.webUi.systemStateVersion;
+        };
     };
 
     # See https://discourse.nixos.org/t/systemd-exporter-couldnt-get-dbus-connection-read-unix-run-dbus-system-bus-socket-recvmsg-connection-reset-by-peer/64367/4
@@ -43,7 +107,11 @@ in
       environment = {
         DATA_DIR = cfg.dataDir;
         EXTRA_FILESYSTEMS = lib.concatStringsSep "," cfg.fileSystems;
-        HUB_URL = "http://127.0.0.1:${builtins.toString config.services.beszel.hub.port}";
+        HUB_URL = lib.mkIf cfg.webUi.enable (
+          "http://${
+            config.server.network.${uiServerName}.subnetPrefix + ".2"
+          }:${builtins.toString config.services.beszel.hub.port}"
+        );
         SERVICE_PATTERNS = "beszel*,docker*,kubelet*,container@*";
       };
 
