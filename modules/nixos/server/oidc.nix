@@ -51,6 +51,7 @@ in
         stateDirectories.oidc = [ cfg.dataDir ];
         network.oidc = {
           subnetPrefix = "10.0.252";
+          internetAccess = true;
           forwardPorts = [
             {
               port = pocketId.settings.PORT;

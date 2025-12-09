@@ -63,6 +63,7 @@ in
 
         network.immich = {
           subnetPrefix = "10.0.255";
+          internetAccess = true;
           forwardPorts = [
             {
               port = immich.port;

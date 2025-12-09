@@ -34,6 +34,8 @@ in
                 example = "10.0.255";
               };
 
+              internetAccess = lib.mkEnableOption "internet access for the server";
+
               forwardPorts = lib.mkOption {
                 default = [ ];
                 type = lib.types.listOf (
@@ -111,6 +113,14 @@ in
         allowedTCPPorts = allowedPorts "tcp" externallyExposedPorts;
         allowedUDPPorts = allowedPorts "udp" externallyExposedPorts;
 
+        extraStopCommands = ''
+            iptables -F server-vnet 2>/dev/null || true
+            iptables -X server-vnet 2>/dev/null || true
+
+            ip6tables -F server-vnet6 2>/dev/null || true
+            ip6tables -X server-vnet6 2>/dev/null || true
+        '';
+
         extraCommands =
           let
             rulePrio = protocol: builtins.toString (if protocol == "tcp" then 1 else 2);
@@ -122,7 +132,7 @@ in
                 port,
                 ...
               }:
-              "iptables -I FORWARD ${rulePrio protocol} -s ${source} -d ${destination} -p ${protocol} --dport ${builtins.toString port} -j ACCEPT";
+              "iptables -I server-vnet ${rulePrio protocol} -s ${source} -d ${destination} -p ${protocol} --dport ${builtins.toString port} -j ACCEPT";
 
             rules =
               {
@@ -146,27 +156,41 @@ in
 
             vnetConnections = builtins.concatMap (
               virtualHostName:
-              (builtins.concatMap (
+              let
+                cfgNetwork = cfg.network.${virtualHostName};
+              in
+              (lib.optional (
+                !cfgNetwork.internetAccess
+              ) "iptables -A server-vnet -s ${cfgNetwork.subnetPrefix}.0/24 ! -d 10.0.0.0/8 -j DROP")
+              ++ (builtins.concatMap (
                 forwardPort: rules (forwardPort // { inherit virtualHostName; })
-              ) cfg.network.${virtualHostName}.forwardPorts)
+              ) cfgNetwork.forwardPorts)
             ) (builtins.attrNames cfg.network);
           in
           ''
+            # Firewall chain server-vnet and server-vnet6
+            iptables -N server-vnet 2>/dev/null || true
+            iptables -A INPUT -s 10.0.0.0/8 -j server-vnet
+            iptables -A FORWARD -j server-vnet
+
+            ip6tables -N server-vnet6 2>/dev/null || true
+            ip6tables -A FORWARD -j server-vnet6
+
             # Block connections from VNets to host
             iptables -A INPUT -s 10.0.0.0/8 -j DROP
 
             # Allow the local network to reach the containers but not in reverse
-            iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-            iptables -A FORWARD -s 10.0.0.0/8 -d 192.168.0.0/16 -m conntrack --ctstate NEW -j DROP
-            iptables -A FORWARD -s 192.168.0.0/16 -d 10.0.0.0/8 -j ACCEPT
+            iptables -A server-vnet -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+            iptables -A server-vnet -s 10.0.0.0/8 -d 192.168.0.0/16 -m conntrack --ctstate NEW -j DROP
+            iptables -A server-vnet -s 192.168.0.0/16 -d 10.0.0.0/8 -j ACCEPT
 
-            ip6tables -A FORWARD -s fe80::/10 -d 2001:9e8:2e07:f00::/64 -m conntrack --ctstate NEW -j DROP
-            ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+            ip6tables -A server-vnet6 -s fe80::/10 -d 2001:9e8:2e07:f00::/64 -m conntrack --ctstate NEW -j DROP
+            ip6tables -A server-vnet6 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
             # Block all traffic between VNets by default
-            iptables -A FORWARD -s 10.0.0.0/8 -d 10.0.0.0/8 -j DROP
+            iptables -A server-vnet -s 10.0.0.0/8 -d 10.0.0.0/8 -j DROP
 
-            # Allow specific VNet connections
+            # Only accept specific incomming VNet-VNet connections
             ${lib.concatStringsSep "\n" vnetConnections}
           '';
       };

@@ -32,6 +32,7 @@ in
     lib.mkIf (config.server.enable && cfg.enable) {
       server.network.dns = {
         subnetPrefix = "10.0.254";
+        internetAccess = true;
         forwardPorts = [
           {
             port = blocky.settings.ports.dns;
@@ -51,8 +52,9 @@ in
           container = "${config.server.network.dns.subnetPrefix}.0/24";
         in
         ''
-          iptables -I FORWARD 1 -s ${container} -d 192.168.178.1 -p udp --dport 53 -j ACCEPT
-          iptables -I FORWARD 2 -s ${container} -d 192.168.178.1 -p tcp --dport 53 -j ACCEPT
+          iptables -N server-vnet 2>/dev/null || true
+          iptables -I server-vnet 1 -s ${container} -d 192.168.178.1 -p udp --dport 53 -j ACCEPT
+          iptables -I server-vnet 2 -s ${container} -d 192.168.178.1 -p tcp --dport 53 -j ACCEPT
         '';
 
       containers.dns = {
