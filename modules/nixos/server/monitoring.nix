@@ -61,6 +61,8 @@ in
         ];
       };
 
+      oidc.clients = [ uiServerName ];
+
       reverse-proxy.virtualHosts = lib.mkIf (cfg.webUi.virtualHostName != null) {
         ${cfg.webUi.virtualHostName} = {
           target.host = container.localAddress;
@@ -95,6 +97,10 @@ in
           services.beszel.hub = {
             enable = true;
             host = "0.0.0.0";
+            environment = lib.mkIf config.server.oidc.enable {
+              USER_CREATION = "true";
+              DISABLE_PASSWORD_AUTH = "true";
+            };
           };
 
           systemd.services.beszel-hub.serviceConfig = {

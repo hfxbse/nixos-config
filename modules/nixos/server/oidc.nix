@@ -30,6 +30,12 @@ in
       type = lib.types.nullOr lib.types.str;
       default = null;
     };
+
+    clients = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Container names which need to access the OpenID Connect server";
+    };
   };
 
   config =
@@ -110,48 +116,59 @@ in
           };
         };
 
-      containers.oidc = {
-        autoStart = true;
-        privateUsers = "pick";
-
-        bindMounts = {
-          data = {
-            mountPoint = "${pocketId.dataDir}:idmap";
-            hostPath = cfg.dataDir;
-            isReadOnly = false;
+      containers =
+        lib.genAttrs cfg.clients (name: {
+          config.networking.hosts = lib.mkIf config.server.reverse-proxy.enable {
+            "${config.server.network.reverse-proxy.subnetPrefix}.2" = [ cfg.virtualHostName ];
           };
+        })
+        // {
+          oidc = {
+            autoStart = true;
+            privateUsers = "pick";
 
-          secrets = {
-            mountPoint = pocketId.environmentFile;
-            hostPath = cfg.secretsFile;
-            isReadOnly = true;
-          };
-        };
+            bindMounts = {
+              data = {
+                mountPoint = "${pocketId.dataDir}:idmap";
+                hostPath = cfg.dataDir;
+                isReadOnly = false;
+              };
 
-        config = {
-          services.pocket-id = {
-            enable = true;
-            settings = {
-              ALLOW_USER_SIGNUPS = "withToken";
-              APP_NAME =
-                let
-                  parts = lib.splitString "." cfg.virtualHostName;
-                in
-                builtins.concatStringsSep "." (lib.takeEnd 2 parts);
-
-              APP_URL = origin (if virtualHost then 443 else pocketId.settings.PORT);
-              EMAIL_LOGIN_NOTIFICATION_ENABLED = true;
-              PORT = 1411;
-              SMTP_FROM = lib.mkIf (cfg.virtualHostName != null) "no-reply@${cfg.virtualHostName}";
-              TRUST_PROXY = true;
-              UI_CONFIG_DISABLED = true;
+              secrets = {
+                mountPoint = pocketId.environmentFile;
+                hostPath = cfg.secretsFile;
+                isReadOnly = true;
+              };
             };
 
-            environmentFile = "/run/secrets/pocket-id";
-          };
+            config = {
+              services.pocket-id = {
+                enable = true;
+                settings = {
+                  ALLOW_USER_SIGNUPS = "withToken";
+                  APP_NAME =
+                    let
+                      parts = lib.splitString "." cfg.virtualHostName;
+                    in
+                    builtins.concatStringsSep "." (lib.takeEnd 2 parts);
 
-          system.stateVersion = cfg.systemStateVersion;
+                  APP_URL = origin (if virtualHost then 443 else pocketId.settings.PORT);
+                  EMAIL_LOGIN_NOTIFICATION_ENABLED = true;
+                  PORT = 1411;
+                  SMTP_FROM = lib.mkIf (cfg.virtualHostName != null) "no-reply@${cfg.virtualHostName}";
+                  TRUST_PROXY = true;
+                  UI_CONFIG_DISABLED = true;
+
+                  # See https://pocket-id.org/docs/client-examples/beszel
+                  EMAILS_VERIFIED = config.server.monitoring.enable;
+                };
+
+                environmentFile = "/run/secrets/pocket-id";
+              };
+
+              system.stateVersion = cfg.systemStateVersion;
+            };
+          };
         };
-      };
     };
 }

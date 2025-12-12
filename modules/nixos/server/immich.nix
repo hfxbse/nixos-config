@@ -72,13 +72,15 @@ in
             }
           ];
         };
-      };
 
-      server.reverse-proxy.virtualHosts = lib.mkIf (cfg.virtualHostName != null) {
-        ${cfg.virtualHostName} = {
-          public = true;
-          target.host = container.localAddress;
-          target.port = immich.port;
+        oidc.clients = [ "immich" ];
+
+        reverse-proxy.virtualHosts = lib.mkIf (cfg.virtualHostName != null) {
+          ${cfg.virtualHostName} = {
+            public = true;
+            target.host = container.localAddress;
+            target.port = immich.port;
+          };
         };
       };
 
@@ -123,10 +125,6 @@ in
             machine-learning-dir = "/var/lib/immich-machine-learning";
           in
           {
-            networking.hosts = lib.mkIf (config.server.oidc.enable && config.server.reverse-proxy.enable) {
-              "${config.server.network.reverse-proxy.subnetPrefix}.2" = [ config.server.oidc.virtualHostName ];
-            };
-
             services.postgresql.package = pkgs.postgresql_16;
             services.immich = {
               enable = true;

@@ -67,8 +67,8 @@ in
 
       server.network.${serverName} =
         let
-          oidc = config.server.oidc.enable;
-          immich = oidc && config.server.immich.enable;
+          oidc = config.server.oidc;
+          allowVNets = lib.optionals oidc.enable oidc.clients;
         in
         {
           subnetPrefix = "10.0.253";
@@ -77,13 +77,13 @@ in
               port = 80;
               vmHostPort = 8080;
               external = true;
-              allowVNets = lib.optional immich "immich";
+              inherit allowVNets;
             }
             {
               port = 443;
               vmHostPort = 8443;
               external = true;
-              allowVNets = lib.optional immich "immich";
+              inherit allowVNets;
             }
           ];
         };
