@@ -97,10 +97,14 @@ in
           services.beszel.hub = {
             enable = true;
             host = "0.0.0.0";
-            environment = lib.mkIf config.server.oidc.enable {
-              USER_CREATION = "true";
-              DISABLE_PASSWORD_AUTH = "true";
-            };
+            environment =
+              lib.mkIf config.server.oidc.enable {
+                USER_CREATION = "true";
+                DISABLE_PASSWORD_AUTH = "true";
+              }
+              // lib.mkIf config.server.reverse-proxy.enable {
+                APP_URL = "https://${cfg.webUi.virtualHostName}";
+              };
           };
 
           systemd.services.beszel-hub.serviceConfig = {
