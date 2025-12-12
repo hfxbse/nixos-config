@@ -111,6 +111,7 @@
         enable = true;
         dataDir = "/var/lib/beszel-hub";
         systemStateVersion = "25.11";
+        virtualHostName = "monitoring.fxbse.com";
       };
     };
 
@@ -120,6 +121,7 @@
       mappings = lib.genAttrs (builtins.map (server: server.virtualHostName) [
         immich
         oidc
+        monitoring.webUi
       ]) (virtualHostName: [ "192.168.178.60" ]);
     };
 
@@ -146,6 +148,7 @@
 
       virtualHosts.${immich.virtualHostName}.sslCertificateDir = "/var/lib/certs";
       virtualHosts.${oidc.virtualHostName}.sslCertificateDir = "/var/lib/certs";
+      virtualHosts.${monitoring.webUi.virtualHostName}.sslCertificateDir = "/var/lib/certs";
     };
   };
 

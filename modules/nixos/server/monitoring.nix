@@ -8,7 +8,8 @@ let
   cfg = config.server.monitoring;
 
   uiServerName = "monitoring-ui";
-  cfgBeszelHub = config.containers.${uiServerName}.config.services.beszel.hub;
+  container = config.containers.${uiServerName};
+  cfgBeszelHub = container.config.services.beszel.hub;
 in
 {
   options.server.monitoring = {
@@ -38,6 +39,11 @@ in
         description = "System state version used for the container. Do not change it after the container has been created.";
         type = lib.types.str;
       };
+
+      virtualHostName = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+      };
     };
   };
 
@@ -50,9 +56,16 @@ in
         forwardPorts = [
           {
             port = cfgBeszelHub.port;
-            external = true;
+            allowVNets = lib.mkIf config.server.reverse-proxy.enable [ "reverse-proxy" ];
           }
         ];
+      };
+
+      reverse-proxy.virtualHosts = lib.mkIf (cfg.webUi.virtualHostName != null) {
+        ${cfg.webUi.virtualHostName} = {
+          target.host = container.localAddress;
+          target.port = cfgBeszelHub.port;
+        };
       };
     };
 

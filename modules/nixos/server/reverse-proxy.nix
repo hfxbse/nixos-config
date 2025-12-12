@@ -34,6 +34,8 @@ in
                 default = '''';
               };
 
+              public = lib.mkEnableOption "access from any IP range";
+
               target = {
                 host = lib.mkOption {
                   type = lib.types.str;
@@ -128,6 +130,10 @@ in
                   locations."/" = {
                     proxyPass = "http://${virtualHost.target.host}:${builtins.toString virtualHost.target.port}";
                     proxyWebsockets = true;
+                    extraConfig = lib.mkIf (!virtualHost.public) ''
+                      allow 192.168.0.0/16;
+                      deny all;
+                    '';
                   };
                 }
               );

@@ -76,6 +76,7 @@ in
 
       server.reverse-proxy.virtualHosts = lib.mkIf (cfg.virtualHostName != null) {
         ${cfg.virtualHostName} = {
+          public = true;
           target.host = container.localAddress;
           target.port = immich.port;
         };
