@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   facter.reportPath = ./facter.json;
   virtualisation.vmVariant.facter.reportPath = lib.mkForce ./facter-vm.json;
@@ -89,6 +94,25 @@
     server.immich.accelerationDevices = lib.mkForce [ ];
   };
 
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "web@fhaas.org";
+    certs."fxbse.com" = {
+      domain = "*.fxbse.com";
+      dnsProvider = "porkbun";
+      dnsPropagationCheck = true;
+      credentialsFile = "/var/fxbse.com.secrets";
+    };
+  };
+
+  users = {
+    groups.acme.gid = 990;
+    users.acme = {
+      group = "acme";
+      uid = 992;
+    };
+  };
+
   server = rec {
     enable = true;
     externalNetworkInterface = "eno1";
@@ -146,9 +170,20 @@
       enable = true;
       systemStateVersion = "25.11";
 
-      virtualHosts.${immich.virtualHostName}.sslCertificateDir = "/var/lib/certs";
-      virtualHosts.${oidc.virtualHostName}.sslCertificateDir = "/var/lib/certs";
-      virtualHosts.${monitoring.webUi.virtualHostName}.sslCertificateDir = "/var/lib/certs";
+      virtualHosts =
+        lib.genAttrs
+          (builtins.map (server: server.virtualHostName) [
+            immich
+            oidc
+            monitoring.webUi
+          ])
+          (virtualHostName: {
+            sslCertificateDir =
+              let
+                parts = lib.splitString "." virtualHostName;
+              in
+              "/var/lib/acme/${builtins.concatStringsSep "." (lib.takeEnd 2 parts)}";
+          });
     };
   };
 

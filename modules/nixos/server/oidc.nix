@@ -54,7 +54,6 @@ in
     in
     lib.mkIf (config.server.enable && cfg.enable) {
       server = {
-        stateDirectories.oidc = [ cfg.dataDir ];
         network.oidc = {
           subnetPrefix = "10.0.252";
           internetAccess = true;
@@ -66,55 +65,33 @@ in
             }
           ];
         };
-      };
 
-      server.reverse-proxy.virtualHosts = lib.mkIf (cfg.virtualHostName != null) {
-        ${cfg.virtualHostName} = {
-          public = true;
-          target.host = container.localAddress;
-          target.port = pocketId.settings.PORT;
+        reverse-proxy.virtualHosts = lib.mkIf (cfg.virtualHostName != null) {
+          ${cfg.virtualHostName} = {
+            public = true;
+            target.host = container.localAddress;
+            target.port = pocketId.settings.PORT;
 
-          # See https://pocket-id.org/docs/advanced/nginx-reverse-proxy
-          extraConfig = ''
-            proxy_busy_buffers_size   512k;
-            proxy_buffers   4 512k;
-            proxy_buffer_size   256k;
-          '';
+            # See https://pocket-id.org/docs/advanced/nginx-reverse-proxy
+            extraConfig = ''
+              proxy_busy_buffers_size   512k;
+              proxy_buffers   4 512k;
+              proxy_buffer_size   256k;
+            '';
+          };
+        };
+
+        stateDirectories.oidc = [ cfg.dataDir ];
+        permissionCorrections."oidc-data" = {
+          inherit (pocketId) user group;
+          server = "oidc";
+          path = pocketId.dataDir;
         };
       };
 
       virtualisation.vmVariant.containers.oidc.config.services.pocket-id.settings = {
         APP_URL = lib.mkForce (origin (if virtualHost then 8443 else pocketId.settings.PORT));
       };
-
-      # Directory permission reset after every container restart
-      # The pocked-id services is NOT restarted when the container is restarted
-      # The container does not "boot", meaning the usual mulit-user.target trigger
-      # does not work.
-      # Therefore, this workaround running on the host machine.
-      systemd.services.pocket-id-data =
-        let
-          trigger = [ "container@oidc.service" ];
-        in
-        {
-          description = "Fixes the file permissions for the data stored by Pocked ID";
-          wantedBy = trigger;
-          partOf = trigger;
-          after = trigger;
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart =
-              let
-                nixos-container = lib.getExe pkgs.nixos-container;
-              in
-              lib.getExe (
-                pkgs.writeShellScriptBin "pocked-id-data" ''
-                  ${nixos-container} run oidc -- chown ${pocketId.user}:${pocketId.group} \
-                    -R -L ${pocketId.dataDir};
-                ''
-              );
-          };
-        };
 
       containers =
         lib.genAttrs cfg.clients (name: {
