@@ -1,5 +1,5 @@
 name: check-flake
-run-name: "Check Flake"
+run-name: "Check Flake – ${{ github.event.head_commit.message }}"
 on:
   push:
     paths-ignore:

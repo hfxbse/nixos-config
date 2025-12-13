@@ -1,0 +1,38 @@
+name: update-sbom
+run-name: "Update SBOM – ${{ github.event.workflow_run.head_commit.message }}"
+on:
+  workflow_run:
+    workflows:
+      - check-flake
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  update-sbom:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - uses: cachix/install-nix-action@v31
+        name: "Install Nix"
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v4
+        name: "Checkout repository"
+
+      - run: >
+          nix develop ${{ github.workspace }}#sbom -c --
+          sbomnix ${{ github.workspace }}#nixosConfigurations.snowball.config.system.build.toplevel
+        name: "Generate SBOM"
+
+      - uses: advanced-security/spdx-dependency-submission-action@v0.1.1
+        name: "Submit SBOM to GitHub"
+        with:
+          filePath: "${{ github.workspace }}"

@@ -74,6 +74,10 @@
 
       overlays = lib.genAttrs [ "image-nvim" ] (name: ((import ./overlays/${name}.nix) lib));
 
+      devShells.${system} = {
+        sbom = pkgs.mkShell { packages = with pkgs; [ sbomnix ]; };
+      };
+
       templates = {
         default = self.templates.baseline;
         baseline = {

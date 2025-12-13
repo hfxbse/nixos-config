@@ -4,3 +4,5 @@ result
 authorized_keys
 *.qcow2
 /*.patch
+http_cache.sqlite
+sbom.*
