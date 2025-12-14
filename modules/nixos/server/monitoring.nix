@@ -69,9 +69,16 @@ in
           target.port = cfgBeszelHub.port;
         };
       };
+
+      permissionMappings.monitoring-ui = lib.mkIf cfg.webUi.enable {
+        user.nameOnServer = "beszel-hub";
+        group.nameOnServer = "beszel-hub";
+        server = uiServerName;
+        paths = [ cfgBeszelHub.dataDir ];
+      };
     };
 
-    containers.monitoring-ui = lib.mkIf cfg.webUi.enable {
+    containers.${uiServerName} = lib.mkIf cfg.webUi.enable {
       autoStart = true;
       privateUsers = "pick";
 
@@ -81,43 +88,35 @@ in
         isReadOnly = false;
       };
 
-      config =
-        let
-          name = "beszel-hub";
-        in
-        rec {
-          users = {
-            groups.${name} = { };
-            users.${name} = {
-              isSystemUser = true;
-              group = name;
+      config = {
+        services.beszel.hub = {
+          enable = true;
+          host = "0.0.0.0";
+          environment =
+            lib.optionalAttrs config.server.oidc.enable {
+              USER_CREATION = "true";
+              DISABLE_PASSWORD_AUTH = "true";
+            }
+            // lib.optionalAttrs config.server.reverse-proxy.enable {
+              APP_URL = "https://${cfg.webUi.virtualHostName}";
             };
-          };
+        };
 
-          services.beszel.hub = {
-            enable = true;
-            host = "0.0.0.0";
-            environment =
-              lib.mkIf config.server.oidc.enable {
-                USER_CREATION = "true";
-                DISABLE_PASSWORD_AUTH = "true";
-              }
-              // lib.mkIf config.server.reverse-proxy.enable {
-                APP_URL = "https://${cfg.webUi.virtualHostName}";
-              };
-          };
-
-          systemd.services.beszel-hub.serviceConfig = {
-            User = name;
-            Group = users.users.${name}.group;
+        systemd.services.beszel-hub.serviceConfig =
+          let
+            mapping = config.server.permissionMappings.${uiServerName};
+          in
+          {
+            User = mapping.user.nameOnServer;
+            Group = mapping.group.nameOnServer;
 
             # Enabling those breaks the bind mount
             DynamicUser = lib.mkForce false;
             PrivateUsers = lib.mkForce false;
           };
 
-          system.stateVersion = cfg.webUi.systemStateVersion;
-        };
+        system.stateVersion = cfg.webUi.systemStateVersion;
+      };
     };
 
     # See https://discourse.nixos.org/t/systemd-exporter-couldnt-get-dbus-connection-read-unix-run-dbus-system-bus-socket-recvmsg-connection-reset-by-peer/64367/4

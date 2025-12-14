@@ -20,7 +20,7 @@ in
       # Using StateDir in the service definition results the directory to be created in /var/lib
       # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
       description = "Directory name to store the service files on the host system at /var/lib via a mount";
-      type = lib.types.nullOr (lib.types.strMatching ''^/var/lib/[^/.]+(/[^/.]+)*$'');
+      type = lib.types.path;
     };
 
     secretSettingsDir = lib.mkOption {
@@ -49,17 +49,33 @@ in
       immich = container.config.services.immich;
       postgresql = container.config.services.postgresql;
 
-      storeDataOnHost = cfg.dataDir != null;
-
       secretSettings = "/run/secrets/immich-settings";
     in
     lib.mkIf (config.server.enable && cfg.enable) {
+
       server = {
         stateDirectories.immich = [
-          "${cfg.dataDir}/media"
           "${cfg.dataDir}/database"
           cfg.secretSettingsDir
-        ];
+        ]
+        ++ config.server.permissionMappings.immich-server.paths;
+
+        permissionMappings = {
+          immich-server = {
+            user.nameOnServer = immich.user;
+            group.nameOnServer = immich.group;
+            server = "immich";
+            paths = [ immich.mediaLocation ];
+          };
+
+          immich-db = {
+            # Hard coded names to avoid infinite recursion
+            user.nameOnServer = "postgres";
+            group.nameOnServer = "postgres";
+            server = "immich";
+            paths = [ postgresql.dataDir ];
+          };
+        };
 
         network.immich = {
           subnetPrefix = "10.0.255";
@@ -86,7 +102,7 @@ in
 
       containers.immich = {
         autoStart = true;
-        # Failes to mount the nix store using this option
+        # FUSE-based filesystems cannot be id-mapped :(
         # privateUsers = "pick";
 
         bindMounts =
@@ -96,13 +112,13 @@ in
             isReadOnly = false;
           })
           // {
-            media = lib.mkIf storeDataOnHost {
+            media = {
               mountPoint = immich.mediaLocation;
               hostPath = "${cfg.dataDir}/media";
               isReadOnly = false;
             };
 
-            database = lib.mkIf storeDataOnHost {
+            database = {
               mountPoint = postgresql.dataDir;
               hostPath = "${cfg.dataDir}/database";
               isReadOnly = false;
@@ -125,6 +141,11 @@ in
             machine-learning-dir = "/var/lib/immich-machine-learning";
           in
           {
+            ids = {
+              uids.postgres = lib.mkForce config.server.permissionMappings.immich-db.user.uid;
+              gids.postgres = lib.mkForce config.server.permissionMappings.immich-db.group.gid;
+            };
+
             services.postgresql.package = pkgs.postgresql_16;
             services.immich = {
               enable = true;

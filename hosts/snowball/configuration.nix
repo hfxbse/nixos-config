@@ -105,87 +105,93 @@
     };
   };
 
-  users = {
-    groups.acme.gid = 990;
-    users.acme = {
-      group = "acme";
-      uid = 992;
-    };
-  };
-
-  server = rec {
-    enable = true;
-    externalNetworkInterface = "eno1";
-
-    monitoring = {
+  server =
+    let
+      virtualHostNames =
+        with config.server;
+        builtins.map (host: host.virtualHostName) [
+          immich
+          monitoring.webUi
+          oidc
+        ];
+    in
+    {
       enable = true;
-      secretsFile = "/var/lib/beszel-agent.secrets";
-      fileSystems = builtins.map ({ name, label }: "/mnt/immich/${name}__${label}") [
-        {
-          name = "memory-card";
-          label = "Memory Card";
-        }
-        {
-          name = "usb-drive";
-          label = "USB Drive";
-        }
-      ];
+      externalNetworkInterface = "eno1";
 
-      webUi = {
+      monitoring = {
         enable = true;
-        dataDir = "/var/lib/beszel-hub";
-        systemStateVersion = "25.11";
-        virtualHostName = "monitoring.fxbse.com";
+        secretsFile = "/var/lib/beszel-agent.secrets";
+        fileSystems = builtins.map ({ name, label }: "/mnt/immich/${name}__${label}") [
+          {
+            name = "memory-card";
+            label = "Memory Card";
+          }
+          {
+            name = "usb-drive";
+            label = "USB Drive";
+          }
+        ];
+
+        webUi = {
+          enable = true;
+          dataDir = "/var/lib/beszel-hub";
+          systemStateVersion = "25.11";
+          virtualHostName = "monitoring.fxbse.com";
+        };
       };
-    };
 
-    dns = {
-      enable = true;
-      systemStateVersion = "25.11";
-      mappings = lib.genAttrs (builtins.map (server: server.virtualHostName) [
-        immich
-        oidc
-        monitoring.webUi
-      ]) (virtualHostName: [ "192.168.178.60" ]);
-    };
+      dns = {
+        enable = true;
+        systemStateVersion = "25.11";
+        mappings = lib.genAttrs virtualHostNames (virtualHostName: [ "192.168.178.60" ]);
+      };
 
-    immich = {
-      enable = true;
-      dataDir = "/var/lib/immich";
-      accelerationDevices = [ "/dev/dri/renderD128" ];
-      systemStateVersion = "25.11";
-      virtualHostName = "immich.fxbse.com";
-      secretSettingsDir = "/var/lib/immich-secrets";
-    };
+      immich = {
+        enable = true;
+        dataDir = "/var/lib/immich";
+        accelerationDevices = [ "/dev/dri/renderD128" ];
+        systemStateVersion = "25.11";
+        virtualHostName = "immich.fxbse.com";
+        secretSettingsDir = "/var/lib/immich-secrets";
+      };
 
-    oidc = {
-      enable = true;
-      dataDir = "/var/lib/pocket-id";
-      systemStateVersion = "25.11";
-      secretsFile = "/var/lib/pocket-id-secrets";
-      virtualHostName = "account.fxbse.com";
-    };
+      oidc = {
+        enable = true;
+        dataDir = "/var/lib/pocket-id";
+        systemStateVersion = "25.11";
+        secretsFile = "/var/lib/pocket-id-secrets";
+        virtualHostName = "account.fxbse.com";
+      };
 
-    reverse-proxy = {
-      enable = true;
-      systemStateVersion = "25.11";
+      reverse-proxy = {
+        enable = true;
+        systemStateVersion = "25.11";
 
-      virtualHosts =
-        lib.genAttrs
-          (builtins.map (server: server.virtualHostName) [
-            immich
-            oidc
-            monitoring.webUi
-          ])
-          (virtualHostName: {
-            sslCertificateDir =
-              let
-                parts = lib.splitString "." virtualHostName;
-              in
-              "/var/lib/acme/${builtins.concatStringsSep "." (lib.takeEnd 2 parts)}";
-          });
+        virtualHosts = lib.genAttrs virtualHostNames (virtualHostName: {
+          sslCertificateDir =
+            let
+              parts = lib.splitString "." virtualHostName;
+            in
+            "/var/lib/acme/${builtins.concatStringsSep "." (lib.takeEnd 2 parts)}";
+        });
+      };
+
+      permissionMappings =
+        let
+          ids = uid: gid: {
+            user.uid = uid;
+            group.gid = gid;
+          };
+        in
+        {
+          acme = ids 992 990;
+          oidc = ids 990 988;
+          monitoring-ui = ids 989 987;
+          immich-server = ids 988 986;
+          immich-db = ids 987 985;
+        };
     };
-  };
 
   # NEVER CHANGE AFTER INSTALLING THE SYSTEM
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .

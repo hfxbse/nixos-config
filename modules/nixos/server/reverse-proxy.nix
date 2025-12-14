@@ -69,18 +69,12 @@ in
           host: cfg.virtualHosts.${host}.sslCertificateDir
         ) sslHosts;
 
-        permissionCorrections = lib.genAttrs (builtins.map (host: "cert-${host}") sslHosts) (
-          correctionName:
-          let
-            host = lib.removePrefix "cert-" correctionName;
-          in
-          {
-            user = "acme";
-            group = "acme";
-            server = serverName;
-            path = mountPoint host;
-          }
-        );
+        permissionMappings.acme = {
+          user.nameOnServer = "acme";
+          group.nameOnServer = "acme";
+          server = serverName;
+          paths = builtins.map (host: mountPoint host) (builtins.attrNames cfg.virtualHosts);
+        };
 
         network.${serverName} =
           let

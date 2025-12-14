@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
@@ -82,10 +81,11 @@ in
         };
 
         stateDirectories.oidc = [ cfg.dataDir ];
-        permissionCorrections."oidc-data" = {
-          inherit (pocketId) user group;
+        permissionMappings.oidc = {
+          user.nameOnServer = pocketId.user;
+          group.nameOnServer = pocketId.group;
           server = "oidc";
-          path = pocketId.dataDir;
+          paths = [ pocketId.dataDir ];
         };
       };
 
