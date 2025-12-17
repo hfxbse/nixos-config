@@ -58,11 +58,19 @@
     in
     {
       packages.${system} =
-        lib.genAttrs [
-          "flaketex"
-          "cups-brother-hl3172cdw"
-          "quick-template"
-        ] (name: pkgs.callPackage (import ./derivations/${name}.nix) { latex = pkgs.texliveFull; })
+        lib.genAttrs
+          [
+            "cups-brother-hl3172cdw"
+            "flaketex"
+            "jeniffer2"
+            "quick-template"
+          ]
+          (
+            name:
+            with pkgs;
+            with javaPackages;
+            callPackage (import ./derivations/${name}.nix) { latex = texliveFull; }
+          )
         // {
           image-nvim = pkgs.luajitPackages.image-nvim;
           blackbox-terminal = pkgs.blackbox-terminal;

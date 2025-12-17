@@ -6,3 +6,6 @@ authorized_keys
 /*.patch
 http_cache.sqlite
 sbom.*
+
+.folderSave
+/jeniffer2-logs
