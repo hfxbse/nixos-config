@@ -33,8 +33,14 @@ in
 
     environment.systemPackages = with pkgs; [
       blackbox-terminal
+      gnome-network-displays
       gnomeExtensions.hibernate-status-button
       papers
+    ];
+
+    # For network displays
+    networking.firewall.allowedTCPPorts = [
+      7236 # Miracast
     ];
 
     # Allow mounting MTP devices in Nautilus
