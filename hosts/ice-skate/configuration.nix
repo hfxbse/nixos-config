@@ -36,7 +36,7 @@
 
   specialisation.server-virtualisation.configuration.networking.hosts = {
     "127.0.0.1" = [
-      "immich.fxbse.com"
+      "gallery.fxbse.com"
       "auth.fxbse.com"
     ];
   };
