@@ -60,6 +60,7 @@
       packages.${system} =
         lib.genAttrs
           [
+            "by-disk-snapshotter"
             "cups-brother-hl3172cdw"
             "flaketex"
             "jeniffer2"

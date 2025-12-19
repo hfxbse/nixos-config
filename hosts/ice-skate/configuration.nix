@@ -23,16 +23,22 @@
 
   backups = {
     enable = true;
-    repositoryUrlFile = "/var/lib/backup-repository/url";
-    repositoryPasswordFile = "/var/lib/backup-repository/password";
-    rootPaths = [
+    repository = {
+      urlFile = "/var/lib/backup-repository/url";
+      passwordFile = "/var/lib/backup-repository/password";
+    };
+
+    volumePaths = [
       "/home"
       "/var"
     ];
   };
 
   specialisation.server-virtualisation.configuration.networking.hosts = {
-    "127.0.0.1" = [ "immich.fxbse.com" "auth.fxbse.com" ];
+    "127.0.0.1" = [
+      "immich.fxbse.com"
+      "auth.fxbse.com"
+    ];
   };
 
   users.users.${config.user.name}.packages = with pkgs; [ xournalpp ];

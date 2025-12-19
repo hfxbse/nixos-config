@@ -31,9 +31,9 @@ in
 
   backups = {
     enable = true;
-    repositoryUrlFile = "/var/lib/backup-repository/url";
-    repositoryPasswordFile = "/var/lib/backup-repository/password";
-    rootPaths = [ "/home" ];
+    repository.urlFile = "/var/lib/backup-repository/url";
+    repository.passwordFile = "/var/lib/backup-repository/password";
+    volumePaths = [ "/home" ];
   };
 
   # Desktop setup.

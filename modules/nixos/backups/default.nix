@@ -6,41 +6,43 @@
 }:
 let
   cfg = config.backups;
-
-  btrfsCli = lib.getExe pkgs.btrfs-progs;
+  snapshotter = lib.getExe pkgs.by-disk-snapshotter;
 in
 {
-  options.backups =
-    let
-      absolutePathString = lib.types.strMatching "^/.*";
-    in
-    {
-      enable = lib.mkEnableOption "automatic backups";
+  options.backups = {
+    enable = lib.mkEnableOption "automatic backups";
 
-      cpuLimit = lib.mkOption {
-        type = lib.types.nullOr lib.types.ints.positive;
-        description = "Limit how many CPU cores are used in parallel.";
-        default = null;
-      };
+    cpuLimit = lib.mkOption {
+      type = lib.types.nullOr lib.types.ints.positive;
+      description = "Limit how many CPU cores are used in parallel.";
+      default = null;
+    };
 
-      repositoryPasswordFile = lib.mkOption {
-        type = absolutePathString;
+    repository = {
+      passwordFile = lib.mkOption {
+        type = lib.types.path;
         description = "Path to the file containing the repository password.";
       };
 
-      repositoryUrlFile = lib.mkOption {
-        type = absolutePathString;
+      urlFile = lib.mkOption {
+        type = lib.types.path;
         description = ''
           Path to the file containig the URL to the backup repository.
           Neccessary as the URL may contain the credentials.
         '';
       };
-
-      rootPaths = lib.mkOption {
-        type = lib.types.listOf absolutePathString;
-        description = "Absolute paths to the backup roots.";
-      };
     };
+
+    volumePaths = lib.mkOption {
+      type = lib.types.listOf lib.types.path;
+      description = "Absolute paths to the backup roots.";
+    };
+
+    snapshotPath = lib.mkOption {
+      type = lib.types.path;
+      default = "/snapshots";
+    };
+  };
 
   config.services.restic.backups =
     let
@@ -48,37 +50,26 @@ in
         GOMAXPROCS=${builtins.toString cfg.cpuLimit}
       ''}";
 
-      backupPrepareCommand = ''
-        set -e;
-        mkdir /snapshots;
-
-        for volumne in ${builtins.concatStringsSep " " cfg.rootPaths}; do
-          echo $volumne;
-          ${btrfsCli} subvolume snapshot -r "$volumne" "/snapshots$volumne";
-        done
-      '';
-      backupCleanupCommand = ''
-        set -e;
-        ${btrfsCli} subvolume delete /snapshots/*
-        rmdir /snapshots
-      '';
+      paths = lib.concatStringsSep " " cfg.volumePaths;
+      backupPrepareCommand = "${snapshotter} ${cfg.snapshotPath} ${paths};";
+      backupCleanupCommand = "${snapshotter} -c ${cfg.snapshotPath} ${paths};";
     in
     lib.mkIf cfg.enable {
       borgbase = {
         inherit backupPrepareCommand backupCleanupCommand;
 
         initialize = true;
-        repositoryFile = cfg.repositoryUrlFile;
-        passwordFile = cfg.repositoryPasswordFile;
+        repositoryFile = cfg.repository.urlFile;
+        passwordFile = cfg.repository.passwordFile;
 
-        paths = [ "/snapshots" ];
+        paths = [ cfg.snapshotPath ];
         environmentFile = lib.mkIf (cfg.cpuLimit != null) environment;
 
         exclude = lib.map (path: "*${path}") (
-          with cfg;
+          with cfg.repository;
           [
-            repositoryUrlFile
-            repositoryPasswordFile
+            urlFile
+            passwordFile
           ]
         );
 
