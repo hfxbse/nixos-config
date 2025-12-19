@@ -34,6 +34,8 @@
                         inherit mountOptions;
                         mountpoint = "/mnt/immich/memory-card";
                       };
+
+                      "@snapshots".mountpoint = "/mnt/snapshots/memory-card";
                     };
                   };
                 };
@@ -63,6 +65,8 @@
                         inherit mountOptions;
                         mountpoint = "/mnt/immich/usb-drive";
                       };
+
+                      "@snapshots".mountpoint = "/mnt/snapshots/usb-drive";
                     };
                   };
                 };
@@ -122,10 +126,13 @@
                         inherit mountOptions;
                         mountpoint = "/var";
                       };
+
                       "@immich" = {
                         inherit mountOptions;
                         mountpoint = "/mnt/immich/boot-drive";
                       };
+
+                      "@snapshots".mountpoint = "/mnt/snapshots/boot-drive";
                     };
                   };
                 };

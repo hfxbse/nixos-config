@@ -34,19 +34,20 @@ writeShellScriptBin "by-disk-snapshotter" ''
   target=$1;
   shift;
 
-  for volume in "$@"; do
-    blk="$(df "$volume" --output=source | tail -n 1 | sed 's@^/dev@@' | sed 's@^/mapper@@')"
-    volumeTarget=$(echo "$target/$blk/$volume" | sed 's@/\+@/@'g | sed 's@/$@@' );
+  for volumePath in "$@"; do
+    blk="$(df "$volumePath" --output=source | tail -n 1 | sed 's@^/dev@@' | sed 's@^/mapper@@')";
+    volumeName=$(echo $volumePath | sed "s@^/mnt@@");
+    volumeTarget=$(echo "$target/$blk/$volumeName" | sed 's@/\+@/@'g | sed 's@/$@@' | sed "s@$blk\$@@");
 
     if [ "$clean" -eq 0 ]; then
-      echo "Creating a read-only BTRFS volume snapshot of $volume at $volumeTarget";
+      echo "Creating a read-only BTRFS volume snapshot of $volumePath at $volumeTarget";
 
       if [ "$dry" -eq 0 ]; then
         mkdir -p "$(dirname "$volumeTarget")";
-        ${lib.getExe btrfs-progs} subvolume snapshot -r "$volume" $volumeTarget;
+        ${lib.getExe btrfs-progs} subvolume snapshot -r "$volumePath" $volumeTarget;
       fi
     else
-      echo "Deleting a read-only BTRFS volume snapshot of $volume at $volumeTarget";
+      echo "Deleting a read-only BTRFS volume snapshot of $volumePath at $volumeTarget";
 
       if [ "$dry" -eq 0 ]; then
         ${lib.getExe btrfs-progs} subvolume delete "$volumeTarget";

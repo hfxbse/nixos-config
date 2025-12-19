@@ -4,6 +4,13 @@
   pkgs,
   ...
 }:
+let
+  immichVolues = [
+    "/mnt/immich/memory-card"
+    "/mnt/immich/usb-drive"
+    "/mnt/immich/boot-drive"
+  ];
+in
 {
   facter.reportPath = ./facter.json;
   virtualisation.vmVariant.facter.reportPath = lib.mkForce ./facter-vm.json;
@@ -37,6 +44,29 @@
   # Set your time zone.
   time.timeZone = "UTC";
 
+  backups = {
+    enable = true;
+    repository.urlFile = "/var/lib/backup-repository/url";
+    repository.passwordFile = "/var/lib/backup-repository/password";
+    snapshotPath = "/mnt/snapshots";
+    volumePaths = immichVolues ++ [
+      "/root"
+      "/srv"
+      "/home"
+      "/var"
+    ];
+  };
+
+  fileSystems."/var/lib/immich/media" = {
+    depends = immichVolues;
+    device = "/mnt/immich/*";
+    fsType = "mergerfs";
+    options = [
+      "defaults"
+      "fsname=mergerfs-immich"
+    ];
+  };
+
   services.fail2ban = {
     enable = true;
     bantime = "1d";
@@ -65,20 +95,6 @@
     openssl
     s-tui
   ];
-
-  fileSystems."/var/lib/immich/media" = {
-    depends = [
-      "/mnt/immich/memory-card"
-      "/mnt/immich/usb-drive"
-      "/mnt/immich/boot-drive"
-    ];
-    device = "/mnt/immich/*";
-    fsType = "mergerfs";
-    options = [
-      "defaults"
-      "fsname=mergerfs-immich"
-    ];
-  };
 
   system.autoUpgrade = {
     operation = lib.mkForce "switch";
