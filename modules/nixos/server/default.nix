@@ -15,6 +15,7 @@ in
     ./networking.nix
     ./oidc.nix
     ./reverse-proxy.nix
+    ./tunnel.nix
   ];
 
   options.server = {

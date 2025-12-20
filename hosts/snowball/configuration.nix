@@ -194,6 +194,12 @@ in
         });
       };
 
+      tunnel = {
+        enable = true;
+        environmentFile = "/var/lib/tunnel.secrets";
+        systemStateVersion = "25.11";
+      };
+
       permissionMappings =
         let
           ids = uid: gid: {

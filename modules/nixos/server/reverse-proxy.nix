@@ -79,7 +79,8 @@ in
         network.${serverName} =
           let
             oidc = config.server.oidc;
-            allowVNets = lib.optionals oidc.enable oidc.clients;
+            allowVNets =
+              lib.optionals oidc.enable oidc.clients ++ lib.optional config.server.tunnel.enable "tunnel";
           in
           {
             subnetPrefix = "10.0.253";
