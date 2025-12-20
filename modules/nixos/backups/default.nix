@@ -42,6 +42,11 @@ in
       type = lib.types.path;
       default = "/snapshots";
     };
+
+    interval = lib.mkOption {
+      default = "12h";
+      description = "Time between the last backup completion and the next start";
+    };
   };
 
   config.services.restic.backups =
@@ -61,6 +66,12 @@ in
         initialize = true;
         repositoryFile = cfg.repository.urlFile;
         passwordFile = cfg.repository.passwordFile;
+
+        timerConfig = {
+          OnUnitInactiveSec = cfg.interval;
+          Persistent = true;
+          RandomizedDelaySec = "10m";
+        };
 
         paths = [ cfg.snapshotPath ];
         environmentFile = lib.mkIf (cfg.cpuLimit != null) environment;
