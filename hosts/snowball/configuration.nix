@@ -164,6 +164,16 @@ in
         mappings = lib.genAttrs virtualHostNames (virtualHostName: [ "192.168.178.60" ]);
       };
 
+      smart-home =
+        let
+          stateDir = "/var/lib/smart-home";
+        in
+        {
+          enable = true;
+          mqtt.passwordsDir = "${stateDir}/mqtt/passwords";
+          mqtt.dataDir = "${stateDir}/mqtt/db";
+        };
+
       immich = {
         enable = true;
         dataDir = "/var/lib/immich";
@@ -213,6 +223,7 @@ in
           monitoring-ui = ids 989 987;
           immich-server = ids 988 986;
           immich-db = ids 987 985;
+          smart-home-mqtt = ids 986 984;
         };
     };
 

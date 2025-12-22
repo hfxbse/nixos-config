@@ -10,6 +10,7 @@ in
 {
   imports = [
     ./dns.nix
+    ./smart-home
     ./immich.nix
     ./monitoring.nix
     ./networking.nix
