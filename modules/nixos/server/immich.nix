@@ -49,7 +49,7 @@ in
       immich = container.config.services.immich;
       postgresql = container.config.services.postgresql;
 
-      secretSettings = "/run/secrets/immich-settings";
+      secretSettings = "/run/secrets/immich/settings";
     in
     lib.mkIf (config.server.enable && cfg.enable) {
 

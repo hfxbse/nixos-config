@@ -174,13 +174,13 @@ in
           mqtt.dataDir = "${stateDir}/mqtt/db";
         };
 
-      immich = {
+      immich = rec {
         enable = true;
         dataDir = "/var/lib/immich";
         accelerationDevices = [ "/dev/dri/renderD128" ];
         systemStateVersion = "25.11";
         virtualHostName = "gallery.fxbse.com";
-        secretSettingsDir = "/var/lib/immich-secrets";
+        secretSettingsDir = "${dataDir}/secrets";
       };
 
       oidc = {
