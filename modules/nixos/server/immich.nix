@@ -165,7 +165,11 @@ in
               # List of options https://docs.immich.app/install/config-file/
               settings.machineLearning.enabled = cfg.machine-learning.enable;
 
-              settings.server.publicUsers = false;
+              settings.server = {
+                externalDomain = "https://${cfg.virtualHostName}";
+                publicUsers = false;
+              };
+
               settings.passwordLogin.enabled = !config.server.oidc.enable;
               settings.oauth = lib.mkIf config.server.oidc.enable {
                 enabled = true;
@@ -175,6 +179,23 @@ in
                 clientId._secret = "${secretSettings}/oauth/clientId";
                 clientSecret._secret = "${secretSettings}/oauth/clientSecret";
               };
+
+              settings.notifications.smtp =
+                let
+                  secret = name: "${secretSettings}/notifications/smtp/${name}";
+                in
+                {
+                  enabled = true;
+                  from = "no-reply@${cfg.virtualHostName}";
+                  transport = {
+                    host._secret = secret "host";
+                    ignoreCert = false;
+                    password._secret = secret "password";
+                    port = 465;
+                    secure = true;
+                    username._secret = secret "username";
+                  };
+                };
             };
 
             systemd.services."immich-machine-learning".serviceConfig = {
