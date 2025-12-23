@@ -106,20 +106,10 @@ in
             };
           };
 
-          systemd.services.unbound.serviceConfig =
-            let
-              serviceConfig = config.systemd.services.unbound.serviceConfig or { };
-            in
-            {
-              AmbientCapabilities = (serviceConfig.AmbientCapabilities or [ ]) ++ [
-                "CAP_NET_ADMIN"
-              ];
-
-              CapabilityBoundingSet = (serviceConfig.CapabilityBoundingSet or [ ]) ++ [
-                "CAP_NET_ADMIN"
-              ];
-
-            };
+          systemd.services.unbound.serviceConfig = {
+            AmbientCapabilities = [ "CAP_NET_ADMIN" ];
+            CapabilityBoundingSet = [ "CAP_NET_ADMIN" ];
+          };
 
           services.blocky =
             let
