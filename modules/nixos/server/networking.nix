@@ -75,19 +75,24 @@ in
 
   config =
     let
-      forwardPorts = builtins.concatMap (
-        containerName:
-        builtins.map (
-          forwardPort: forwardPort // { inherit containerName; }
-        ) cfg.network.${containerName}.forwardPorts
-      ) (builtins.attrNames cfg.network);
+      forwardPorts = lib.pipe cfg.network [
+        builtins.attrNames
+        (builtins.concatMap (
+          containerName:
+          builtins.map (
+            forwardPort: forwardPort // { inherit containerName; }
+          ) cfg.network.${containerName}.forwardPorts
+        ))
+      ];
+
       externallyExposedPorts = builtins.filter (port: port.external) forwardPorts;
 
       allowedPorts =
         protocol: forwardPorts:
-        builtins.map ({ port, ... }: port) (
-          builtins.filter ({ protocols, ... }: builtins.elem protocol protocols) forwardPorts
-        );
+        lib.pipe forwardPorts [
+          (builtins.filter ({ protocols, ... }: builtins.elem protocol protocols))
+          (builtins.map ({ port, ... }: port))
+        ];
     in
     lib.mkIf cfg.enable {
       networking.nat = {
@@ -110,7 +115,6 @@ in
 
         extraCommands =
           let
-            rulePrio = protocol: builtins.toString (if protocol == "tcp" then 1 else 2);
             rule =
               {
                 protocol,
@@ -119,7 +123,15 @@ in
                 port,
                 ...
               }:
-              "iptables -I server-vnet ${rulePrio protocol} -s ${source} -d ${destination} -p ${protocol} --dport ${builtins.toString port} -j ACCEPT";
+              lib.concatStringsSep " " [
+                "iptables"
+                "-I server-vnet ${builtins.toString (if protocol == "tcp" then 1 else 2)}"
+                "-s ${source}"
+                "-d ${destination}"
+                "-p ${protocol}"
+                "--dport ${builtins.toString port}"
+                "-j ACCEPT"
+              ];
 
             rules =
               {
@@ -141,18 +153,27 @@ in
                 ) protocols
               ) allowVNets;
 
-            vnetConnections = builtins.concatMap (
-              virtualHostName:
-              let
-                cfgNetwork = cfg.network.${virtualHostName};
-              in
-              (lib.optional (
-                !cfgNetwork.internetAccess
-              ) "iptables -A server-vnet -s ${cfgNetwork.subnetPrefix}.0/24 ! -d 10.0.0.0/8 -j DROP")
-              ++ (builtins.concatMap (
-                forwardPort: rules (forwardPort // { inherit virtualHostName; })
-              ) cfgNetwork.forwardPorts)
-            ) (builtins.attrNames cfg.network);
+            vnetConnections = lib.pipe cfg.network [
+              builtins.attrNames
+              (builtins.concatMap (
+                virtualHostName:
+                let
+                  cfgNetwork = cfg.network.${virtualHostName};
+                in
+                (lib.optional (!cfgNetwork.internetAccess) (
+                  lib.concatStringsSep " " [
+                    "iptables"
+                    "-A server-vnet"
+                    "-s ${cfgNetwork.subnetPrefix}.0/24"
+                    "! -d 10.0.0.0/8"
+                    "-j DROP"
+                  ]
+                ))
+                ++ (builtins.concatMap (
+                  forwardPort: rules (forwardPort // { inherit virtualHostName; })
+                ) cfgNetwork.forwardPorts)
+              ))
+            ];
           in
           ''
             # Firewall chain server-vnet and server-vnet6

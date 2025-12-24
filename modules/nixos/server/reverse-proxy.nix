@@ -56,9 +56,10 @@ in
 
   config =
     let
-      sslHosts = builtins.filter (name: cfg.virtualHosts.${name}.sslCertificateDir != null) (
-        builtins.attrNames cfg.virtualHosts
-      );
+      sslHosts = lib.pipe cfg.virtualHosts [
+        builtins.attrNames
+        (builtins.filter (name: cfg.virtualHosts.${name}.sslCertificateDir != null))
+      ];
 
       mountPoint = name: "/run/secrets/acme/${name}";
     in
@@ -73,7 +74,10 @@ in
           user.nameOnServer = "acme";
           group.nameOnServer = "acme";
           server = serverName;
-          paths = builtins.map (host: mountPoint host) (builtins.attrNames cfg.virtualHosts);
+          paths = lib.pipe cfg.virtualHosts [
+            builtins.attrNames
+            (builtins.map (host: mountPoint host))
+          ];
         };
 
         network.${serverName} =

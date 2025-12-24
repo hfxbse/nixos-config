@@ -94,11 +94,13 @@ in
       };
 
       containers =
-        lib.genAttrs cfg.clients (name: {
-          config.networking.hosts = lib.mkIf config.server.reverse-proxy.enable {
-            "${config.server.network.reverse-proxy.subnetPrefix}.2" = [ cfg.virtualHostName ];
-          };
-        })
+        lib.genAttrs cfg.clients (
+          name: with config.server; {
+            config.networking.hosts = lib.mkIf reverse-proxy.enable {
+              "${network.reverse-proxy.subnetPrefix}.2" = [ cfg.virtualHostName ];
+            };
+          }
+        )
         // {
           oidc = {
             autoStart = true;
@@ -123,11 +125,11 @@ in
                 enable = true;
                 settings = {
                   ALLOW_USER_SIGNUPS = "withToken";
-                  APP_NAME =
-                    let
-                      parts = lib.splitString "." cfg.virtualHostName;
-                    in
-                    builtins.concatStringsSep "." (lib.takeEnd 2 parts);
+                  APP_NAME = lib.pipe cfg.virtualHostName [
+                    (lib.splitString ".")
+                    (lib.takeEnd 2)
+                    (builtins.concatStringsSep ".")
+                  ];
 
                   APP_URL = origin (if virtualHost then 443 else pocketId.settings.PORT);
                   EMAIL_LOGIN_NOTIFICATION_ENABLED = true;

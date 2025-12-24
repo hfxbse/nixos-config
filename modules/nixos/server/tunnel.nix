@@ -54,15 +54,23 @@ in
               RestartSteps = 10;
               RestartMaxDelaySec = "5min";
 
-              ExecStartPre = ''${pkgs.openssh}/bin/ssh-keygen -q -f /run/${RuntimeDirectory}/id -t ed25519 -N \"\"'';
-              ExecStart = ''${lib.getExe pkgs.openssh} -i /run/${RuntimeDirectory}/id ${
-                lib.concatStringsSep " " (
-                  builtins.map (option: "-o ${option}") [
-                    "StrictHostKeyChecking=no"
-                    "ServerAliveInterval=3"
-                  ]
-                )
-              } -p "$PORT" -R0:${config.server.network.reverse-proxy.subnetPrefix}.2:443 "$GATEWAY"'';
+              ExecStartPre = lib.concatStringsSep " " [
+                "${pkgs.openssh}/bin/ssh-keygen"
+                "-q"
+                "-f /run/${RuntimeDirectory}/id"
+                "-t ed25519"
+                ''-N \"\"''
+              ];
+
+              ExecStart = lib.concatStringsSep " " [
+                (lib.getExe pkgs.openssh)
+                "-i /run/${RuntimeDirectory}/id"
+                "-o StrictHostKeyChecking=no"
+                "-o ServerAliveInterval=3"
+                "-p \"$PORT\""
+                "-R0:${config.server.network.reverse-proxy.subnetPrefix}.2:443"
+                "\"$GATEWAY\""
+              ];
 
               User = "tunnel";
               Group = User;

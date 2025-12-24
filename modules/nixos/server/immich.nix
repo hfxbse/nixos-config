@@ -80,11 +80,11 @@ in
         network.immich = {
           subnetPrefix = "10.0.255";
           internetAccess = true;
-          forwardPorts = [
+          forwardPorts = with config.server; [
             {
               port = immich.port;
-              external = !config.server.reverse-proxy.enable;
-              allowVNets = lib.mkIf config.server.reverse-proxy.enable [ "reverse-proxy" ];
+              external = !reverse-proxy.enable;
+              allowVNets = lib.mkIf reverse-proxy.enable [ "reverse-proxy" ];
             }
           ];
         };
@@ -141,13 +141,13 @@ in
             machine-learning-dir = "/var/lib/immich-machine-learning";
           in
           {
-            ids = {
-              uids.postgres = lib.mkForce config.server.permissionMappings.immich-db.user.uid;
-              gids.postgres = lib.mkForce config.server.permissionMappings.immich-db.group.gid;
+            ids = with config.server.permissionMappings; {
+              uids.postgres = lib.mkForce immich-db.user.uid;
+              gids.postgres = lib.mkForce immich-db.group.gid;
             };
 
             services.postgresql.package = pkgs.postgresql_16;
-            services.immich = {
+            services.immich = with config.server; {
               enable = true;
               database.enableVectors = false;
 
@@ -170,8 +170,8 @@ in
                 publicUsers = false;
               };
 
-              settings.passwordLogin.enabled = !config.server.oidc.enable;
-              settings.oauth = lib.mkIf config.server.oidc.enable {
+              settings.passwordLogin.enabled = !oidc.enable;
+              settings.oauth = lib.mkIf oidc.enable {
                 enabled = true;
                 autoLaunch = true;
 

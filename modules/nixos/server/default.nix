@@ -97,8 +97,9 @@ in
       mapAttributeNames =
         mappings:
         { context, nameAttr }:
-        builtins.listToAttrs (
-          builtins.map (
+        lib.pipe mappings [
+          builtins.attrNames
+          (builtins.map (
             mappingName:
             let
               mapping = mappings.${mappingName};
@@ -107,8 +108,9 @@ in
               name = mapping.${context}.${nameAttr};
               value = mapping;
             }
-          ) (builtins.attrNames mappings)
-        );
+          ))
+          builtins.listToAttrs
+        ];
 
       createUserMapping = mappings: nameAttr: {
         groups =
@@ -145,97 +147,104 @@ in
     lib.mkIf cfg.enable {
       users = createUserMapping cfg.permissionMappings "name";
 
-      containers =
-        lib.genAttrs (builtins.map (mapping: mapping.server) (builtins.attrValues cfg.permissionMappings))
-          (server: {
-            config.users = createUserMapping (lib.filterAttrs (
-              mappingName: mapping: mapping.server == server
-            ) cfg.permissionMappings) "nameOnServer";
-          });
+      containers = lib.pipe cfg.permissionMappings [
+        builtins.attrValues
+        (builtins.map (mapping: mapping.server))
+        (
+          servers:
+          lib.genAttrs servers (server: {
+            config.users = lib.pipe cfg.permissionMappings [
+              (lib.filterAttrs (mappingName: mapping: mapping.server == server))
+              (servers: createUserMapping servers "nameOnServer")
+            ];
+          })
+        )
+      ];
 
       systemd.services =
-        let
-          containerServices = builtins.map (name: "container@${name}") (
-            builtins.attrNames cfg.stateDirectories
-          );
+        (lib.pipe cfg.stateDirectories [
+          builtins.attrNames
+          (builtins.map (name: "container@${name}"))
+          (
+            containerServices:
+            (lib.genAttrs containerServices (service: {
+              serviceConfig.StateDirectory = builtins.map (directory: lib.removePrefix "/var/lib/" directory) (
+                cfg.stateDirectories.${lib.removePrefix "container@" service}
+              );
+            }))
+          )
+        ])
 
-          permissionCorrectionServices = builtins.map (name: "mount-permissions@${name}") (
-            builtins.filter (name: builtins.length cfg.permissionMappings.${name}.paths > 0) (
-              builtins.attrNames cfg.permissionMappings
-            )
-          );
-        in
-        lib.genAttrs containerServices (service: {
-          serviceConfig = {
-            StateDirectory =
-              let
-                directories = cfg.stateDirectories.${lib.removePrefix "container@" service};
-              in
-              builtins.map (directory: lib.removePrefix "/var/lib/" directory) directories;
-          };
-        })
         # Directory permission reset after every container restart
         # The internal services is NOT restarted when the container is restarted
         # The container does not "boot", meaning the usual mulit-user.target trigger
         # does not work.
         # Therefore, this workaround running on the host machine.
-        // lib.genAttrs permissionCorrectionServices (
-          service:
-          let
-            mapping = cfg.permissionMappings.${lib.removePrefix "mount-permissions@" service};
-            trigger = [ "container@${mapping.server}.service" ];
-          in
-          {
-            description = "Fixes the file permissions for the data stored by ${mapping.server}";
-            wantedBy = trigger;
-            partOf = trigger;
-            after = trigger;
-            serviceConfig = {
-              Type = "simple";
-              Restart = "on-failure";
-              RestartSec = 30;
-              NotifyAccess = "all";
+        // lib.pipe cfg.permissionMappings [
+          builtins.attrNames
+          (builtins.filter (name: builtins.length cfg.permissionMappings.${name}.paths > 0))
+          (builtins.map (name: "mount-permissions@${name}"))
+          (
+            permissionCorrectionServices:
+            lib.genAttrs permissionCorrectionServices (
+              service:
+              let
+                mapping = cfg.permissionMappings.${lib.removePrefix "mount-permissions@" service};
+                trigger = [ "container@${mapping.server}.service" ];
+              in
+              {
+                description = "Fixes the file permissions for the data stored by ${mapping.server}";
+                wantedBy = trigger;
+                partOf = trigger;
+                after = trigger;
+                serviceConfig = {
+                  Type = "simple";
+                  Restart = "on-failure";
+                  RestartSec = 30;
+                  NotifyAccess = "all";
 
-              ExecStart =
-                let
-                  nixos-container = lib.getExe pkgs.nixos-container;
-                  systemd-notify = "${pkgs.systemdMinimal}/bin/systemd-notify";
-                  paths = lib.concatStringsSep " " mapping.paths;
+                  ExecStart =
+                    let
+                      nixos-container = lib.getExe pkgs.nixos-container;
+                      systemd-notify = "${pkgs.systemdMinimal}/bin/systemd-notify";
+                      paths = lib.concatStringsSep " " mapping.paths;
 
-                  fileMod = builtins.toString mapping.chmod.file;
-                  dirMod = builtins.toString mapping.chmod.dir;
-                in
-                lib.getExe (
-                  pkgs.writeShellScriptBin service ''
-                    set -euo pipefail;
+                      fileMod = builtins.toString mapping.chmod.file;
+                      dirMod = builtins.toString mapping.chmod.dir;
+                    in
+                    lib.getExe (
+                      pkgs.writeShellScriptBin service ''
+                        set -euo pipefail;
 
-                    function mountChown {
-                      ${nixos-container} run ${mapping.server} -- \
-                          chown \
-                              ${mapping.user.nameOnServer}:${mapping.group.nameOnServer} \
-                              $@ ${paths};
-                    }
+                        function mountChown {
+                          ${nixos-container} run ${mapping.server} -- \
+                              chown \
+                                  ${mapping.user.nameOnServer}:${mapping.group.nameOnServer} \
+                                  $@ ${paths};
+                        }
 
-                    function mountChmod {
-                      type="$1";
-                      shift;
-                      mod="$1";
-                      shift;
+                        function mountChmod {
+                          type="$1";
+                          shift;
+                          mod="$1";
+                          shift;
 
-                      ${nixos-container} run ${mapping.server} -- \
-                          find $@ ${paths} -type "$type" -exec chmod "$mod" {} +;
-                    }
+                          ${nixos-container} run ${mapping.server} -- \
+                              find $@ ${paths} -type "$type" -exec chmod "$mod" {} +;
+                        }
 
-                    # Fallback to ignore links if a read only file is encountered
-                    mountChown -L -R || mountChown -R;
-                    mountChmod f ${fileMod} -L || mountChmod f ${fileMod};
-                    mountChmod d ${dirMod} -L || mountChmod d ${dirMod};
+                        # Fallback to ignore links if a read only file is encountered
+                        mountChown -L -R || mountChown -R;
+                        mountChmod f ${fileMod} -L || mountChmod f ${fileMod};
+                        mountChmod d ${dirMod} -L || mountChmod d ${dirMod};
 
-                    ${systemd-notify} --ready;
-                  ''
-                );
-            };
-          }
-        );
+                        ${systemd-notify} --ready;
+                      ''
+                    );
+                };
+              }
+            )
+          )
+        ];
     };
 }

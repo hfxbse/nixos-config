@@ -129,11 +129,9 @@ in
       environment = {
         DATA_DIR = cfg.dataDir;
         EXTRA_FILESYSTEMS = lib.concatStringsSep "," cfg.fileSystems;
-        HUB_URL = lib.mkIf cfg.webUi.enable (
-          "http://${
-            config.server.network.${uiServerName}.subnetPrefix + ".2"
-          }:${builtins.toString config.services.beszel.hub.port}"
-        );
+        HUB_URL = lib.mkIf cfg.webUi.enable "http://${
+          config.server.network.${uiServerName}.subnetPrefix + ".2"
+        }:${builtins.toString config.services.beszel.hub.port}";
         SERVICE_PATTERNS = "beszel*,docker*,kubelet*,container@*";
       };
 
