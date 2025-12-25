@@ -46,7 +46,7 @@ in
 
   backups = {
     enable = true;
-    interval = "4h";
+    interval = 4;
     repository.urlFile = "/var/lib/backup-repository/url";
     repository.passwordFile = "/var/lib/backup-repository/password";
     snapshotPath = "/mnt/snapshots";

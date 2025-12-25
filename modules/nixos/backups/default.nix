@@ -44,7 +44,8 @@ in
     };
 
     interval = lib.mkOption {
-      default = "12h";
+      default = 12;
+      type = lib.types.ints.unsigned;
       description = "Time between the last backup completion and the next start";
     };
   };
@@ -68,7 +69,7 @@ in
         passwordFile = cfg.repository.passwordFile;
 
         timerConfig = {
-          OnUnitInactiveSec = cfg.interval;
+          OnCalendar = "*-*-* 0/${builtins.toString cfg.interval}:00:00";
           Persistent = true;
           RandomizedDelaySec = "10m";
         };
