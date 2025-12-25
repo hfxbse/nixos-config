@@ -96,6 +96,14 @@ in
             public = true;
             target.host = container.localAddress;
             target.port = immich.port;
+
+            # https://docs.immich.app/administration/reverse-proxy/#nginx-example-config
+            extraConfig = ''
+              client_max_body_size 50000M;
+              proxy_buffering off;
+              proxy_request_buffering off;
+              client_body_buffer_size 1024k;
+            '';
           };
         };
       };
