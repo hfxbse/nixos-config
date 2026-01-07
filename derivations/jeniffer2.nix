@@ -49,7 +49,7 @@ maven.buildMavenPackage rec {
 
   src = "${mono-repo}/ui";
 
-  mvnHash = "sha256-5VkLSlt8pkgPp7Cfi9RvYF72WClYUmhIaRouoJNKYy4=";
+  mvnHash = "sha256-P9ovCPtvnqMVNhnPPpM9OoQH3AAurMgd/mLAkbUR/H0=";
 
   mvnFetchExtraArgs = {
     # See https://maven.apache.org/plugins/maven-install-plugin/examples/custom-pom-installation.html
