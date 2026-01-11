@@ -14,7 +14,10 @@ in
 {
   facter.reportPath = ./facter.json;
   virtualisation.vmVariant.facter.reportPath = lib.mkForce ./facter-vm.json;
-  imports = [ ./disk-config.nix ];
+  imports = [
+    ./disk-config.nix
+    ./wifi-bridge.nix
+  ];
 
   boot = {
     defaults.secureBoot = true;
@@ -134,7 +137,7 @@ in
     in
     {
       enable = true;
-      externalNetworkInterface = "eno1";
+      externalNetworkInterface = "br0";
 
       monitoring = {
         enable = true;
@@ -161,7 +164,7 @@ in
       dns = {
         enable = true;
         systemStateVersion = "25.11";
-        mappings = lib.genAttrs virtualHostNames (virtualHostName: [ "192.168.178.60" ]);
+        mappings = lib.genAttrs virtualHostNames (virtualHostName: [ "192.168.178.64" ]);
       };
 
       smart-home =
