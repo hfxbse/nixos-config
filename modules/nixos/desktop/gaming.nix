@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -22,5 +23,7 @@ in
     };
 
     hardware.steam-hardware.enable = cfg.steam.enable;
+
+    users.users.${config.user.name}.packages = with pkgs; [ prismlauncher ];
   };
 }
