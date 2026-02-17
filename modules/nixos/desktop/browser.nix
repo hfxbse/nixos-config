@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.desktop.browser;
 in
@@ -85,6 +90,13 @@ in
 
         "redirect-nix-wiki@undesided.me" = {
           install_url = "https://addons.mozilla.org/firefox/downloads/file/4373121/redirectnixwiki-latest.xpi";
+          installation_mode = "force_installed";
+          private_browsing = true;
+          default_area = "menupanel";
+        };
+
+        "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4666829/video_downloadhelper-latest.xpi";
           installation_mode = "force_installed";
           private_browsing = true;
           default_area = "menupanel";
