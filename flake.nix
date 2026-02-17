@@ -43,9 +43,8 @@
         in
         (final: prev: lib.genAttrs packageNames (name: packages.${name}));
 
-      overlays = [
+      overlays = builtins.attrValues self.overlays ++ [
         ownPackages
-        self.overlays.image-nvim
       ];
 
       pkgs = import nixpkgs {
@@ -78,7 +77,10 @@
           };
         };
 
-      overlays = lib.genAttrs [ "image-nvim" ] (name: ((import ./overlays/${name}.nix) lib));
+      overlays = lib.genAttrs [
+        "image-nvim"
+        "sieve-editor-gui"
+      ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; }));
 
       devShells.${system} = {
         sbom = pkgs.mkShell { packages = with pkgs; [ sbomnix ]; };
