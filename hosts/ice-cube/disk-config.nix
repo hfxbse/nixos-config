@@ -13,6 +13,8 @@
       };
     };
 
+  # Setup keyfile
+  boot.initrd.secrets = { "/crypto_keyfile.bin" = null; };
   boot.initrd.luks.devices =
     lib.genAttrs
       (map (uuid: "luks-${uuid}") [

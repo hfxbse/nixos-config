@@ -9,12 +9,9 @@ in
 {
   imports = [ ./disk-config.nix ];
   facter.reportPath = ./facter.json;
-  boot.defaults.secureBoot = true;
 
-  # Setup keyfile
-  boot.initrd.secrets = {
-    "/crypto_keyfile.bin" = null;
-  };
+  boot.defaults.secureBoot = true;
+  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
 
   # CPU frequence scaling
   powerManagement = {
