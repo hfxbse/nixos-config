@@ -16,6 +16,7 @@ in
     # Allow sharing network connections on demand
     networking.firewall = {
       enable = lib.mkDefault true;
+      checkReversePath = "loose"; # Required for VPN connections to work
 
       allowedTCPPorts = [
         53 # DNS
