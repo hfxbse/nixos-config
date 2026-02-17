@@ -17,7 +17,6 @@
     lib.genAttrs
       (map (uuid: "luks-${uuid}") [
         "59789c93-fc96-4727-bcd0-a779a7aff0cc"
-        "4e58cd4b-76ee-49a4-a86c-0ad7985e8a8b"
         "d9afb347-3b4f-4606-8ca1-ddea2f9a43c3"
       ])
       (device: {
