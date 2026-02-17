@@ -3,9 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    nixpkgs-container-in-vm-patch = {
-      url = "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/454484.patch";
-      flake = false;
+    nixpkgs-container-in-vm-fix = {
+      url = "github:hfxbse/nixpkgs?ref=nixos-container-inside-vm-fix";
     };
 
     nixvim.url = "github:nix-community/nixvim";
@@ -34,8 +33,6 @@
     let
       system = "x86_64-linux";
       lib = nixpkgs.lib;
-      # Needed for server virtualisation but messes with nix shell
-      # lib = ((import ./nixpkgs-override.nix) (inputs // { inherit system; })).lib;
 
       ownPackages =
         let
@@ -103,8 +100,12 @@
             inputs.nixos-wsl.nixosModules.default
             inputs.lanzaboote.nixosModules.lanzaboote
             nixvim.nixosModules.nixvim
+            "${inputs.nixpkgs-container-in-vm-fix}/nixos/modules/virtualisation/nixos-containers.nix"
             ./modules/nixos/default.nix
             {
+              # See https://discourse.nixos.org/t/using-changes-from-a-nixpkgs-pr-in-your-flake/60948
+              disabledModules = [ "virtualisation/nixos-containers.nix" ];
+
               nixpkgs.overlays = overlays;
               user.fullName = "Fabian Haas";
             }
