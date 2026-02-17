@@ -12,6 +12,7 @@
   ];
 
   boot.defaults.secureBoot = true;
+  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v4;
 
   # Regression bug for ipu6 starting with Linux 6.16
   # See https://github.com/intel/ipu6-drivers/issues/381

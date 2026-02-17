@@ -1,11 +1,20 @@
 {
   description = "Nixos configuration to manage my various system configs and derivations.";
 
+  nixConfig = {
+    # CachyOS Kernel binary cache
+    # See https://github.com/xddxdd/nix-cachyos-kernel?tab=readme-ov-file#binary-cache
+    extra-substituters = [ "https://attic.xuyh0120.win/lantian" ];
+    extra-trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     nixpkgs-container-in-vm-fix = {
       url = "github:hfxbse/nixpkgs?ref=nixos-container-inside-vm-fix";
     };
+
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
@@ -45,6 +54,7 @@
 
       overlays = builtins.attrValues self.overlays ++ [
         ownPackages
+        inputs.nix-cachyos-kernel.overlays.pinned
       ];
 
       pkgs = import nixpkgs {
@@ -105,6 +115,7 @@
             "${inputs.nixpkgs-container-in-vm-fix}/nixos/modules/virtualisation/nixos-containers.nix"
             ./modules/nixos/default.nix
             {
+              # Container in VM fix
               # See https://discourse.nixos.org/t/using-changes-from-a-nixpkgs-pr-in-your-flake/60948
               disabledModules = [ "virtualisation/nixos-containers.nix" ];
 
