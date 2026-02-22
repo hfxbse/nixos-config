@@ -125,7 +125,7 @@
           ];
 
         in
-        lib.genAttrs [ "ice-cube" "ice-skate" "snowman" "snowball" ] (
+        lib.genAttrs [ "ice-skate" "snowman" "snowball" ] (
           name:
           lib.nixosSystem {
             inherit system;
