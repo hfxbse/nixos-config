@@ -10,6 +10,8 @@ in
   options.desktop.networking.enable = lib.mkEnableOption "dynamic networking for interactive computers";
 
   config = lib.mkIf cfg.enable {
+    # Disables scripted networking configured by NixOS facter
+    networking.interfaces = lib.mkForce { };
     networking.networkmanager.enable = true;
     users.users.${config.user.name}.extraGroups = [ "networkmanager" ];
 
