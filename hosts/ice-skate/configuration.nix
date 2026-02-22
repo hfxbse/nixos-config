@@ -42,6 +42,7 @@
     ];
   };
 
+  desktop."3d-printing".enable = true;
   users.users.${config.user.name}.packages = with pkgs; [ xournalpp ];
 
   # DO NOT CHANGE AFTER INSTALLING THE SYSTEM

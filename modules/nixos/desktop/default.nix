@@ -9,6 +9,7 @@ let
 in
 {
   imports = [
+    ./3d-printing.nix
     ./auto-rotate.nix
     ./browser.nix
     ./email.nix
