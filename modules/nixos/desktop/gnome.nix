@@ -9,6 +9,11 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && cfg.type == "gnome") {
+    # https://github.com/NixOS/nixpkgs/issues/149812#issuecomment-3647060694
+    environment.extraInit = ''
+      export XDG_DATA_DIRS="$XDG_DATA_DIRS:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"
+    '';
+
     security.pam.services.gdm.enableGnomeKeyring = true;
     services = {
       displayManager.gdm.enable = lib.mkDefault true;
