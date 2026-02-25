@@ -71,6 +71,7 @@
             "cups-brother-hl3172cdw"
             "flaketex"
             "jeniffer2"
+            "neural-pixel"
             "ollamadiffuser"
             "sd-cpp-webui"
             "quick-template"
