@@ -9,6 +9,7 @@
   };
 
   inputs = {
+    nixpkgs-25-11.url = "github:nixos/nixpkgs?ref=nixos-25.11-small";
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     nixpkgs-container-in-vm-fix = {
       url = "github:hfxbse/nixpkgs?ref=nixos-container-inside-vm-fix";
@@ -70,15 +71,25 @@
             "cups-brother-hl3172cdw"
             "flaketex"
             "jeniffer2"
+            "sd-cpp-webui"
             "quick-template"
           ]
           (
             name:
             with pkgs;
             with javaPackages;
-            callPackage (import ./derivations/${name}.nix) { latex = texliveFull; }
+            with python3Packages;
+            callPackage (import ./derivations/${name}.nix) {
+              latex = texliveFull;
+            }
           )
         // {
+          sd-cpp-webui =
+            let
+              pkgs = inputs.nixpkgs-25-11.legacyPackages.${system};
+            in
+            pkgs.python3Packages.callPackage (import ./derivations/sd-cpp-webui.nix) { };
+
           image-nvim = pkgs.luajitPackages.image-nvim;
           blackbox-terminal = pkgs.blackbox-terminal;
           nvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
