@@ -71,6 +71,7 @@
             "cups-brother-hl3172cdw"
             "flaketex"
             "jeniffer2"
+            "ollamadiffuser"
             "sd-cpp-webui"
             "quick-template"
           ]
@@ -81,15 +82,10 @@
             with python3Packages;
             callPackage (import ./derivations/${name}.nix) {
               latex = texliveFull;
+              stable-diffusion-cpp = stable-diffusion-cpp-vulkan;
             }
           )
         // {
-          sd-cpp-webui =
-            let
-              pkgs = inputs.nixpkgs-25-11.legacyPackages.${system};
-            in
-            pkgs.python3Packages.callPackage (import ./derivations/sd-cpp-webui.nix) { };
-
           image-nvim = pkgs.luajitPackages.image-nvim;
           blackbox-terminal = pkgs.blackbox-terminal;
           nvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
