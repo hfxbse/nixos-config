@@ -12,13 +12,17 @@
   ];
 
   boot.defaults.secureBoot = true;
-  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v4;
 
   boot.kernelParams = [
     "zswap.enabled=1"
     "zswap.compressor=zstd"
     "zswap.max_pool_percent=25"
     "zswap.shrinker_enabled=1"
+
+    "amdgpu.gpu_recovery=1"
+    "amdgpu.lockup_timeout=10000"
+    "iommu=pt"
+    "amdgpu.ppfeaturemask=0xffffffff"
   ];
 
   # Regression bug for ipu6 starting with Linux 6.16
