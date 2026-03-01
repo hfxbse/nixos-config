@@ -14,6 +14,13 @@
   boot.defaults.secureBoot = true;
   boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v4;
 
+  boot.kernelParams = [
+    "zswap.enabled=1"
+    "zswap.compressor=zstd"
+    "zswap.max_pool_percent=25"
+    "zswap.shrinker_enabled=1"
+  ];
+
   # Regression bug for ipu6 starting with Linux 6.16
   # See https://github.com/intel/ipu6-drivers/issues/381
   # The issue prevents the device to be suspended or rebootet properly.
