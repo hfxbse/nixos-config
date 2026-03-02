@@ -1,4 +1,5 @@
-{ ... }: {
+{ ... }:
+{
   imports = [
     ./backups
     ./boot.nix
@@ -8,7 +9,7 @@
     ./nix.nix
     ./permissions.nix
     ./printing.nix
-    ./server
+    ./servers
     ./user.nix
     ./workplace-compliance.nix
     ./text-processing.nix

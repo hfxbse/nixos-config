@@ -11,6 +11,7 @@
         Name = "br0";
       };
     };
+
     networks = {
       "30-eno1" = {
         matchConfig.Name = "eno1";
@@ -25,6 +26,7 @@
     };
   };
 
+  virtualisation.vmVariant.services.hostapd.enable = lib.mkForce false;
   services.hostapd = {
     enable = true;
     radios.wlp58s0 = {
@@ -40,7 +42,7 @@
         ssid = "FRITZ!Box 7490-62";
         authentication = {
           mode = "wpa2-sha256";
-          wpaPasswordFile = "/var/lib/wifi-bridge-psk";
+          wpaPasswordFile = "/var/lib/secrets/wifi-bridge-psk";
         };
       };
     };
