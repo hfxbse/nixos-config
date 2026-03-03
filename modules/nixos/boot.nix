@@ -16,6 +16,7 @@ in
     secureBoot = lib.mkEnableOption "default secure boot configuration";
   };
 
+  config.boot.tmp.cleanOnBoot = true;
   config.boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
   config.boot.loader.efi = {
     canTouchEfiVariables = lib.mkDefault true;
