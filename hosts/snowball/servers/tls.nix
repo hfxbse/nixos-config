@@ -14,6 +14,8 @@ in
     };
   };
 
+  server.services.reverse-proxy.defaults.acmeCertName = domain;
+
   virtualisation.vmVariant.security.acme.certs.${domain} = {
     dnsProvider = lib.mkForce "";
     credentialsFile = lib.mkForce null;
