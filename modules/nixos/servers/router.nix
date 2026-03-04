@@ -20,7 +20,7 @@ let
   };
 
   types = lib.types;
-  bridgeName = "br-ve";
+  bridgeName = "br-ingress";
   ulaPrefix = "fd7e:f08c:27e1";
 in
 {

@@ -1,25 +1,28 @@
 { lib, ... }:
+let
+  bridgeName = "br-lan";
+in
 {
   networking.interfaces = lib.mkForce { };
   networking.useDHCP = false;
 
   systemd.network = {
     enable = true;
-    netdevs."20-br0" = {
+    netdevs."20-${bridgeName}" = {
       netdevConfig = {
         Kind = "bridge";
-        Name = "br0";
+        Name = bridgeName;
       };
     };
 
     networks = {
       "30-eno1" = {
         matchConfig.Name = "eno1";
-        networkConfig.Bridge = "br0";
+        networkConfig.Bridge = bridgeName;
         linkConfig.RequiredForOnline = "enslaved";
       };
-      "40-br0" = {
-        matchConfig.Name = "br0";
+      "40-${bridgeName}" = {
+        matchConfig.Name = bridgeName;
         networkConfig.DHCP = "ipv4";
         linkConfig.RequiredForOnline = "carrier";
       };
@@ -30,7 +33,7 @@
   services.hostapd = {
     enable = true;
     radios.wlp58s0 = {
-      settings.bridge = "br0";
+      settings.bridge = bridgeName;
 
       wifi4.enable = true;
       wifi5.enable = true;

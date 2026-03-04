@@ -6,5 +6,5 @@
   ];
 
   server.services.dummy.enable = true;
-  server.router.wan = "br0";
+  server.router.wan = "br-lan";
 }
