@@ -13,6 +13,8 @@ in
 
   imports = [
     ./dummy.nix
+    ./dummy-http.nix
+    ./reverse-proxy.nix
     ./router.nix
   ];
 

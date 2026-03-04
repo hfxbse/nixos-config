@@ -119,7 +119,9 @@ in
       (
         names:
         lib.genAttrs names (name: {
-          inherit (config.containers.router) privateNetwork hostBridge;
+          inherit (config.containers.router) privateNetwork;
+          hostBridge = lib.mkDefault bridgeName;
+
           config = lib.recursiveUpdate resolverFix {
             environment.systemPackages = with pkgs; [ traceroute ];
             systemd.network = {
