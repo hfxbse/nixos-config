@@ -154,7 +154,8 @@ in
               "net.ipv6.conf.all.forwarding" = 2;
             };
 
-            services.resolved.settings.Resolve.MulticastDNS = lib.mkDefault "resolve";
+            networking.firewall.interfaces.${veth}.allowedUDPPorts = [ 5353 ]; # mDNS
+            services.resolved.settings.Resolve.MulticastDNS = "resolve";
             systemd.network = {
               enable = true;
               networks."40-${veth}" = {
@@ -184,7 +185,6 @@ in
               '';
             };
 
-            networking.firewall.interfaces.${veth}.allowedUDPPorts = [ 5353 ]; # mDNS
             networking.firewall.allowedTCPPorts = builtins.attrValues cfg.ports;
 
             systemd.services.haproxy.serviceConfig.LoadCredential = lib.pipe cfg.virtualHosts [
@@ -212,13 +212,10 @@ in
                     serverName = "container_${cfgHost.containerName}";
                     origin = "${cfgHost.containerName}.local:${toString cfgHost.port}";
                   in
-                  # Delay initial DNS query
-                  # Increases the change that mDNS has already resolved correctly
-                  # Minimises initial delay
                   ''
                     backend ${domain}
                       mode http
-                      server ${serverName} ${origin} resolvers sys init-addr last,none
+                      server ${serverName} ${origin} resolvers sys init-addr last,libc,none
                   ''
                 ))
                 (lib.concatStringsSep "\n\n")
@@ -229,14 +226,13 @@ in
     // lib.genAttrs containerNames (name: {
       hostBridge = bridgeName;
       config = {
-        networking.firewall.allowedUDPPorts = [ 5353 ];
-        services.resolved.settings.Resolve.MulticastDNS = true;
-
-        systemd.network = {
+        services.avahi = {
+          allowInterfaces = [ "eth0" ];
           enable = true;
-          networks."20-mDNS" = {
-            matchConfig.Name = "eth*";
-            networkConfig.MulticastDNS = true;
+          ipv4 = false;
+          publish = {
+            enable = true;
+            addresses = true;
           };
         };
       };

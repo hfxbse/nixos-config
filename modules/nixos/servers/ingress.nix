@@ -166,7 +166,6 @@ in
 
           environment.systemPackages = with pkgs; [ dig ];
 
-          services.resolved.settings.Resolve.MulticastDNS = "resolve";
           systemd.network = {
             enable = true;
             networks = {
@@ -175,7 +174,6 @@ in
                 networkConfig = {
                   DHCP = true;
                   IPv6AcceptRA = true;
-                  MulticastDNS = false;
                 };
               };
 
@@ -186,7 +184,7 @@ in
                   DHCPPrefixDelegation = true;
                   IPv6SendRA = true;
                   IPv6AcceptRA = false;
-                  MulticastDNS = "resolve";
+                  MulticastDNS = lib.mkIf useForwarding "resolve";
                 };
                 ipv6Prefixes = [ { Prefix = "${ulaPrefix}:1::/64"; } ];
               };
@@ -201,6 +199,7 @@ in
             };
           };
 
+          services.resolved.settings.Resolve.MulticastDNS = lib.mkIf useForwarding "resolve";
           services.haproxy = lib.mkIf useForwarding {
             enable = true;
             config = ''
@@ -222,7 +221,7 @@ in
                 listen ${containerName}_${protocol}_${toString port}
                   mode ${protocol}
                   bind 0.0.0.0:${toString port}
-                  server ${serverName} ${serverAddress} check resolvers sys init-addr last,none
+                  server ${serverName} ${serverAddress} check resolvers sys init-addr last,libc,none
               ''
             ) cfg.forwardPorts;
           };
@@ -248,16 +247,23 @@ in
                 traceroute
               ];
 
-              networking.firewall.interfaces.eth0.allowedUDPPorts = [ 5353 ]; # mDNS
-              services.resolved.settings.Resolve.MulticastDNS = lib.mkIf mDNS true;
+              networking.firewall.interfaces.eth0.allowedUDPPorts = lib.mkIf mDNS [ 5353 ]; # mDNS
+              services.avahi = lib.mkIf mDNS {
+                allowInterfaces = [ "eth0" ];
+                enable = true;
+                ipv4 = false;
+                openFirewall = false;
+                publish = {
+                  enable = true;
+                  addresses = true;
+                };
+              };
+
               systemd.network = {
                 enable = true;
                 networks."30-${bridgeName}" = {
                   matchConfig.Name = "eth0";
-                  networkConfig = {
-                    DHCP = true;
-                    MulticastDNS = lib.mkIf mDNS true;
-                  };
+                  networkConfig.DHCP = true;
                 };
               };
             };
