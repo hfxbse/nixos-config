@@ -188,8 +188,9 @@ in
                   serverName = "container_${cfgHost.containerName}";
                   origin = "${cfgHost.containerName}.local:${toString cfgHost.port}";
                 in
-                # Do not use the internel libc resolver of haproxy
-                # The initial address resolution messes up mDNS completely
+                # Delay initial DNS query
+                # Increases the change that mDNS has already resolved correctly
+                # Minimises initial delay
                 ''
                   backend ${domain}
                     mode http
@@ -204,6 +205,7 @@ in
     // lib.genAttrs containerNames (name: {
       hostBridge = bridgeName;
       config = {
+        networking.firewall.allowedUDPPorts = [ 5353 ];
         services.resolved.settings.Resolve.MulticastDNS = true;
 
         systemd.network = {
