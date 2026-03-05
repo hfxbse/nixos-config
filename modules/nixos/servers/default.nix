@@ -14,8 +14,8 @@ in
   imports = [
     ./dummy.nix
     ./dummy-http.nix
+    ./ingress.nix
     ./reverse-proxy.nix
-    ./router.nix
   ];
 
   config.containers = lib.genAttrs cfg.containerNames (name: {

@@ -5,7 +5,7 @@
   ...
 }:
 let
-  cfg = config.server.router // {
+  cfg = config.server.ingress // {
     enable = lib.pipe config.server.services [
       builtins.attrValues
       (lib.any (server: server.enable or false))
@@ -26,7 +26,7 @@ let
   ulaPrefix = "fd7e:f08c:27e1";
 in
 {
-  options.server.router.wan = lib.mkOption {
+  options.server.ingress.wan = lib.mkOption {
     description = "Upstream internet interface";
     type = types.types.str;
   };
@@ -42,7 +42,7 @@ in
       ];
 
       # Enable NAT66 when running as VM as their ain't any global IPv6 address
-      containers.router.config.networking.nftables.ruleset = ''
+      containers.ingress.config.networking.nftables.ruleset = ''
         table ip6 nat {
           chain postrouting {
             type nat hook postrouting priority srcnat; policy accept;
@@ -73,9 +73,9 @@ in
       };
     };
 
-    server.containerNames = [ "router" ];
+    server.containerNames = [ "ingress" ];
     containers = {
-      router = {
+      ingress = {
         privateNetwork = true;
         macvlans = [ cfg.wan ];
         hostBridge = bridgeName;
@@ -85,7 +85,7 @@ in
             "net.ipv6.conf.all.forwarding" = 2;
           };
 
-          networking.hostName = "${config.networking.hostName}-router";
+          networking.hostName = "${config.networking.hostName}-ingress";
           networking.nftables.enable = true;
 
           systemd.network = {
@@ -115,11 +115,11 @@ in
       };
     }
     // lib.pipe config.server.containerNames [
-      (builtins.filter (name: name != "router"))
+      (builtins.filter (name: name != "ingress"))
       (
         names:
         lib.genAttrs names (name: {
-          inherit (config.containers.router) privateNetwork;
+          inherit (config.containers.ingress) privateNetwork;
           hostBridge = lib.mkDefault bridgeName;
 
           config = lib.recursiveUpdate resolverFix {

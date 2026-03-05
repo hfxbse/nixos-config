@@ -11,5 +11,5 @@
     domain = "example.fxbse.com";
   };
 
-  server.router.wan = "br-lan";
+  server.ingress.wan = "br-lan";
 }
