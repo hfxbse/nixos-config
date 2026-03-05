@@ -203,7 +203,7 @@ in
                   bind :::${toString http}
                   bind :::${toString https} ssl crt /run/credentials/haproxy.service/ # $CREDENTIALS_DIRECTORY hard-coded
                   http-request redirect scheme https unless { ssl_fc }
-                  use_backend %[req.hdr(Host),lower]
+                  use_backend %[req.hdr(Host),lower,word(1,:)]
               ''
               + lib.pipe cfg.virtualHosts [
                 (lib.mapAttrsToList (
