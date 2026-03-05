@@ -19,8 +19,8 @@ in
   ];
 
   config.containers = lib.genAttrs cfg.containerNames (name: {
-    autoStart = true;
-    privateUsers = "pick";
-    config.system.stateVersion = config.system.stateVersion;
+    autoStart = lib.mkDefault true;
+    privateUsers = lib.mkDefault "pick";
+    config.system.stateVersion = lib.mkDefault config.system.stateVersion;
   });
 }
