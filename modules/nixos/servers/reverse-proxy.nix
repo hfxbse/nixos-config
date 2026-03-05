@@ -13,6 +13,8 @@ let
   ulaPrefix = "fd00:9d1f:b7b7:1721";
   veth = "vb-http";
 
+  portNumber = types.ints.between 0 65535;
+
   containerNames = lib.pipe cfg.virtualHosts [
     builtins.attrValues
     (map ({ containerName, ... }: containerName))
@@ -30,6 +32,20 @@ in
       acmeDescription = "The name used for the security.acme.certs.<name> properity.";
     in
     {
+      ports = {
+        http = lib.mkOption {
+          description = "On which port to listen for HTTP trafic";
+          type = portNumber;
+          default = 80;
+        };
+
+        https = lib.mkOption {
+          description = "On which port to listen for HTTPS trafic";
+          type = portNumber;
+          default = 443;
+        };
+      };
+
       defaults = {
         acmeCertName = lib.mkOption {
           description = acmeDescription;
@@ -47,7 +63,7 @@ in
               options = {
                 port = lib.mkOption {
                   description = "On which port the service is listening.";
-                  type = types.ints.between 0 65535;
+                  type = portNumber;
                 };
 
                 containerName = lib.mkOption {
@@ -71,7 +87,17 @@ in
     };
 
   config = lib.mkIf (builtins.length containerNames != 0) {
-    server.containerNames = [ containerName ] ++ containerNames;
+    server = {
+      containerNames = [ containerName ] ++ containerNames;
+      ingress.forwardPorts = lib.pipe cfg.ports [
+        builtins.attrValues
+        (map (port: {
+          inherit containerName port;
+          protocol = "tcp";
+        }))
+      ];
+    };
+
     systemd.network = {
       enable = true;
       netdevs."25-${bridgeName}" = {
@@ -128,7 +154,7 @@ in
               "net.ipv6.conf.all.forwarding" = 2;
             };
 
-            services.resolved.settings.Resolve.MulticastDNS = "resolve";
+            services.resolved.settings.Resolve.MulticastDNS = lib.mkDefault "resolve";
             systemd.network = {
               enable = true;
               networks."40-${veth}" = {
@@ -158,12 +184,8 @@ in
               '';
             };
 
-            # mDNS
-            networking.firewall.interfaces.${veth}.allowedUDPPorts = [ 5353 ];
-            networking.firewall.allowedTCPPorts = [
-              80 # HTTP
-              443 # HTTPS
-            ];
+            networking.firewall.interfaces.${veth}.allowedUDPPorts = [ 5353 ]; # mDNS
+            networking.firewall.allowedTCPPorts = builtins.attrValues cfg.ports;
 
             systemd.services.haproxy.serviceConfig.LoadCredential = lib.pipe cfg.virtualHosts [
               builtins.attrNames
@@ -171,34 +193,36 @@ in
             ];
 
             services.haproxy.enable = true;
-            services.haproxy.config = ''
-              resolvers sys
-                parse-resolv-conf
-              frontend www
-                mode http
-                bind :::80
-                bind :::443 ssl crt /run/credentials/haproxy.service/ # $CREDENTIALS_DIRECTORY hard-coded
-                http-request redirect scheme https unless { ssl_fc }
-                use_backend %[req.hdr(Host),lower]
-            ''
-            + lib.pipe cfg.virtualHosts [
-              (lib.mapAttrsToList (
-                domain: cfgHost:
-                let
-                  serverName = "container_${cfgHost.containerName}";
-                  origin = "${cfgHost.containerName}.local:${toString cfgHost.port}";
-                in
-                # Delay initial DNS query
-                # Increases the change that mDNS has already resolved correctly
-                # Minimises initial delay
-                ''
-                  backend ${domain}
-                    mode http
-                    server ${serverName} ${origin} resolvers sys init-addr last,none
-                ''
-              ))
-              (lib.concatStringsSep "\n\n")
-            ];
+            services.haproxy.config =
+              with cfg.ports;
+              ''
+                resolvers sys
+                  parse-resolv-conf
+                frontend www
+                  mode http
+                  bind :::${toString http}
+                  bind :::${toString https} ssl crt /run/credentials/haproxy.service/ # $CREDENTIALS_DIRECTORY hard-coded
+                  http-request redirect scheme https unless { ssl_fc }
+                  use_backend %[req.hdr(Host),lower]
+              ''
+              + lib.pipe cfg.virtualHosts [
+                (lib.mapAttrsToList (
+                  domain: cfgHost:
+                  let
+                    serverName = "container_${cfgHost.containerName}";
+                    origin = "${cfgHost.containerName}.local:${toString cfgHost.port}";
+                  in
+                  # Delay initial DNS query
+                  # Increases the change that mDNS has already resolved correctly
+                  # Minimises initial delay
+                  ''
+                    backend ${domain}
+                      mode http
+                      server ${serverName} ${origin} resolvers sys init-addr last,none
+                  ''
+                ))
+                (lib.concatStringsSep "\n\n")
+              ];
           };
         };
     }
