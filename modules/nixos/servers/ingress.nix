@@ -114,7 +114,7 @@ in
               };
               proto = protocol;
             }
-          ) cfg.forwardPorts;
+          ) config.virtualisation.vmVariant.server.ingress.forwardPorts;
         };
 
       # Enable NAT66 when running as VM as their ain't any global IPv6 address
