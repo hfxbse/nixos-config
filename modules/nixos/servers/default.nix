@@ -12,6 +12,7 @@ in
   };
 
   imports = [
+    ./dns.nix
     ./dummy.nix
     ./dummy-http.nix
     ./ingress.nix
