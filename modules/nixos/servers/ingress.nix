@@ -217,7 +217,6 @@ in
                   after = wants;
                   wants = [ "network-online.target" ];
                   wantedBy = [ "multi-user.target" ];
-                  serviceConfig.Restart = "always";
                   script = lib.concatStringsSep " " (
                     if protocol == "tcp" then
                       [
@@ -234,6 +233,38 @@ in
                         "UDP6-SENDTO:${target}"
                       ]
                   );
+
+                  serviceConfig = rec {
+                    Restart = "always";
+                    # Hardening
+                    AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
+                    CapabilityBoundingSet = AmbientCapabilities;
+                    RestrictAddressFamilies = [
+                      "AF_INET"
+                      "AF_INET6"
+                      "AF_UNIX"
+                    ];
+                    DynamicUser = true;
+                    NoNewPrivileges = true;
+                    MemoryMax = "128M";
+                    TasksMax = 1000;
+                    PrivateUsers = true;
+                    PrivateTmp = true;
+                    PrivateDevices = true;
+                    PrivateMounts = true;
+                    ProtectClock = true;
+                    ProtectControlGroups = true;
+                    ProtectHome = true;
+                    ProtectHostname = true;
+                    ProtectKernelLogs = true;
+                    ProtectKernelModules = true;
+                    ProtectKernelTunables = true;
+                    ProtectSystem = "strict";
+                    RestrictNamespaces = true;
+                    RestrictRealtime = true;
+                    RestrictSUIDSGID = true;
+                    LockPersonality = true;
+                  };
                 };
               }
             ))
