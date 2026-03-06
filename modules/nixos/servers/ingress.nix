@@ -191,6 +191,7 @@ in
             };
           };
 
+          services.resolved.settings.Resolve.MulticastDNS = lib.mkIf useForwarding "resolve";
           networking.firewall.interfaces = lib.mkIf useForwarding {
             "eth0".allowedUDPPorts = [ 5353 ]; # mDNS
             "mv-${cfg.wan}" = {
@@ -199,32 +200,45 @@ in
             };
           };
 
-          services.resolved.settings.Resolve.MulticastDNS = lib.mkIf useForwarding "resolve";
-          services.haproxy = lib.mkIf useForwarding {
-            enable = true;
-            config = ''
-              resolvers sys
-                parse-resolv-conf
-            ''
-            + lib.concatMapStringsSep "\n" (
+          systemd.services = lib.pipe cfg.forwardPorts [
+            (map (
               {
                 port,
-                protocol,
                 containerName,
+                protocol,
                 ...
               }:
               let
-                serverName = "container_${containerName}";
-                serverAddress = "${containerName}.local:${toString port}";
+                target = "${containerName}.local:${toString port}";
               in
-              ''
-                listen ${containerName}_${protocol}_${toString port}
-                  mode ${protocol}
-                  bind 0.0.0.0:${toString port}
-                  server ${serverName} ${serverAddress} check resolvers sys init-addr last,libc,none
-              ''
-            ) cfg.forwardPorts;
-          };
+              {
+                name = "forward@${protocol}_${toString port}";
+                value = rec {
+                  after = wants;
+                  wants = [ "network-online.target" ];
+                  wantedBy = [ "multi-user.target" ];
+                  serviceConfig.Restart = "always";
+                  script = lib.concatStringsSep " " (
+                    if protocol == "tcp" then
+                      [
+                        (lib.getExe pkgs.socat)
+                        "-d -T 60"
+                        "TCP4-LISTEN:${toString port},fork,reuseaddr"
+                        "TCP6:${target}"
+                      ]
+                    else
+                      [
+                        (lib.getExe pkgs.socat)
+                        "-d -T 20"
+                        "UDP4-RECVFROM:${toString port},fork,reuseaddr"
+                        "UDP6-SENDTO:${target}"
+                      ]
+                  );
+                };
+              }
+            ))
+            builtins.listToAttrs
+          ];
         };
       };
     }

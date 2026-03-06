@@ -55,7 +55,7 @@ in
   config = lib.mkIf cfg.enable rec {
     server = {
       containerNames = [ "dns" ];
-      ingress.forwardPorts = lib.flip map [ "tcp" ] (protocol: {
+      ingress.forwardPorts = lib.flip map [ "tcp" "udp" ] (protocol: {
         inherit protocol;
         inherit (cfg) port;
         containerName = "dns";
