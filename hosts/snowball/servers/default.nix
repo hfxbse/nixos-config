@@ -3,6 +3,7 @@
   imports = [
     ./dns.nix
     ./immich.nix
+    ./oidc.nix
     ./tls.nix
   ];
 
