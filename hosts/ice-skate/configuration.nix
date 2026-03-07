@@ -46,13 +46,6 @@
     ];
   };
 
-  specialisation.server-virtualisation.configuration.networking.hosts = {
-    "127.0.0.1" = [
-      "gallery.fxbse.com"
-      "auth.fxbse.com"
-    ];
-  };
-
   desktop."3d-printing".enable = true;
   users.users.${config.user.name}.packages = with pkgs; [ xournalpp ];
 

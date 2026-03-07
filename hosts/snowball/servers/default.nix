@@ -8,6 +8,9 @@
 
   server.ingress.wan = "br-lan";
   virtualisation.vmVariant = {
+    # Accessing websites locally via Firefox during testing:
+    # Within about:config set `network.dns.localDomains` to be a
+    # comma separated list of the required (sub-)domains
     server.services.dummy.enable = true;
     server.services.dummy-http = {
       enable = true;
