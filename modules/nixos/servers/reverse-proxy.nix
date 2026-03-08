@@ -190,10 +190,15 @@ in
                   serverName = "container_${cfgHost.containerName}";
                   origin = "${cfgHost.containerName}.local:${toString cfgHost.port}";
                 in
+                # Do not use libc to initialize the server IPs
+                # Libc will most likely try to resolve the DNS names before mDNS
+                # fully up and running.
+                # This is not only bad for the start up time, but also messes up
+                # routing for the HTTP services and therefore internet access
                 ''
                   backend ${domain}
                     mode http
-                    server ${serverName} ${origin} resolvers sys init-addr last,libc,none
+                    server ${serverName} ${origin} resolvers sys init-addr last,none
                 ''
               ))
               (lib.concatStringsSep "\n\n")
