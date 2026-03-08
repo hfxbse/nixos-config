@@ -38,37 +38,25 @@ in
     in
     lib.mkIf cfg.enable {
       server = {
-        containers.oidc.secrets."${containerName}/secrets.env".path = cfg.environmentFile;
         services.reverse-proxy.virtualHosts.${cfg.domain} = {
           inherit containerName;
           port = pocket-id.settings.PORT;
         };
-      };
 
-      systemd.services."container@${containerName}" = {
-        script =
-          let
-            owner =
-              with config.containers.${containerName}.config.users;
-              "${toString users.pocket-id.uid}:${toString groups.pocket-id.gid}";
-          in
-          lib.mkBefore ''
-            mkdir -p "$root${pocket-id.dataDir}"
-            chown ${owner} "$root${pocket-id.dataDir}"
-          '';
-
-        serviceConfig.StateDirectory = lib.removePrefix "/var/lib/" cfg.dataDir;
+        containers.oidc = {
+          secrets."${containerName}/secrets.env".path = cfg.environmentFile;
+          dataDirs.pocket-id = {
+            host.path = cfg.dataDir;
+            container = with config.containers.${containerName}.config.users; {
+              inherit (users.pocket-id) uid;
+              inherit (groups.pocket-id) gid;
+              path = pocket-id.dataDir;
+            };
+          };
+        };
       };
 
       containers.${containerName} = {
-        bindMounts = {
-          data = {
-            mountPoint = "${pocket-id.dataDir}:owneridmap";
-            hostPath = cfg.dataDir;
-            isReadOnly = false;
-          };
-        };
-
         config = {
           networking.firewall.allowedTCPPorts = [ pocket-id.settings.PORT ];
 
@@ -79,8 +67,6 @@ in
               uid = 789;
             };
           };
-          systemd.services.pocket-id.serviceConfig.StateDirectory =
-            lib.removePrefix "/var/lib/" pocket-id.dataDir;
 
           services.pocket-id = {
             enable = true;
