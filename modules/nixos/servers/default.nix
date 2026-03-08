@@ -8,6 +8,7 @@ in
     ./dns.nix
     ./dummy.nix
     ./dummy-http.nix
+    ./gallery.nix
     ./ingress.nix
     ./oidc.nix
     ./reverse-proxy.nix
