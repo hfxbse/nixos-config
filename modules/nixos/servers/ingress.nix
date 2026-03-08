@@ -149,7 +149,7 @@ in
       };
     };
 
-    server.containerNames = [ "ingress" ];
+    server.containers.ingress = {};
     containers = {
       ingress = {
         privateNetwork = true;
@@ -273,7 +273,8 @@ in
         };
       };
     }
-    // lib.pipe config.server.containerNames [
+    // lib.pipe config.server.containers [
+      builtins.attrNames
       (builtins.filter (name: name != "ingress"))
       (
         names:

@@ -19,12 +19,6 @@ let
     builtins.attrValues
     (map ({ containerName, ... }: containerName))
   ];
-
-  uniqueCerts = lib.pipe cfg.virtualHosts [
-    builtins.attrValues
-    (map ({ acmeCertName, ... }: acmeCertName))
-    lib.unique
-  ];
 in
 {
   options.server.services.reverse-proxy =
@@ -73,12 +67,9 @@ in
 
                 acmeCertName = lib.mkOption {
                   description = acmeDescription;
-                  type = types.nullOr types.str;
+                  type = types.str;
+                  default = cfg.defaults.acmeCertName;
                 };
-              };
-
-              config = {
-                acmeCertName = lib.mkDefault cfg.defaults.acmeCertName;
               };
             }
           )
@@ -87,8 +78,26 @@ in
     };
 
   config = lib.mkIf (builtins.length containerNames != 0) {
+    security.acme.certs = lib.pipe cfg.virtualHosts [
+      builtins.attrValues
+      (map ({ acmeCertName, ... }: acmeCertName))
+      lib.unique
+      (lib.flip lib.genAttrs (cert: {
+        # See https://nixos.org/manual/nixos/stable/#module-security-acme-root-owned
+        postRun = "systemctl restart container@${containerName};";
+      }))
+    ];
+
     server = {
-      containerNames = [ containerName ] ++ containerNames;
+      containers = lib.genAttrs containerNames (_: { }) // {
+        ${containerName}.secrets = lib.flip builtins.mapAttrs cfg.virtualHosts (
+          domain: host: {
+            name = "acme/${domain}.pem";
+            path = "${config.security.acme.certs.${host.acmeCertName}.directory}/full.pem";
+          }
+        );
+      };
+
       ingress.forwardPorts = lib.pipe cfg.ports [
         builtins.attrValues
         (map (port: {
@@ -113,115 +122,84 @@ in
       };
     };
 
-    # See https://nixos.org/manual/nixos/stable/#module-security-acme-root-owned
-    security.acme.certs = lib.genAttrs uniqueCerts (cert: {
-      postRun = "systemctl restart container@${containerName};";
-    });
-    systemd.services."container@${containerName}".serviceConfig.LoadCredential = map (
-      cert:
-      let
-        certDir = config.security.acme.certs.${cert}.directory;
-      in
-      "${cert}.pem:${certDir}/full.pem"
-    ) uniqueCerts;
-
     containers = {
-      ${containerName} =
-        let
-          certDir = "/run/credentials/acme";
-        in
-        {
-          extraVeths.${veth}.hostBridge = bridgeName;
+      ${containerName} = {
+        extraVeths.${veth}.hostBridge = bridgeName;
 
-          bindMounts = lib.pipe cfg.virtualHosts [
-            builtins.attrNames
-            (
-              domains:
-              lib.genAttrs domains (
-                domain: with cfg.virtualHosts.${domain}; {
-                  # Cannot use environment variable $CREDENTIALS_DIRECTORY :c
-                  hostPath = "/run/credentials/container@${containerName}.service/${acmeCertName}.pem";
-                  mountPoint = "${certDir}/${domain}.pem:owneridmap";
-                  isReadOnly = true;
-                }
-              )
-            )
-          ];
+        config = {
+          environment.systemPackages = with pkgs; [ dnsutils ];
+          boot.kernel.sysctl = {
+            "net.ipv6.conf.all.forwarding" = 2;
+          };
 
-          config = {
-            environment.systemPackages = with pkgs; [ dnsutils ];
-            boot.kernel.sysctl = {
-              "net.ipv6.conf.all.forwarding" = 2;
-            };
+          networking.firewall.interfaces.${veth}.allowedUDPPorts = [ 5353 ]; # mDNS
+          services.resolved.settings.Resolve.MulticastDNS = "resolve";
+          systemd.network = {
+            enable = true;
+            networks."40-${veth}" = {
+              matchConfig.Name = veth;
 
-            networking.firewall.interfaces.${veth}.allowedUDPPorts = [ 5353 ]; # mDNS
-            services.resolved.settings.Resolve.MulticastDNS = "resolve";
-            systemd.network = {
-              enable = true;
-              networks."40-${veth}" = {
-                matchConfig.Name = veth;
-
-                address = [ "${ulaPrefix}::1/64" ];
-                ipv6Prefixes = [ { Prefix = "${ulaPrefix}::/64"; } ];
-                networkConfig = {
-                  IPv6SendRA = true;
-                  IPv6AcceptRA = false;
-                  MulticastDNS = "resolve";
-                };
+              address = [ "${ulaPrefix}::1/64" ];
+              ipv6Prefixes = [ { Prefix = "${ulaPrefix}::/64"; } ];
+              networkConfig = {
+                IPv6SendRA = true;
+                IPv6AcceptRA = false;
+                MulticastDNS = "resolve";
               };
             };
-
-            # NAT66 for the HTTP network
-            # Provides internet access without assigning public IPv6 addresses
-            networking.nftables = {
-              enable = true;
-              ruleset = ''
-                table ip6 nat {
-                  chain postrouting {
-                    type nat hook postrouting priority srcnat; policy accept;
-                    iifname "${veth}" oifname "eth0" masquerade
-                  }
-                }
-              '';
-            };
-
-            networking.firewall.allowedTCPPorts = builtins.attrValues cfg.ports;
-
-            systemd.services.haproxy.serviceConfig.LoadCredential = lib.pipe cfg.virtualHosts [
-              builtins.attrNames
-              (map (domain: "${domain}.pem:${certDir}/${domain}.pem"))
-            ];
-
-            services.haproxy.enable = true;
-            services.haproxy.config =
-              with cfg.ports;
-              ''
-                resolvers sys
-                  parse-resolv-conf
-                frontend www
-                  mode http
-                  bind :::${toString http}
-                  bind :::${toString https} ssl crt /run/credentials/haproxy.service/ # $CREDENTIALS_DIRECTORY hard-coded
-                  http-request redirect scheme https unless { ssl_fc }
-                  use_backend %[req.hdr(Host),lower,word(1,:)]
-              ''
-              + lib.pipe cfg.virtualHosts [
-                (lib.mapAttrsToList (
-                  domain: cfgHost:
-                  let
-                    serverName = "container_${cfgHost.containerName}";
-                    origin = "${cfgHost.containerName}.local:${toString cfgHost.port}";
-                  in
-                  ''
-                    backend ${domain}
-                      mode http
-                      server ${serverName} ${origin} resolvers sys init-addr last,libc,none
-                  ''
-                ))
-                (lib.concatStringsSep "\n\n")
-              ];
           };
+
+          # NAT66 for the HTTP network
+          # Provides internet access without assigning public IPv6 addresses
+          networking.nftables = {
+            enable = true;
+            ruleset = ''
+              table ip6 nat {
+                chain postrouting {
+                  type nat hook postrouting priority srcnat; policy accept;
+                  iifname "${veth}" oifname "eth0" masquerade
+                }
+              }
+            '';
+          };
+
+          networking.firewall.allowedTCPPorts = builtins.attrValues cfg.ports;
+
+          systemd.services.haproxy.serviceConfig.LoadCredential = lib.pipe cfg.virtualHosts [
+            builtins.attrNames
+            (map (domain: "${domain}.pem:/run/credentials/acme/${domain}.pem"))
+          ];
+
+          services.haproxy.enable = true;
+          services.haproxy.config =
+            with cfg.ports;
+            ''
+              resolvers sys
+                parse-resolv-conf
+              frontend www
+                mode http
+                bind :::${toString http}
+                bind :::${toString https} ssl crt /run/credentials/haproxy.service/ # $CREDENTIALS_DIRECTORY hard-coded
+                http-request redirect scheme https unless { ssl_fc }
+                use_backend %[req.hdr(Host),lower,word(1,:)]
+            ''
+            + lib.pipe cfg.virtualHosts [
+              (lib.mapAttrsToList (
+                domain: cfgHost:
+                let
+                  serverName = "container_${cfgHost.containerName}";
+                  origin = "${cfgHost.containerName}.local:${toString cfgHost.port}";
+                in
+                ''
+                  backend ${domain}
+                    mode http
+                    server ${serverName} ${origin} resolvers sys init-addr last,libc,none
+                ''
+              ))
+              (lib.concatStringsSep "\n\n")
+            ];
         };
+      };
     }
     // lib.genAttrs containerNames (name: {
       hostBridge = bridgeName;

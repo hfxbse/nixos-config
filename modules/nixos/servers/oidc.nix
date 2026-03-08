@@ -37,9 +37,12 @@ in
       inherit (config.containers.${containerName}.config.services) pocket-id;
     in
     lib.mkIf cfg.enable {
-      server.services.reverse-proxy.virtualHosts.${cfg.domain} = {
-        inherit containerName;
-        port = pocket-id.settings.PORT;
+      server = {
+        containers.oidc.secrets."${containerName}/secrets.env".path = cfg.environmentFile;
+        services.reverse-proxy.virtualHosts.${cfg.domain} = {
+          inherit containerName;
+          port = pocket-id.settings.PORT;
+        };
       };
 
       systemd.services."container@${containerName}" = {
@@ -54,74 +57,59 @@ in
             chown ${owner} "$root${pocket-id.dataDir}"
           '';
 
-        serviceConfig = {
-          StateDirectory = lib.removePrefix "/var/lib/" cfg.dataDir;
-          LoadCredential = [
-            "secrets.env:${cfg.environmentFile}"
-          ];
-        };
+        serviceConfig.StateDirectory = lib.removePrefix "/var/lib/" cfg.dataDir;
       };
 
-      containers.${containerName} =
-        let
-          mountPoint = "/run/credentials/${containerName}";
-        in
-        {
-          bindMounts = {
-            data = {
-              mountPoint = "${pocket-id.dataDir}:owneridmap";
-              hostPath = cfg.dataDir;
-              isReadOnly = false;
-            };
-
-            secrets = {
-              mountPoint = "${mountPoint}:owneridmap";
-              hostPath = "/run/credentials/container@${containerName}.service";
-              isReadOnly = true;
-            };
-          };
-
-          config = {
-            networking.firewall.allowedTCPPorts = [ pocket-id.settings.PORT ];
-
-            users = rec {
-              groups.pocket-id.gid = users.pocket-id.uid;
-              users.pocket-id = {
-                home = lib.mkForce "/var/empty"; # Reset to the default value
-                uid = 789;
-              };
-            };
-            systemd.services.pocket-id.serviceConfig.StateDirectory =
-              lib.removePrefix "/var/lib/" pocket-id.dataDir;
-
-            services.pocket-id = {
-              enable = true;
-              dataDir = "/var/lib/pocket-id";
-              settings = {
-                ALLOW_USER_SIGNUPS = "withToken";
-                APP_NAME = lib.pipe cfg.domain [
-                  (lib.splitString ".")
-                  (lib.takeEnd 2)
-                  (builtins.concatStringsSep ".")
-                ];
-
-                APP_URL =
-                  with reverse-proxy;
-                  "https://${cfg.domain}${lib.optionalString (ports.https != 443) (toString ports.https)}";
-
-                EMAIL_LOGIN_NOTIFICATION_ENABLED = true;
-                PORT = 1411;
-                SMTP_FROM = "no-reply@${cfg.domain}";
-                TRUST_PROXY = true;
-                UI_CONFIG_DISABLED = true;
-              };
-
-              # Cannot use LoadCredential.
-              # This gets added to the service config directly.
-              environmentFile = "${mountPoint}/secrets.env";
-            };
+      containers.${containerName} = {
+        bindMounts = {
+          data = {
+            mountPoint = "${pocket-id.dataDir}:owneridmap";
+            hostPath = cfg.dataDir;
+            isReadOnly = false;
           };
         };
+
+        config = {
+          networking.firewall.allowedTCPPorts = [ pocket-id.settings.PORT ];
+
+          users = rec {
+            groups.pocket-id.gid = users.pocket-id.uid;
+            users.pocket-id = {
+              home = lib.mkForce "/var/empty"; # Reset to the default value
+              uid = 789;
+            };
+          };
+          systemd.services.pocket-id.serviceConfig.StateDirectory =
+            lib.removePrefix "/var/lib/" pocket-id.dataDir;
+
+          services.pocket-id = {
+            enable = true;
+            dataDir = "/var/lib/pocket-id";
+            settings = {
+              ALLOW_USER_SIGNUPS = "withToken";
+              APP_NAME = lib.pipe cfg.domain [
+                (lib.splitString ".")
+                (lib.takeEnd 2)
+                (builtins.concatStringsSep ".")
+              ];
+
+              APP_URL =
+                with reverse-proxy;
+                "https://${cfg.domain}${lib.optionalString (ports.https != 443) (toString ports.https)}";
+
+              EMAIL_LOGIN_NOTIFICATION_ENABLED = true;
+              PORT = 1411;
+              SMTP_FROM = "no-reply@${cfg.domain}";
+              TRUST_PROXY = true;
+              UI_CONFIG_DISABLED = true;
+            };
+
+            # Cannot use LoadCredential.
+            # This gets added to the service config directly.
+            environmentFile = "/run/credentials/${containerName}/secrets.env";
+          };
+        };
+      };
 
       virtualisation.vmVariant.systemd.services."dummy-secrets@pocket-id" = {
         wantedBy = [ "multi-user.target" ];

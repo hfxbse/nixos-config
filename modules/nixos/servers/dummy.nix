@@ -12,6 +12,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    server.containerNames = [ "dummy" ];
+    server.containers.dummy = {};
   };
 }
