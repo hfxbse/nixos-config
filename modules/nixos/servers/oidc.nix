@@ -84,6 +84,7 @@ in
                 "https://${cfg.domain}${lib.optionalString (ports.https != 443) (toString ports.https)}";
 
               EMAIL_LOGIN_NOTIFICATION_ENABLED = true;
+              EMAIL_VERIFICATION_ENABLED = true;
               PORT = 1411;
               SMTP_FROM = "no-reply@${cfg.domain}";
               TRUST_PROXY = true;
@@ -97,13 +98,19 @@ in
         };
       };
 
-      virtualisation.vmVariant.systemd.services."dummy-secrets@pocket-id" = {
-        wantedBy = [ "multi-user.target" ];
-        serviceConfig.Type = "oneshot";
-        script = ''
-          mkdir -p ''$(dirname "${cfg.environmentFile}");
-          echo ENCRYPTION_KEY=1234567890987654321 > "${cfg.environmentFile}"
-        '';
+      virtualisation.vmVariant = {
+        containers.${containerName}.config.services.pocket-id.settings = {
+          EMAIL_VERIFICATION_ENABLED = lib.mkForce false;
+        };
+
+        systemd.services."dummy-secrets@pocket-id" = {
+          wantedBy = [ "multi-user.target" ];
+          serviceConfig.Type = "oneshot";
+          script = ''
+            mkdir -p ''$(dirname "${cfg.environmentFile}");
+            echo ENCRYPTION_KEY=1234567890987654321 > "${cfg.environmentFile}"
+          '';
+        };
       };
     };
 }
