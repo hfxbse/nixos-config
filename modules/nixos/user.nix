@@ -13,6 +13,10 @@ in
   config.virtualisation = rec {
     vmVariantWithBootLoader = vmVariant;
     vmVariant = {
+      # Will falsely ban the QEMU host as it tries all SSH-keys before
+      # falling back to password login
+      services.fail2ban.ignoreIP = [ "10.0.2.2" ];
+
       security.sudo.wheelNeedsPassword = false;
       services.getty.autologinUser = config.user.name;
 
