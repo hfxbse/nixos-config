@@ -34,6 +34,14 @@ in
               types.submodule (
                 { ... }:
                 {
+                  options.idmap =
+                    lib.mkEnableOption {
+                      description = "use id mapping.";
+                    }
+                    // {
+                      default = true;
+                    };
+
                   options.host.path = lib.mkOption {
                     description = "Path to the data directory on the host.";
                     type = lib.types.addCheck lib.types.path (p: lib.hasPrefix "/var/lib/" (toString p));
@@ -153,9 +161,14 @@ in
             ))
             // lib.flip builtins.mapAttrs container.dataDirs (
               _:
-              { host, container, ... }:
               {
-                mountPoint = "${container.path}:owneridmap";
+                idmap,
+                host,
+                container,
+                ...
+              }:
+              {
+                mountPoint = "${container.path}${lib.optionalString idmap ":owneridmap"}";
                 hostPath = host.path;
                 isReadOnly = false;
               }

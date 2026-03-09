@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   ...
@@ -37,6 +38,25 @@ in
     ];
   };
 
+  # FUSE based like mergerfs directores do not support id mapping permissions
+  containers.gallery.privateUsers = "identity";
+  server.containers.gallery.dataDirs.media.idmap = false;
+  users =
+    with config.containers.gallery.config;
+    let
+      inherit (services.immich) group user;
+      inherit (users.users.${user}) uid;
+      inherit (users.groups.${group}) gid;
+    in
+    {
+      users.${user} = {
+        inherit uid;
+        group = services.immich.group;
+        isSystemUser = true;
+      };
+      groups.${group}.gid = gid;
+    };
+
   server.services.gallery = {
     enable = true;
     dataDir = "/var/lib/immich";
@@ -56,7 +76,6 @@ in
       ])
       // {
         port = 465;
-      }
-    ;
+      };
   };
 }
