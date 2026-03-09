@@ -118,6 +118,7 @@ in
         };
 
       # Enable NAT66 when running as VM as their ain't any global IPv6 address
+      boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = false;
       containers.ingress.config.networking.nftables.ruleset = ''
         table ip6 nat {
           chain postrouting {
@@ -149,7 +150,7 @@ in
       };
     };
 
-    server.containers.ingress = {};
+    server.containers.ingress = { };
     containers = {
       ingress = {
         privateNetwork = true;
@@ -157,9 +158,7 @@ in
         hostBridge = bridgeName;
 
         config = lib.recursiveUpdate resolverFix {
-          boot.kernel.sysctl = {
-            "net.ipv6.conf.all.forwarding" = 2;
-          };
+          boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
 
           networking.hostName = "${config.networking.hostName}-ingress";
           networking.nftables.enable = true;
@@ -174,6 +173,13 @@ in
                 networkConfig = {
                   DHCP = true;
                   IPv6AcceptRA = true;
+                };
+
+                # Only use DHCPv6 for prefix delegation.
+                # Assign own address via SLAAC.
+                dhcpV6Config = {
+                  WithoutRA = "solicit";
+                  UseAddress = false;
                 };
               };
 
@@ -200,7 +206,13 @@ in
             };
           };
 
-          systemd.services = lib.pipe cfg.forwardPorts [
+          systemd.services = {
+            systemd-networkd.serviceConfig = {
+              # Easier debugging of DHCPv6
+              Environment = "SYSTEMD_LOG_LEVEL=debug";
+            };
+          }
+          // lib.pipe cfg.forwardPorts [
             (map (
               {
                 port,
