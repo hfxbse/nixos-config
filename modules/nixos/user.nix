@@ -25,7 +25,10 @@ in
         {
           from = "host";
           host.port = 2222;
-          guest.port = 22;
+          guest = {
+            address = "10.0.2.15";
+            port = 22;
+          };
           proto = "tcp";
         }
       ];
