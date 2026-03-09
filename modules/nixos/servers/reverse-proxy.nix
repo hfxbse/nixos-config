@@ -174,10 +174,20 @@ in
           services.haproxy.config =
             with cfg.ports;
             ''
+              global
+                maxconn 10000
+              defaults
+                mode http
+                option forwarded
+                option forwardfor
+                compression algo gzip
+                timeout connect 10s
+                timeout client 60s
+                timeout server 60s
+                timeout tunnel 1h
               resolvers sys
                 parse-resolv-conf
               frontend www
-                mode http
                 bind :::${toString http}
                 bind :::${toString https} ssl crt /run/credentials/haproxy.service/ # $CREDENTIALS_DIRECTORY hard-coded
                 http-request redirect scheme https unless { ssl_fc }
@@ -197,7 +207,7 @@ in
                 # routing for the HTTP services and therefore internet access
                 ''
                   backend ${domain}
-                    mode http
+                    compression offload
                     server ${serverName} ${origin} resolvers sys init-addr last,none
                 ''
               ))
