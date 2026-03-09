@@ -174,7 +174,7 @@ in
               # Credentials are loades via systemd's LoadCredential already
               settings =
                 let
-                  secret' = directory: name: "/run/credentials/${directory}/${name}";
+                  secret' = directory: name: { _secret = "/run/credentials/${directory}/${name}"; };
                 in
                 {
                   machineLearning.enabled = true;
@@ -187,8 +187,8 @@ in
                     lib.mkIf cfg.oauth.enable {
                       enabled = true;
                       autoLaunch = true;
-                      issuerUrl._secret = secret "issuerUrl";
-                      clientId._secret = secret "clientId";
+                      issuerUrl = secret "issuerUrl";
+                      clientId = secret "clientId";
                       clientSecret = secret "clientSecret";
                     };
 
