@@ -158,6 +158,7 @@ in
         hostBridge = bridgeName;
 
         config = lib.recursiveUpdate resolverFix {
+          services.resolved.settings.Resolve.DNSStubListener = false;
           boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
 
           networking.hostName = "${config.networking.hostName}-ingress";
@@ -260,7 +261,6 @@ in
                     NoNewPrivileges = true;
                     MemoryMax = "128M";
                     TasksMax = 1000;
-                    PrivateUsers = true;
                     PrivateTmp = true;
                     PrivateDevices = true;
                     PrivateMounts = true;
