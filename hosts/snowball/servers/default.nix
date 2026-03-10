@@ -7,7 +7,7 @@
     ./tls.nix
   ];
 
-  server.ingress.wan = "br-lan";
+  server.ingress.wan = "br-host";
   virtualisation.vmVariant = {
     # Accessing websites locally via Firefox during testing:
     # Within about:config set `network.dns.localDomains` to be a

@@ -11,6 +11,9 @@ let
   containerName = "reverse-proxy";
   bridgeName = "br-http";
   ulaPrefix = "fd00:9d1f:b7b7:1721";
+
+  lanVb = "vb-rp-lan";
+  wanVb = "vb-rp-wan";
   veth = "vb-http";
 
   portNumber = types.ints.between 0 65535;
@@ -70,6 +73,10 @@ in
                   type = types.str;
                   default = cfg.defaults.acmeCertName;
                 };
+
+                public = lib.mkEnableOption {
+                  description = "Allow access from the public internet.";
+                };
               };
             }
           )
@@ -124,27 +131,45 @@ in
 
     containers = {
       ${containerName} = {
-        extraVeths.${veth}.hostBridge = bridgeName;
+        hostBridge = null;
+        extraVeths = with config.server.ingress; {
+          ${lanVb}.hostBridge = bridgeNames.lan;
+          ${wanVb}.hostBridge = bridgeNames.wan;
+          ${veth}.hostBridge = bridgeName;
+        };
 
         config = {
-          environment.systemPackages = with pkgs; [ dnsutils ];
-          boot.kernel.sysctl = {
-            "net.ipv6.conf.all.forwarding" = 2;
-          };
+          services.avahi.allowInterfaces = lib.mkForce [ lanVb ];
 
-          networking.firewall.interfaces.${veth}.allowedUDPPorts = [ 5353 ]; # mDNS
+          environment.systemPackages = with pkgs; [ dnsutils ];
+          boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = false;
+
           services.resolved.settings.Resolve.MulticastDNS = "resolve";
+          networking.firewall.interfaces = lib.genAttrs [ veth lanVb ] (_: {
+            allowedUDPPorts = [ 5353 ]; # mDNS
+          });
+
           systemd.network = {
             enable = true;
-            networks."40-${veth}" = {
-              matchConfig.Name = veth;
+            networks = {
+              "30-${config.server.ingress.bridgeNames.lan}" = {
+                matchConfig.Name = [
+                  lanVb
+                  wanVb
+                ];
+                networkConfig.IPv6SendRA = false;
+              };
 
-              address = [ "${ulaPrefix}::1/64" ];
-              ipv6Prefixes = [ { Prefix = "${ulaPrefix}::/64"; } ];
-              networkConfig = {
-                IPv6SendRA = true;
-                IPv6AcceptRA = false;
-                MulticastDNS = "resolve";
+              "40-${veth}" = {
+                matchConfig.Name = veth;
+
+                address = [ "${ulaPrefix}::1/64" ];
+                ipv6Prefixes = [ { Prefix = "${ulaPrefix}::/64"; } ];
+                networkConfig = {
+                  IPv6SendRA = true;
+                  IPv6AcceptRA = false;
+                  MulticastDNS = "resolve";
+                };
               };
             };
           };
@@ -157,7 +182,7 @@ in
               table ip6 nat {
                 chain postrouting {
                   type nat hook postrouting priority srcnat; policy accept;
-                  iifname "${veth}" oifname "eth0" masquerade
+                  iifname "${veth}" oifname { "${lanVb}", "${wanVb}" } masquerade
                 }
               }
             '';
@@ -173,6 +198,16 @@ in
           services.haproxy.enable = true;
           services.haproxy.config =
             with cfg.ports;
+            let
+              # $CREDENTIALS_DIRECTORY has to be hard-coded :c
+              frontend = label: interface: ''
+                frontend ${label}
+                  bind :::${toString http} interface ${interface}
+                  bind :::${toString https} interface ${interface} ssl crt /run/credentials/haproxy.service/
+                  http-request redirect scheme https unless { ssl_fc }
+                  use_backend %[req.hdr(Host),lower,word(1,:)]_${label}
+              '';
+            in
             ''
               global
                 maxconn 10000
@@ -187,31 +222,30 @@ in
                 timeout tunnel 1h
               resolvers sys
                 parse-resolv-conf
-              frontend www
-                bind :::${toString http}
-                bind :::${toString https} ssl crt /run/credentials/haproxy.service/ # $CREDENTIALS_DIRECTORY hard-coded
-                http-request redirect scheme https unless { ssl_fc }
-                use_backend %[req.hdr(Host),lower,word(1,:)]
             ''
+            + frontend "lan" lanVb
+            + frontend "wan" wanVb
             + lib.pipe cfg.virtualHosts [
               (lib.mapAttrsToList (
                 domain: cfgHost:
                 let
                   serverName = "container_${cfgHost.containerName}";
                   origin = "${cfgHost.containerName}.local:${toString cfgHost.port}";
+
+                  # Do not use libc to initialize the server IPs
+                  # Libc will most likely try to resolve the DNS names before mDNS
+                  # fully up and running.
+                  # This is not only bad for the start up time, but also messes up
+                  # routing for the HTTP services and therefore internet access
+                  backend = label: ''
+                    backend ${domain}_${label}
+                      compression offload
+                      server ${serverName} ${origin} resolvers sys init-addr last,none
+                  '';
                 in
-                # Do not use libc to initialize the server IPs
-                # Libc will most likely try to resolve the DNS names before mDNS
-                # fully up and running.
-                # This is not only bad for the start up time, but also messes up
-                # routing for the HTTP services and therefore internet access
-                ''
-                  backend ${domain}
-                    compression offload
-                    server ${serverName} ${origin} resolvers sys init-addr last,none
-                ''
+                backend "lan" + lib.optionalString cfgHost.public (backend "wan")
               ))
-              (lib.concatStringsSep "\n\n")
+              lib.concatStrings
             ];
         };
       };

@@ -26,6 +26,7 @@ in
     server.services.reverse-proxy.virtualHosts.${cfg.domain} = {
       containerName = "dummy-http";
       port = 80;
+      public = true;
     };
 
     containers.dummy-http = {

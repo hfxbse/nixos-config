@@ -22,8 +22,6 @@ let
   };
 
   types = lib.types;
-  bridgeName = "br-ingress";
-  ulaPrefix = "fd7e:f08c:27e1";
 
   useForwarding = builtins.length cfg.forwardPorts != 0;
   allowedPorts =
@@ -38,6 +36,20 @@ in
     wan = lib.mkOption {
       description = "Upstream internet interface.";
       type = types.types.str;
+    };
+
+    bridgeNames = {
+      wan = lib.mkOption {
+        description = "Name of the host bridge receiving ingress from WAN";
+        type = types.str;
+        default = "br-wan";
+      };
+
+      lan = lib.mkOption {
+        description = "Name of the host bridge receiving ingress from WAN";
+        type = types.str;
+        default = "br-lan";
+      };
     };
 
     forwardPorts = lib.mkOption {
@@ -100,7 +112,7 @@ in
           # Forcing QEMU to use an ULA as well fixes this.
           qemu.networkingOptions = lib.mkForce [
             "-net nic,netdev=user.0,model=virtio"
-            "-netdev user,id=user.0,${forwardingOptions},ipv6-prefix=${ulaPrefix}:0::,ipv6-prefixlen=64,\${QEMU_NET_OPTS:+,$QEMU_NET_OPTS}"
+            "-netdev user,id=user.0,${forwardingOptions},ipv6-prefix=fd00:2e57:eb00:74df::,ipv6-prefixlen=64,\${QEMU_NET_OPTS:+,$QEMU_NET_OPTS}"
           ];
 
           forwardPorts = map (
@@ -118,12 +130,13 @@ in
         };
 
       # Enable NAT66 when running as VM as their ain't any global IPv6 address
-      boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = false;
+      boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
       containers.ingress.config.networking.nftables.ruleset = ''
         table ip6 nat {
           chain postrouting {
             type nat hook postrouting priority srcnat; policy accept;
-            iifname "eth0" oifname "mv-${cfg.wan}" masquerade
+            iifname "vb-lan" oifname "mv-lan" masquerade
+            iifname "vb-wan" oifname "mv-wan" masquerade
           }
         }
       '';
@@ -132,21 +145,32 @@ in
     networking.firewall.enable = true;
     networking.nftables.enable = true;
 
-    systemd.network = {
+    systemd.network = with cfg.bridgeNames; {
       enable = true;
-      netdevs."21-${bridgeName}" = {
-        netdevConfig = {
-          Kind = "bridge";
-          Name = bridgeName;
-        };
-      };
+      netdevs =
+        let
+          netDev = bridgeName: {
+            "21-${bridgeName}" = {
+              netdevConfig = {
+                Kind = "bridge";
+                Name = bridgeName;
+              };
+            };
+          };
+        in
+        (netDev wan) // (netDev lan);
 
-      networks."41-${bridgeName}" = {
-        matchConfig.Name = bridgeName;
+      networks."41-br-ingress" = {
+        matchConfig.Name = [
+          lan
+          wan
+        ];
+
         networkConfig = {
           ConfigureWithoutCarrier = true;
           IPv6AcceptRA = false;
         };
+        linkConfig.RequiredForOnline = "carrier";
       };
     };
 
@@ -154,59 +178,91 @@ in
     containers = {
       ingress = {
         privateNetwork = true;
-        macvlans = [ cfg.wan ];
-        hostBridge = bridgeName;
+        macvlans = [
+          "${cfg.wan}:mv-wan"
+          "${cfg.wan}:mv-lan"
+        ];
+        extraVeths = {
+          vb-lan.hostBridge = cfg.bridgeNames.lan;
+          vb-wan.hostBridge = cfg.bridgeNames.wan;
+        };
 
         config = lib.recursiveUpdate resolverFix {
-          services.resolved.settings.Resolve.DNSStubListener = false;
           boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
-
-          networking.hostName = "${config.networking.hostName}-ingress";
+          networking.firewall.checkReversePath = true;
           networking.nftables.enable = true;
 
           environment.systemPackages = with pkgs; [ dig ];
 
-          systemd.network = {
-            enable = true;
-            networks = {
-              "10-wan" = {
-                matchConfig.Name = "mv-${cfg.wan}";
-                networkConfig = {
-                  DHCP = true;
-                  IPv6AcceptRA = true;
+          systemd.network =
+            let
+              mvNet =
+                name:
+                {
+                  requestPrefix ? false,
+                }:
+                let
+                  Hostname = "${config.networking.hostName}-${name}";
+                in
+                {
+                  "20-mv-${name}" = {
+                    matchConfig.Name = "mv-${name}";
+                    networkConfig = {
+                      DHCP = true;
+                      IPv6AcceptRA = requestPrefix;
+                      IPv6Forwarding = true;
+                    };
+
+                    dhcpV4Config.Hostname = Hostname;
+                    # Only use DHCPv6 for prefix delegation.
+                    # Assign own address via SLAAC.
+                    dhcpV6Config = {
+                      inherit Hostname;
+                      WithoutRA = lib.mkIf requestPrefix "solicit";
+                      UseAddress = false;
+                    };
+                  };
                 };
 
-                # Only use DHCPv6 for prefix delegation.
-                # Assign own address via SLAAC.
-                dhcpV6Config = {
-                  WithoutRA = "solicit";
-                  UseAddress = false;
-                };
-              };
+              vbNet = name: ula: {
+                "30-vb-${name}" = {
+                  address = [ "${ula}::1/64" ];
+                  matchConfig.Name = "vb-${name}";
+                  ipv6Prefixes = [ { Prefix = "${ula}::/64"; } ];
 
-              "30-${bridgeName}" = {
-                address = [ "${ulaPrefix}:1::1/64" ];
-                matchConfig.Name = "eth*";
-                networkConfig = {
-                  DHCPPrefixDelegation = true;
-                  IPv6SendRA = true;
-                  IPv6AcceptRA = false;
-                  MulticastDNS = lib.mkIf useForwarding "resolve";
+                  networkConfig = {
+                    DHCPPrefixDelegation = true;
+                    IPv6SendRA = true;
+                    IPv6AcceptRA = false;
+                    IPv6Forwarding = true;
+                    MulticastDNS = lib.mkIf useForwarding "resolve";
+                  };
                 };
-                ipv6Prefixes = [ { Prefix = "${ulaPrefix}:1::/64"; } ];
               };
+            in
+            {
+              enable = true;
+              networks =
+                (vbNet "lan" "fd9e:adea:e09c:9707")
+                // (vbNet "wan" "fd51:1757:d0ce:320e")
+                // (mvNet "lan" { requestPrefix = true; })
+                // (mvNet "wan" {});
             };
-          };
 
           services.resolved.settings.Resolve.MulticastDNS = lib.mkIf useForwarding "resolve";
-          networking.firewall.interfaces = lib.mkIf useForwarding {
-            "eth0".allowedUDPPorts = [ 5353 ]; # mDNS
-            "mv-${cfg.wan}" = {
-              allowedUDPPorts = allowedPorts "udp";
-              allowedTCPPorts = allowedPorts "tcp";
-            };
-          };
+          networking.firewall.interfaces = lib.mkIf useForwarding (
+            lib.genAttrs [ "vb-lan" "vb-wan" ] (interface: {
+              allowedUDPPorts = [ 5353 ]; # mDNS
+            })
+            // {
+              "mv-lan" = {
+                allowedUDPPorts = allowedPorts "udp";
+                allowedTCPPorts = allowedPorts "tcp";
+              };
+            }
+          );
 
+          services.resolved.settings.Resolve.DNSStubListener = false;
           systemd.services = {
             systemd-networkd.serviceConfig = {
               # Easier debugging of DHCPv6
@@ -297,7 +353,7 @@ in
           in
           {
             inherit (config.containers.ingress) privateNetwork;
-            hostBridge = lib.mkDefault bridgeName;
+            hostBridge = lib.mkDefault cfg.bridgeNames.lan;
 
             config = lib.recursiveUpdate resolverFix {
               environment.systemPackages = with pkgs; [
@@ -319,7 +375,7 @@ in
 
               systemd.network = {
                 enable = true;
-                networks."30-${bridgeName}" = {
+                networks."30-${cfg.bridgeNames.lan}" = {
                   matchConfig.Name = "eth0";
                   networkConfig.DHCP = true;
                 };

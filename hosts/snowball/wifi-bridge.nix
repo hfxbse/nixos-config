@@ -1,6 +1,6 @@
 { lib, ... }:
 let
-  bridgeName = "br-lan";
+  bridgeName = "br-host";
 in
 {
   networking.interfaces = lib.mkForce { };
