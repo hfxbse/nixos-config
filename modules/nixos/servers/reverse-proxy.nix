@@ -142,7 +142,7 @@ in
           services.avahi.allowInterfaces = lib.mkForce [ lanVb ];
 
           environment.systemPackages = with pkgs; [ dnsutils ];
-          boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = false;
+          boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
 
           services.resolved.settings.Resolve.MulticastDNS = "resolve";
           networking.firewall.interfaces = lib.genAttrs [ veth lanVb ] (_: {
@@ -157,7 +157,11 @@ in
                   lanVb
                   wanVb
                 ];
-                networkConfig.IPv6SendRA = false;
+                networkConfig = {
+                  IPv6SendRA = false;
+                  IPv6AcceptRA = true;
+                  IPv6Forwarding = true;
+                };
               };
 
               "40-${veth}" = {
@@ -168,6 +172,7 @@ in
                 networkConfig = {
                   IPv6SendRA = true;
                   IPv6AcceptRA = false;
+                  IPv6Forwarding = true;
                   MulticastDNS = "resolve";
                 };
               };

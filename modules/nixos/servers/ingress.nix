@@ -189,28 +189,39 @@ in
 
         config = lib.recursiveUpdate resolverFix {
           boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
-          networking.firewall.checkReversePath = true;
           networking.nftables.enable = true;
 
           environment.systemPackages = with pkgs; [ dig ];
 
           systemd.network =
             let
+              vrfDev = label: id: {
+                "15-vrf-${label}" = {
+                  netdevConfig = {
+
+                    Name = "vrf-${label}";
+                    Kind = "vrf";
+                  };
+                  vrfConfig.Table = id;
+                };
+              };
+
               mvNet =
-                name:
+                label:
                 {
                   requestPrefix ? false,
                 }:
                 let
-                  Hostname = "${config.networking.hostName}-${name}";
+                  Hostname = "${config.networking.hostName}-${label}";
                 in
                 {
-                  "20-mv-${name}" = {
-                    matchConfig.Name = "mv-${name}";
+                  "20-mv-${label}" = {
+                    matchConfig.Name = "mv-${label}";
                     networkConfig = {
                       DHCP = true;
-                      IPv6AcceptRA = requestPrefix;
+                      IPv6AcceptRA = true;
                       IPv6Forwarding = true;
+                      VRF = "vrf-${label}";
                     };
 
                     dhcpV4Config.Hostname = Hostname;
@@ -224,10 +235,10 @@ in
                   };
                 };
 
-              vbNet = name: ula: {
-                "30-vb-${name}" = {
+              vbNet = label: ula: {
+                "30-vb-${label}" = {
                   address = [ "${ula}::1/64" ];
-                  matchConfig.Name = "vb-${name}";
+                  matchConfig.Name = "vb-${label}";
                   ipv6Prefixes = [ { Prefix = "${ula}::/64"; } ];
 
                   networkConfig = {
@@ -236,17 +247,19 @@ in
                     IPv6AcceptRA = false;
                     IPv6Forwarding = true;
                     MulticastDNS = lib.mkIf useForwarding "resolve";
+                    VRF = "vrf-${label}";
                   };
                 };
               };
             in
             {
               enable = true;
+              netdevs = (vrfDev "lan" 254) // (vrfDev "wan" 2000);
               networks =
                 (vbNet "lan" "fd9e:adea:e09c:9707")
                 // (vbNet "wan" "fd51:1757:d0ce:320e")
                 // (mvNet "lan" { requestPrefix = true; })
-                // (mvNet "wan" {});
+                // (mvNet "wan" { });
             };
 
           services.resolved.settings.Resolve.MulticastDNS = lib.mkIf useForwarding "resolve";
@@ -254,12 +267,10 @@ in
             lib.genAttrs [ "vb-lan" "vb-wan" ] (interface: {
               allowedUDPPorts = [ 5353 ]; # mDNS
             })
-            // {
-              "mv-lan" = {
-                allowedUDPPorts = allowedPorts "udp";
-                allowedTCPPorts = allowedPorts "tcp";
-              };
-            }
+            // lib.genAttrs [ "vrf-lan" "mv-lan" ] (_: {
+              allowedUDPPorts = allowedPorts "udp";
+              allowedTCPPorts = allowedPorts "tcp";
+            })
           );
 
           services.resolved.settings.Resolve.DNSStubListener = false;
