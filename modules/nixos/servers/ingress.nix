@@ -218,6 +218,7 @@ in
                 content = ''
                   chain forward {
                     type filter hook forward priority 0; policy accept;
+                    ct state established,related accept
                     iifname "${ingressName}" oifname { "${lanName}" } drop;
                     iifname "${wanName}" oifname { "${lanName}" } drop;
                   }
