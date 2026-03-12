@@ -213,14 +213,14 @@ in
                   }
                 '';
               };
-
-              isolate-http = {
+              http-isolation = {
                 family = "inet";
                 content = ''
                   chain forward {
                     type filter hook forward priority 0; policy accept;
                     ct state established,related accept
                     iifname { "${lanVb}", "${wanVb}" } oifname ${veth} drop;
+                    iifname "${veth}" fib daddr oifname "${lanVb}" drop;
                   }
                 '';
               };
