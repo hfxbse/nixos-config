@@ -22,6 +22,9 @@ let
   };
 
   types = lib.types;
+  ingressName = "mv-ingress";
+  lanName = "vb-lan";
+  wanName = "vb-wan";
 
   useForwarding = builtins.length cfg.forwardPorts != 0;
   allowedPorts =
@@ -135,8 +138,7 @@ in
         table ip6 nat {
           chain postrouting {
             type nat hook postrouting priority srcnat; policy accept;
-            iifname "vb-lan" oifname "mv-lan" masquerade
-            iifname "vb-wan" oifname "mv-wan" masquerade
+            iifname "${lanName}" oifname "${ingressName}" masquerade
           }
         }
       '';
@@ -178,102 +180,104 @@ in
     containers = {
       ingress = {
         privateNetwork = true;
-        macvlans = [
-          "${cfg.wan}:mv-wan"
-          "${cfg.wan}:mv-lan"
-        ];
+        # Use single macvlan as the Fritz!Box sucks ass and will always
+        # send all traffic to the interface soliciting the RA breaking
+        # the reverse-path check / routing when separate macvlan interfaces
+        # are used for WAN and LAN incoming traffic.
+        # LAN only services have to be accessed via port forwarding.
+        macvlans = [ "${cfg.wan}:${ingressName}" ];
         extraVeths = {
-          vb-lan.hostBridge = cfg.bridgeNames.lan;
-          vb-wan.hostBridge = cfg.bridgeNames.wan;
+          ${lanName}.hostBridge = cfg.bridgeNames.lan;
+          ${wanName}.hostBridge = cfg.bridgeNames.wan;
         };
 
         config = lib.recursiveUpdate resolverFix {
           boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
-          networking.nftables.enable = true;
+          networking.firewall.checkReversePath = "loose";
+          networking.nftables = {
+            enable = true;
+            tables.lan-forwarding-only = {
+              family = "inet";
+              content = ''
+                chain forward {
+                  type filter hook forward priority 0; policy accept;
+                  iifname "${ingressName}" oifname { "${lanName}" } drop;
+                  iifname "${wanName}" oifname { "${lanName}" } drop;
+                }
+              '';
+            };
+          };
 
           environment.systemPackages = with pkgs; [ dig ];
 
-          systemd.network =
-            let
-              vrfDev = label: id: {
-                "15-vrf-${label}" = {
-                  netdevConfig = {
+          systemd.network = {
+            enable = true;
+            networks =
+              let
+                vbNet =
+                  label:
+                  {
+                    ula,
+                    mDNS ? false,
+                  }:
+                  {
+                    "30-vb-${label}" = {
+                      address = [ "${ula}::1/64" ];
+                      matchConfig.Name = "vb-${label}";
+                      ipv6Prefixes = [ { Prefix = "${ula}::/64"; } ];
 
-                    Name = "vrf-${label}";
-                    Kind = "vrf";
-                  };
-                  vrfConfig.Table = id;
-                };
-              };
-
-              mvNet =
-                label:
-                {
-                  requestPrefix ? false,
-                }:
-                let
-                  Hostname = "${config.networking.hostName}-${label}";
-                in
-                {
-                  "20-mv-${label}" = {
-                    matchConfig.Name = "mv-${label}";
-                    networkConfig = {
-                      DHCP = true;
-                      IPv6AcceptRA = true;
-                      IPv6Forwarding = true;
-                      VRF = "vrf-${label}";
-                    };
-
-                    dhcpV4Config.Hostname = Hostname;
-                    # Only use DHCPv6 for prefix delegation.
-                    # Assign own address via SLAAC.
-                    dhcpV6Config = {
-                      inherit Hostname;
-                      WithoutRA = lib.mkIf requestPrefix "solicit";
-                      UseAddress = false;
+                      networkConfig = {
+                        DHCPPrefixDelegation = true;
+                        IPv6SendRA = true;
+                        IPv6AcceptRA = false;
+                        IPv6Forwarding = true;
+                        MulticastDNS = lib.mkIf mDNS "resolve";
+                      };
                     };
                   };
-                };
-
-              vbNet = label: ula: {
-                "30-vb-${label}" = {
-                  address = [ "${ula}::1/64" ];
-                  matchConfig.Name = "vb-${label}";
-                  ipv6Prefixes = [ { Prefix = "${ula}::/64"; } ];
-
+              in
+              {
+                "20-${ingressName}" = rec {
+                  matchConfig.Name = ingressName;
                   networkConfig = {
-                    DHCPPrefixDelegation = true;
-                    IPv6SendRA = true;
-                    IPv6AcceptRA = false;
+                    DHCP = true;
+                    IPv6AcceptRA = true;
                     IPv6Forwarding = true;
-                    MulticastDNS = lib.mkIf useForwarding "resolve";
-                    VRF = "vrf-${label}";
+                    # SOCAT will use the private IPv6 unless disabled
+                    IPv6PrivacyExtensions = false;
+                  };
+
+                  dhcpV4Config.Hostname = "${config.networking.hostName}-ingress";
+                  # Only use DHCPv6 for prefix delegation.
+                  # Assign own address via SLAAC.
+                  dhcpV6Config = {
+                    inherit (dhcpV4Config) Hostname;
+                    WithoutRA = "solicit";
+                    UseAddress = false;
                   };
                 };
-              };
-            in
-            {
-              enable = true;
-              netdevs = (vrfDev "lan" 254) // (vrfDev "wan" 2000);
-              networks =
-                (vbNet "lan" "fd9e:adea:e09c:9707")
-                // (vbNet "wan" "fd51:1757:d0ce:320e")
-                // (mvNet "lan" { requestPrefix = true; })
-                // (mvNet "wan" { });
-            };
+
+              }
+              // (vbNet "wan" { ula = "fd51:1757:d0ce:320e"; })
+              // (vbNet "lan" {
+                ula = "fd9e:adea:e09c:9707";
+                mDNS = true;
+              });
+          };
 
           services.resolved.settings.Resolve.MulticastDNS = lib.mkIf useForwarding "resolve";
           networking.firewall.interfaces = lib.mkIf useForwarding (
-            lib.genAttrs [ "vb-lan" "vb-wan" ] (interface: {
+            lib.genAttrs [ lanName wanName ] (interface: {
               allowedUDPPorts = [ 5353 ]; # mDNS
             })
-            // lib.genAttrs [ "vrf-lan" "mv-lan" ] (_: {
+            // lib.genAttrs [ ingressName ] (_: {
               allowedUDPPorts = allowedPorts "udp";
               allowedTCPPorts = allowedPorts "tcp";
             })
           );
 
           services.resolved.settings.Resolve.DNSStubListener = false;
+          boot.kernel.sysctl."net.ipv6.bindv6only" = false;
           systemd.services = {
             systemd-networkd.serviceConfig = {
               # Easier debugging of DHCPv6
@@ -290,6 +294,7 @@ in
               }:
               let
                 target = "${containerName}.local:${toString port}";
+                interface = "so-bindtodevice=${ingressName}";
               in
               {
                 name = "forward@${protocol}_${toString port}";
@@ -298,18 +303,20 @@ in
                   wants = [ "network-online.target" ];
                   wantedBy = [ "multi-user.target" ];
                   script = lib.concatStringsSep " " (
+                    # TCP6/UDP4 listens for both IPv4 and IPv6 as
+                    # /proc/sys/net/ipv6/bindv6only is turned off
                     if protocol == "tcp" then
                       [
                         (lib.getExe pkgs.socat)
                         "-d -T 60"
-                        "TCP4-LISTEN:${toString port},fork,reuseaddr"
+                        "TCP6-LISTEN:${toString port},fork,reuseaddr"
                         "TCP6:${target}"
                       ]
                     else
                       [
                         (lib.getExe pkgs.socat)
                         "-d -T 20"
-                        "UDP4-RECVFROM:${toString port},fork,reuseaddr"
+                        "UDP6-RECVFROM:${toString port},fork,reuseaddr"
                         "UDP6-SENDTO:${target}"
                       ]
                   );
@@ -367,11 +374,6 @@ in
             hostBridge = lib.mkDefault cfg.bridgeNames.lan;
 
             config = lib.recursiveUpdate resolverFix {
-              environment.systemPackages = with pkgs; [
-                dig
-                traceroute
-              ];
-
               networking.firewall.interfaces.eth0.allowedUDPPorts = lib.mkIf mDNS [ 5353 ]; # mDNS
               services.avahi = lib.mkIf mDNS {
                 allowInterfaces = [ "eth0" ];

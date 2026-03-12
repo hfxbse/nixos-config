@@ -145,52 +145,86 @@ in
           boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
 
           services.resolved.settings.Resolve.MulticastDNS = "resolve";
-          networking.firewall.interfaces = lib.genAttrs [ veth lanVb ] (_: {
-            allowedUDPPorts = [ 5353 ]; # mDNS
-          });
+          networking.firewall = {
+            checkReversePath = "loose";
+            interfaces = lib.genAttrs [ veth lanVb ] (_: {
+              allowedUDPPorts = [ 5353 ]; # mDNS
+            });
+          };
 
           systemd.network = {
             enable = true;
-            networks = {
-              "30-${config.server.ingress.bridgeNames.lan}" = {
-                matchConfig.Name = [
-                  lanVb
-                  wanVb
-                ];
-                networkConfig = {
-                  IPv6SendRA = false;
-                  IPv6AcceptRA = true;
-                  IPv6Forwarding = true;
-                };
+            netdevs."10-vrf-wan" = {
+              netdevConfig = {
+                Name = "vrf-wan";
+                Kind = "vrf";
               };
-
-              "40-${veth}" = {
-                matchConfig.Name = veth;
-
-                address = [ "${ulaPrefix}::1/64" ];
-                ipv6Prefixes = [ { Prefix = "${ulaPrefix}::/64"; } ];
-                networkConfig = {
-                  IPv6SendRA = true;
-                  IPv6AcceptRA = false;
-                  IPv6Forwarding = true;
-                  MulticastDNS = "resolve";
-                };
-              };
+              vrfConfig.Table = 2000;
             };
+
+            networks =
+              let
+                vbNet =
+                  interface:
+                  {
+                    vrf ? null,
+                  }:
+                  {
+                    "30-${interface}" = {
+                      matchConfig.Name = interface;
+                      networkConfig = {
+                        IPv6SendRA = false;
+                        IPv6AcceptRA = true;
+                        IPv6Forwarding = true;
+                        VRF = lib.mkIf (vrf != null) "vrf-${vrf}";
+                      };
+                    };
+                  };
+              in
+              vbNet lanVb { }
+              // vbNet wanVb { }
+              // {
+                "40-${veth}" = {
+                  matchConfig.Name = veth;
+
+                  address = [ "${ulaPrefix}::1/64" ];
+                  ipv6Prefixes = [ { Prefix = "${ulaPrefix}::/64"; } ];
+                  networkConfig = {
+                    IPv6SendRA = true;
+                    IPv6AcceptRA = false;
+                    IPv6Forwarding = true;
+                    MulticastDNS = "resolve";
+                  };
+                };
+              };
           };
 
           # NAT66 for the HTTP network
           # Provides internet access without assigning public IPv6 addresses
           networking.nftables = {
             enable = true;
-            ruleset = ''
-              table ip6 nat {
-                chain postrouting {
-                  type nat hook postrouting priority srcnat; policy accept;
-                  iifname "${veth}" oifname { "${lanVb}", "${wanVb}" } masquerade
-                }
-              }
-            '';
+            tables = {
+              nat = {
+                family = "ip6";
+                content = ''
+                  chain postrouting {
+                    type nat hook postrouting priority srcnat; policy accept;
+                    iifname "${veth}" oifname { "${lanVb}", "${wanVb}" } masquerade
+                  }
+                '';
+              };
+
+              isolate-http = {
+                family = "inet";
+                content = ''
+                  chain forward {
+                    type filter hook forward priority 0; policy accept;
+                    ct state established,related accept
+                    iifname { "${lanVb}", "${wanVb}" } oifname ${veth} drop;
+                  }
+                '';
+              };
+            };
           };
 
           networking.firewall.allowedTCPPorts = builtins.attrValues cfg.ports;

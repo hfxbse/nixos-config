@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   types = lib.types;
   cfg = config.server;
@@ -146,7 +151,13 @@ in
         containerName: container: {
           autoStart = lib.mkDefault true;
           privateUsers = lib.mkDefault "pick";
-          config.system.stateVersion = lib.mkDefault config.system.stateVersion;
+          config = {
+            system.stateVersion = lib.mkDefault config.system.stateVersion;
+            environment.systemPackages = with pkgs; [
+              dnsutils
+              traceroute
+            ];
+          };
 
           bindMounts =
             (lib.flip builtins.mapAttrs container.secrets (
