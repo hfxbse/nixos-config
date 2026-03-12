@@ -7,7 +7,11 @@
     ./tls.nix
   ];
 
-  server.ingress.wan = "br-host";
+  server.ingress = {
+    wan = "br-host";
+    gatewayLLA = "fe80::a96:d7ff:fe70:357b";
+  };
+
   virtualisation.vmVariant = {
     # Accessing websites locally via Firefox during testing:
     # Within about:config set `network.dns.localDomains` to be a

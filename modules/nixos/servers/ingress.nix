@@ -41,6 +41,11 @@ in
       type = types.types.str;
     };
 
+    gatewayLLA = lib.mkOption {
+      description = "LLA address of the gateway connected to the WAN interface";
+      type = types.str;
+    };
+
     bridgeNames = {
       wan = lib.mkOption {
         description = "Name of the host bridge receiving ingress from WAN";
@@ -196,15 +201,28 @@ in
           networking.firewall.checkReversePath = "loose";
           networking.nftables = {
             enable = true;
-            tables.lan-forwarding-only = {
-              family = "inet";
-              content = ''
-                chain forward {
-                  type filter hook forward priority 0; policy accept;
-                  iifname "${ingressName}" oifname { "${lanName}" } drop;
-                  iifname "${wanName}" oifname { "${lanName}" } drop;
-                }
-              '';
+            tables = {
+              dmz = {
+                # Prevent access to devices on the LAN
+                family = "ip6";
+                content = ''
+                  chain forward {
+                    type filter hook forward priority filter; policy accept;
+                    ct state established,related accept
+                    oifname "${ingressName}" rt nexthop != ${cfg.gatewayLLA} drop;
+                  }
+                '';
+              };
+              lan-forwarding-only = {
+                family = "inet";
+                content = ''
+                  chain forward {
+                    type filter hook forward priority 0; policy accept;
+                    iifname "${ingressName}" oifname { "${lanName}" } drop;
+                    iifname "${wanName}" oifname { "${lanName}" } drop;
+                  }
+                '';
+              };
             };
           };
 
