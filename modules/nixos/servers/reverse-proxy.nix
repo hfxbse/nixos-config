@@ -129,6 +129,23 @@ in
       };
     };
 
+    virtualisation.vmVariant.containers.${containerName}.config = {
+      # Networking breakes without GUA
+      # Ignore WAN interface for routing, everything has to go in via
+      # a local IPv4 anyways because of QEMUs limitations
+      networking.nftables.tables.http-isolation.enable = false;
+      systemd.network = {
+        networks."30-${wanVb}".networkConfig.VRF = "vrf-wan";
+        netdevs."10-vrf-wan" = {
+          netdevConfig = {
+            Name = "vrf-wan";
+            Kind = "vrf";
+          };
+          vrfConfig.Table = 2000;
+        };
+      };
+    };
+
     containers = {
       ${containerName} = {
         hostBridge = null;
@@ -154,35 +171,21 @@ in
 
           systemd.network = {
             enable = true;
-            netdevs."10-vrf-wan" = {
-              netdevConfig = {
-                Name = "vrf-wan";
-                Kind = "vrf";
-              };
-              vrfConfig.Table = 2000;
-            };
-
             networks =
               let
-                vbNet =
-                  interface:
-                  {
-                    vrf ? null,
-                  }:
-                  {
-                    "30-${interface}" = {
-                      matchConfig.Name = interface;
-                      networkConfig = {
-                        IPv6SendRA = false;
-                        IPv6AcceptRA = true;
-                        IPv6Forwarding = true;
-                        VRF = lib.mkIf (vrf != null) "vrf-${vrf}";
-                      };
+                vbNet = interface: {
+                  "30-${interface}" = {
+                    matchConfig.Name = interface;
+                    networkConfig = {
+                      IPv6SendRA = false;
+                      IPv6AcceptRA = true;
+                      IPv6Forwarding = true;
                     };
                   };
+                };
               in
-              vbNet lanVb { }
-              // vbNet wanVb { }
+              vbNet lanVb
+              // vbNet wanVb
               // {
                 "40-${veth}" = {
                   matchConfig.Name = veth;

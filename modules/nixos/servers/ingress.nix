@@ -139,14 +139,19 @@ in
 
       # Enable NAT66 when running as VM as their ain't any global IPv6 address
       boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
-      containers.ingress.config.networking.nftables.ruleset = ''
-        table ip6 nat {
-          chain postrouting {
-            type nat hook postrouting priority srcnat; policy accept;
-            iifname "${lanName}" oifname "${ingressName}" masquerade
-          }
-        }
-      '';
+      containers.ingress.config.networking.nftables.tables = {
+        dmz.enable = false;
+        lan-isolation.enable = false;
+        nat = {
+          family = "ip6";
+          content = ''
+            chain postrouting {
+              type nat hook postrouting priority srcnat; policy accept;
+              iifname "${lanName}" oifname "${ingressName}" masquerade
+            }
+          '';
+        };
+      };
     };
 
     networking.firewall.enable = true;
@@ -213,7 +218,7 @@ in
                   }
                 '';
               };
-              lan-forwarding-only = {
+              lan-isolation = {
                 family = "inet";
                 content = ''
                   chain forward {
