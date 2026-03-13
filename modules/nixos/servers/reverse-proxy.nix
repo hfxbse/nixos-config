@@ -129,23 +129,6 @@ in
       };
     };
 
-    virtualisation.vmVariant.containers.${containerName}.config = {
-      # Networking breakes without GUA
-      # Ignore WAN interface for routing, everything has to go in via
-      # a local IPv4 anyways because of QEMUs limitations
-      networking.nftables.tables.http-isolation.enable = false;
-      systemd.network = {
-        networks."30-${wanVb}".networkConfig.VRF = "vrf-wan";
-        netdevs."10-vrf-wan" = {
-          netdevConfig = {
-            Name = "vrf-wan";
-            Kind = "vrf";
-          };
-          vrfConfig.Table = 2000;
-        };
-      };
-    };
-
     containers = {
       ${containerName} = {
         hostBridge = null;
@@ -306,5 +289,22 @@ in
         };
       };
     });
+
+    virtualisation.vmVariant.containers.${containerName}.config = {
+      # Networking breakes without GUA
+      # Ignore WAN interface for routing, everything has to go in via
+      # a local IPv4 anyways because of QEMUs limitations
+      networking.nftables.tables.http-isolation.enable = false;
+      systemd.network = {
+        networks."30-${wanVb}".networkConfig.VRF = "vrf-wan";
+        netdevs."10-vrf-wan" = {
+          netdevConfig = {
+            Name = "vrf-wan";
+            Kind = "vrf";
+          };
+          vrfConfig.Table = 2000;
+        };
+      };
+    };
   };
 }

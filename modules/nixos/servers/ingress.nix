@@ -93,67 +93,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    virtualisation.vmVariant = {
-      virtualisation =
-        let
-          # Docs are lying, $QEMU_NET_OPTS is not set with the default values
-          # Copying code snipped from nixpkgs but using lib.concatMapStringsSep not lib.concatMapStrings
-          # See https://github.com/NixOS/nixpkgs/blob/fabb8c9deee281e50b1065002c9828f2cf7b2239/nixos/modules/virtualisation/qemu-vm.nix#L1247
-          forwardingOptions = lib.concatMapStringsSep "," (
-            {
-              proto,
-              from,
-              host,
-              guest,
-            }:
-            if from == "host" then
-              "hostfwd=${proto}:${host.address}:${toString host.port}-"
-              + "${guest.address}:${toString guest.port}"
-            else
-              "'guestfwd=${proto}:${guest.address}:${toString guest.port}-"
-              + "cmd:${pkgs.netcat}/bin/nc ${host.address} ${toString host.port}'"
-          ) config.virtualisation.vmVariant.virtualisation.forwardPorts;
-        in
-        {
-          # By default deprecated side-local addresses are chosen by QEMU
-          # When setting an ULA, internet connectivity breaks because of this
-          # Forcing QEMU to use an ULA as well fixes this.
-          qemu.networkingOptions = lib.mkForce [
-            "-net nic,netdev=user.0,model=virtio"
-            "-netdev user,id=user.0,${forwardingOptions},ipv6-prefix=fd00:2e57:eb00:74df::,ipv6-prefixlen=64,\${QEMU_NET_OPTS:+,$QEMU_NET_OPTS}"
-          ];
-
-          forwardPorts = map (
-            { port, protocol, ... }:
-            {
-              from = "host";
-              host.port = port;
-              guest = {
-                inherit port;
-                address = "10.0.2.16"; # macVlan interface
-              };
-              proto = protocol;
-            }
-          ) config.virtualisation.vmVariant.server.ingress.forwardPorts;
-        };
-
-      # Enable NAT66 when running as VM as their ain't any global IPv6 address
-      boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
-      containers.ingress.config.networking.nftables.tables = {
-        dmz.enable = false;
-        lan-isolation.enable = false;
-        nat = {
-          family = "ip6";
-          content = ''
-            chain postrouting {
-              type nat hook postrouting priority srcnat; policy accept;
-              iifname "${lanName}" oifname "${ingressName}" masquerade
-            }
-          '';
-        };
-      };
-    };
-
     networking.firewall.enable = true;
     networking.nftables.enable = true;
 
@@ -318,7 +257,6 @@ in
               }:
               let
                 target = "${containerName}.local:${toString port}";
-                interface = "so-bindtodevice=${ingressName}";
               in
               {
                 name = "forward@${protocol}_${toString port}";
@@ -422,5 +360,66 @@ in
         )
       )
     ];
+
+    virtualisation.vmVariant = {
+      virtualisation =
+        let
+          # Docs are lying, $QEMU_NET_OPTS is not set with the default values
+          # Copying code snipped from nixpkgs but using lib.concatMapStringsSep not lib.concatMapStrings
+          # See https://github.com/NixOS/nixpkgs/blob/fabb8c9deee281e50b1065002c9828f2cf7b2239/nixos/modules/virtualisation/qemu-vm.nix#L1247
+          forwardingOptions = lib.concatMapStringsSep "," (
+            {
+              proto,
+              from,
+              host,
+              guest,
+            }:
+            if from == "host" then
+              "hostfwd=${proto}:${host.address}:${toString host.port}-"
+              + "${guest.address}:${toString guest.port}"
+            else
+              "'guestfwd=${proto}:${guest.address}:${toString guest.port}-"
+              + "cmd:${pkgs.netcat}/bin/nc ${host.address} ${toString host.port}'"
+          ) config.virtualisation.vmVariant.virtualisation.forwardPorts;
+        in
+        {
+          # By default deprecated side-local addresses are chosen by QEMU
+          # When setting an ULA, internet connectivity breaks because of this
+          # Forcing QEMU to use an ULA as well fixes this.
+          qemu.networkingOptions = lib.mkForce [
+            "-net nic,netdev=user.0,model=virtio"
+            "-netdev user,id=user.0,${forwardingOptions},ipv6-prefix=fd00:2e57:eb00:74df::,ipv6-prefixlen=64,\${QEMU_NET_OPTS:+,$QEMU_NET_OPTS}"
+          ];
+
+          forwardPorts = map (
+            { port, protocol, ... }:
+            {
+              from = "host";
+              host.port = port;
+              guest = {
+                inherit port;
+                address = "10.0.2.16"; # macVlan interface
+              };
+              proto = protocol;
+            }
+          ) config.virtualisation.vmVariant.server.ingress.forwardPorts;
+        };
+
+      # Enable NAT66 when running as VM as their ain't any global IPv6 address
+      boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
+      containers.ingress.config.networking.nftables.tables = {
+        dmz.enable = false;
+        lan-isolation.enable = false;
+        nat = {
+          family = "ip6";
+          content = ''
+            chain postrouting {
+              type nat hook postrouting priority srcnat; policy accept;
+              iifname "${lanName}" oifname "${ingressName}" masquerade
+            }
+          '';
+        };
+      };
+    };
   };
 }
