@@ -77,6 +77,10 @@ in
                 public = lib.mkEnableOption {
                   description = "Allow access from the public internet.";
                 };
+
+                internal = lib.mkEnableOption {
+                  description = "Allow access from other HTTP services";
+                };
               };
             }
           )
@@ -276,6 +280,7 @@ in
             ''
             + frontend "lan" lanVb
             + frontend "wan" wanVb
+            + frontend "internal" veth
             + lib.pipe cfg.virtualHosts [
               (lib.mapAttrsToList (
                 domain: cfgHost:
@@ -294,7 +299,9 @@ in
                       server ${serverName} ${origin} resolvers sys init-addr last,none
                   '';
                 in
-                backend "lan" + lib.optionalString cfgHost.public (backend "wan")
+                backend "lan"
+                + lib.optionalString cfgHost.internal (backend "internal")
+                + lib.optionalString cfgHost.public (backend "wan")
               ))
               lib.concatStrings
             ];

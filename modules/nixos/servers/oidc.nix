@@ -42,6 +42,7 @@ in
           inherit containerName;
           port = pocket-id.settings.PORT;
           public = true;
+          internal = true;
         };
 
         containers.oidc = {
