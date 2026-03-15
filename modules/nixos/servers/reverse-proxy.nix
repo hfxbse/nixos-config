@@ -112,6 +112,18 @@ in
           protocol = "tcp";
         }))
       ];
+
+      ddns.containers = {
+        # Local only sides
+        ingress = {
+          interface = "mv-ingress";
+        };
+
+        # Public sides
+        ${containerName} = {
+          interface = wanVb;
+        };
+      };
     };
 
     systemd.network = {

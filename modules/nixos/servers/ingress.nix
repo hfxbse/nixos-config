@@ -285,8 +285,8 @@ in
 
                   serviceConfig = rec {
                     Restart = "always";
-                    # Hardening
                     AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
+                    # Hardening
                     CapabilityBoundingSet = AmbientCapabilities;
                     RestrictAddressFamilies = [
                       "AF_INET"

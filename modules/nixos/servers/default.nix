@@ -10,6 +10,7 @@ let
 in
 {
   imports = [
+    ./ddns.nix
     ./dns.nix
     ./dummy.nix
     ./dummy-http.nix
