@@ -113,17 +113,31 @@ in
         }))
       ];
 
-      ddns.containers = {
-        # Local only sides
-        ingress = {
-          interface = "mv-ingress";
-        };
+      ddns.containers =
+        let
+          domains =
+            { public }:
+            lib.pipe cfg.virtualHosts [
+              (lib.filterAttrs (name: config: config.public == public))
+              builtins.attrNames
+            ];
 
-        # Public sides
-        ${containerName} = {
-          interface = wanVb;
+          localDomains = domains { public = false; };
+          publicDomains = domains { public = true; };
+
+          hasDomains = domains: (builtins.length domains > 0);
+        in
+        {
+          ingress = lib.mkIf (hasDomains localDomains) {
+            interface = "mv-ingress";
+            domains = localDomains;
+          };
+
+          ${containerName} = lib.mkIf (hasDomains publicDomains) {
+            interface = wanVb;
+            domains = publicDomains;
+          };
         };
-      };
     };
 
     systemd.network = {

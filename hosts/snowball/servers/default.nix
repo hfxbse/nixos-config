@@ -7,9 +7,13 @@
     ./tls.nix
   ];
 
-  server.ingress = {
-    wan = "br-host";
-    gatewayLLA = "fe80::a96:d7ff:fe70:357b";
+  server = {
+    ingress = {
+      wan = "br-host";
+      gatewayLLA = "fe80::a96:d7ff:fe70:357b";
+    };
+
+    ddns.defaultCredentials.environmentFile = "/var/lib/secrets/ddclient.env";
   };
 
   virtualisation.vmVariant = {

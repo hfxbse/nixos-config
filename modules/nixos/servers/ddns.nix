@@ -38,9 +38,17 @@ in
       description = "Wether to allow the use of ULAs for debugging purposes. NEVER ENABLE IN PRODUCTION!";
     };
 
-    defaultCredentialFile = lib.mkOption {
-      description = "Path to the file containing the default credential for updating DNS records.";
-      type = types.path;
+    defaultCredentials = {
+      protocol = lib.mkOption {
+        description = "Which protocol is used to update the DNS record.";
+        type = types.enum [ "porkbun" ];
+        default = "porkbun";
+      };
+
+      environmentFile = lib.mkOption {
+        description = "Path to the file containing the default credential for updating DNS records.";
+        type = types.path;
+      };
     };
 
     containers = lib.mkOption {
@@ -61,10 +69,18 @@ in
                 type = types.listOf types.str;
               };
 
-              credentialsFile = lib.mkOption {
-                description = "Path to the file containing the credential for updating DNS records.";
-                type = types.path;
-                default = cfg.defaultCredentialFile;
+              credentials = {
+                protocol = lib.mkOption {
+                  description = "Which protocol is used to update the DNS record.";
+                  type = types.enum [ "porkbun" ];
+                  default = cfg.defaultCredentials.protocol;
+                };
+
+                environmentFile = lib.mkOption {
+                  description = "Path to the file containing the credential for updating DNS records.";
+                  type = types.path;
+                  default = cfg.defaultCredentials.environmentFile;
+                };
               };
             };
           }
@@ -111,19 +127,48 @@ in
         });
 
         services =
-          transformContainerNames "ddns" (containerName: rec {
-            requires = [ "ddns@${socketId containerName}.socket" ];
-            after = requires;
-            serviceConfig = {
-              Type = "oneshot";
-              StandardInput = "socket";
-              StandardOutput = "journal";
-              StandardError = "journal";
-              ExecStart = lib.getExe' pkgs.coreutils "cat";
-              # Hardening
-              DynamicUser = true;
-            };
-          })
+          transformContainerNames "ddns" (
+            containerName:
+            let
+              containerCfg = cfg.containers.${containerName};
+              config = pkgs.writeText "ddclient.conf" ''
+                cache="/var/lib/ddns/${socketId containerName}.cache"
+                usev6=cmdv6
+                protocol=${containerCfg.credentials.protocol}
+                ${lib.optionalString (containerCfg.credentials.protocol == "porkbun") ''
+                  apikey_env=PORKBUN_API_KEY
+                  secretapikey_env=PORKBUN_SECRET_API_KEY
+                ''}
+                quiet=no
+                verbose=yes
+                ${lib.concatStringsSep "," containerCfg.domains}
+              '';
+            in
+            rec {
+              requires = [ "ddns@${socketId containerName}.socket" ];
+              after = requires;
+              serviceConfig = defaultServiceHardening // {
+                StateDirectory = "ddns";
+                Type = "oneshot";
+                StandardInput = "socket";
+                StandardOutput = "journal";
+                StandardError = "journal";
+                EnvironmentFile = containerCfg.credentials.environmentFile;
+                # Hardening
+                CapabilityBoundingSet = [ ];
+                RestrictAddressFamilies = [
+                  "AF_INET"
+                  "AF_INET6"
+                  "AF_UNIX"
+                ];
+              };
+              script = ''
+                read -r GUA < /dev/stdin
+                echo "Received new IP address for ${containerName}: $GUA"
+                [[ -n "$GUA" ]] && ${lib.getExe pkgs.ddclient} -file ${config} -cmdv6 "echo $GUA"
+              '';
+            }
+          )
           // transformContainerNames "container" (containerName: rec {
             requires = [ "ddns@${socketId containerName}.socket" ];
             after = requires;
