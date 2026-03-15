@@ -96,6 +96,7 @@ in
         services.reverse-proxy.virtualHosts.${cfg.domain} = {
           containerName = "gallery";
           port = immich.port;
+          public = true;
         };
 
         containers.gallery = {

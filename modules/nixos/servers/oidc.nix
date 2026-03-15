@@ -41,6 +41,7 @@ in
         services.reverse-proxy.virtualHosts.${cfg.domain} = {
           inherit containerName;
           port = pocket-id.settings.PORT;
+          public = true;
         };
 
         containers.oidc = {
