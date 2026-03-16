@@ -186,19 +186,23 @@ in
             enable = true;
             networks =
               let
-                vbNet = interface: {
-                  "30-${interface}" = {
-                    matchConfig.Name = interface;
-                    networkConfig = {
-                      IPv6SendRA = false;
-                      IPv6AcceptRA = true;
-                      IPv6Forwarding = true;
+                vbNet =
+                  interface:
+                  { metric }:
+                  {
+                    "30-${interface}" = {
+                      matchConfig.Name = interface;
+                      networkConfig = {
+                        IPv6SendRA = false;
+                        IPv6AcceptRA = true;
+                        IPv6Forwarding = true;
+                      };
+                      ipv6AcceptRAConfig.RouteMetric = metric;
                     };
                   };
-                };
               in
-              vbNet lanVb
-              // vbNet wanVb
+              vbNet lanVb { metric = 500; }
+              // vbNet wanVb { metric = 100; }
               // {
                 "40-${veth}" = {
                   matchConfig.Name = veth;
