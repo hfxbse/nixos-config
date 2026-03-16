@@ -61,6 +61,7 @@ in
     enable = true;
     dataDir = "/var/lib/immich";
     domain = "gallery.fxbse.com";
+    accelerationDevices = [ "/dev/dri/renderD128" ];
 
     oauth = secretsFiles "oauth" [
       "clientId"
@@ -78,4 +79,6 @@ in
         port = 465;
       };
   };
+
+  virtualisation.vmVariant.server.services.gallery.accelerationDevices = lib.mkForce [ ];
 }

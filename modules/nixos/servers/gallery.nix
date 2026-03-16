@@ -140,6 +140,16 @@ in
       };
 
       containers.gallery = {
+        allowedDevices = lib.flip map cfg.accelerationDevices (device: {
+          node = device;
+          modifier = "rw";
+        });
+
+        bindMounts = lib.genAttrs cfg.accelerationDevices (device: {
+          hostPath = device;
+          isReadOnly = false;
+        });
+
         config =
           let
             mlDir = "/var/lib/immich-machine-learning";
