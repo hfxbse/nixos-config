@@ -18,7 +18,19 @@ let
     networking.useHostResolvConf = lib.mkForce false;
     services.resolved.enable = lib.mkDefault true;
 
-    services.resolved.settings.Resolve.LLMNR = "false";
+    services.resolved.settings.Resolve = {
+      LLMNR = "false";
+      # NAT64
+      DNS = lib.concatStringsSep " " [
+        # nat64.net
+        "2a00:1098:2b::1"
+        "2a01:4f9:c010:3f02::1"
+        "2a00:1098:2c::1"
+        # level66.services
+        "2001:67c:2960::64"
+        "2001:67c:2960::6464"
+      ];
+    };
   };
 
   types = lib.types;
