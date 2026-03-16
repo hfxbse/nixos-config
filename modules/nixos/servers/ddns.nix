@@ -220,8 +220,7 @@ in
               get_gua;
               ${ip} -6 monitor address dev '${interface}' | while read -r _; do
                 # Debounce
-                sleep 2
-                while read -r -t 0 _; do :; done
+                while read -r -t 2 _; do :; done
 
                 get_gua
               done
@@ -229,5 +228,16 @@ in
         };
       }
     );
+
+    virtualisation.vmVariant = {
+      systemd.services."dummy-secrets@pocket-id" = {
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig.Type = "oneshot";
+        script = ''
+          mkdir -p ''$(dirname "${cfg.defaultCredentials.environmentFile}");
+          echo dummy > "${cfg.defaultCredentials.environmentFile}"
+        '';
+      };
+    };
   };
 }
