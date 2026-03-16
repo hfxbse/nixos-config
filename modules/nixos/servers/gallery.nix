@@ -188,7 +188,13 @@ in
                   secret' = directory: name: { _secret = "/run/credentials/${directory}/${name}"; };
                 in
                 {
-                  machineLearning.enabled = true;
+                  machineLearning = {
+                    enabled = true;
+                    clip = {
+                      enabled = true;
+                      modelName = "ViT-L-14-quickgelu__dfn2b";
+                    };
+                  };
 
                   passwordLogin.enabled = !cfg.oauth.enable;
                   oauth =
