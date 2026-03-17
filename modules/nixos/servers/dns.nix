@@ -85,6 +85,7 @@ in
           settings = {
             connectIPVersion = "v6";
             ports.dns = cfg.port;
+            dnssec.validate = true;
             upstreams = {
               init.strategy = "failOnError";
               strategy = "strict";
@@ -122,6 +123,7 @@ in
         };
         services.unbound = {
           enable = true;
+          enableRootTrustAnchor = true;
           # Setting up a recursive resolver
           # See https://docs.pi-hole.net/guides/dns/unbound
           settings = {
