@@ -203,15 +203,23 @@ in
           script =
             let
               ip = lib.getExe' pkgs.iproute2 "ip";
-              awk = lib.getExe pkgs.gawk;
-              filter = lib.optionalString (!cfg.useULA) "| grep -v '^fd'";
+              jq = lib.getExe pkgs.jq;
             in
             /* bash */ ''
               function get_gua {
                 GUA=$(
-                  ${ip} -6 addr ls scope global dev '${interface}' \
-                  | grep mngtmpaddr \
-                  | ${awk} '/inet6/{print $2}' ${filter} #
+                  ${ip} -j -6 addr show dev '${interface}' \
+                      | ${jq} -r '
+                          .[0].addr_info
+                          | map(select(
+                              .scope == "global"
+                              and .mngtmpaddr == true
+                              and .prefixlen == 64
+                              and (.local | startswith("fd") | not)
+                              and .preferred_life_time > 0
+                          ))
+                          | .[0].local
+                      '
                 )
 
                 [[ -n "$GUA" ]] && echo "$GUA" > '/run/ddns/${interface}'

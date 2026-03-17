@@ -45,6 +45,27 @@ let
       (builtins.filter (port: port.protocol == protocol))
       (map ({ port, ... }: port))
     ];
+
+  serviceHardening = {
+    # Hardening
+    DynamicUser = true;
+    NoNewPrivileges = true;
+    PrivateTmp = true;
+    PrivateDevices = true;
+    PrivateMounts = true;
+    ProtectClock = true;
+    ProtectControlGroups = true;
+    ProtectHome = true;
+    ProtectHostname = true;
+    ProtectKernelLogs = true;
+    ProtectKernelModules = true;
+    ProtectKernelTunables = true;
+    ProtectSystem = "strict";
+    RestrictNamespaces = true;
+    RestrictRealtime = true;
+    RestrictSUIDSGID = true;
+    LockPersonality = true;
+  };
 in
 {
   options.server.ingress = {
@@ -258,6 +279,41 @@ in
               # Easier debugging of DHCPv6
               Environment = "SYSTEMD_LOG_LEVEL=debug";
             };
+
+            prefix-deprecating = rec {
+              # Needed as the upstream router does only advertise the new prefix.
+              # The router is setting the preferred life time of the old prefix to 0
+              # instead of deprecating explicitly old prefix.
+              # This causes the downstream interfaces not annoucning the new prefix
+              # until the old one is completely invalid, which can take hours to
+              # happen.
+              after = [ "network.target" ];
+              requires = after;
+              wantedBy = [ "multi-user.target" ];
+              serviceConfig = serviceHardening // rec {
+                Restart = "always";
+                RestartSec = "2s";
+                AmbientCapabilities = [ "CAP_NET_ADMIN" ];
+                CapabilityBoundingSet = AmbientCapabilities;
+                # Hardening
+                RestrictAddressFamilies = [ "AF_NETLINK" ];
+              };
+              script =
+                let
+                  ip = lib.getExe' pkgs.iproute2 "ip";
+                in
+                /* bash */ ''
+                  ${ip} -6 monitor address dev '${ingressName}' | while read -r _; do
+                    # Debounce
+                    while read -r -t 2 _; do :; done
+                    ip=$(${ip} -6 addr show '${ingressName}')
+                    if echo "$ip" | grep -q "preferred_lft 0"; then
+                      ${ip} link set ${ingressName} down
+                      ${ip} link set ${ingressName} up
+                    fi
+                  done
+                '';
+            };
           }
           // lib.pipe cfg.forwardPorts [
             (map (
@@ -295,35 +351,18 @@ in
                       ]
                   );
 
-                  serviceConfig = rec {
+                  serviceConfig = serviceHardening // rec {
                     Restart = "always";
                     AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
-                    # Hardening
                     CapabilityBoundingSet = AmbientCapabilities;
+                    # Hardening
                     RestrictAddressFamilies = [
                       "AF_INET"
                       "AF_INET6"
                       "AF_UNIX"
                     ];
-                    DynamicUser = true;
-                    NoNewPrivileges = true;
                     MemoryMax = "128M";
                     TasksMax = 1000;
-                    PrivateTmp = true;
-                    PrivateDevices = true;
-                    PrivateMounts = true;
-                    ProtectClock = true;
-                    ProtectControlGroups = true;
-                    ProtectHome = true;
-                    ProtectHostname = true;
-                    ProtectKernelLogs = true;
-                    ProtectKernelModules = true;
-                    ProtectKernelTunables = true;
-                    ProtectSystem = "strict";
-                    RestrictNamespaces = true;
-                    RestrictRealtime = true;
-                    RestrictSUIDSGID = true;
-                    LockPersonality = true;
                   };
                 };
               }
