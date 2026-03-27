@@ -75,6 +75,7 @@
             "ollamadiffuser"
             "sd-cpp-webui"
             "quick-template"
+            "scan-crop"
           ]
           (
             name:
