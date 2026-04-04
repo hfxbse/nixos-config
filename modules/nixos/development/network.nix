@@ -31,7 +31,6 @@ in
 
     users.users.${config.user.name}.packages = with pkgs; [
       dnsutils
-      docker-compose
       iperf3
       nmap
       tcpdump
