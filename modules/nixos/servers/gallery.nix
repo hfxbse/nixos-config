@@ -169,7 +169,6 @@ in
               inherit (cfg) accelerationDevices;
               enable = true;
               openFirewall = true;
-              database.enableVectors = false;
               host = "::";
 
               machine-learning = {
