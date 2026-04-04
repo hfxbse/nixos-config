@@ -44,7 +44,7 @@ writeShellScriptBin "scan-crop" ''
   BOX=$(
     echo "$BOX" \
     | sed -E "s/x[0-9]+/x''${H}/" \
-    | sed -E "s/^([0-9]+)/$(( $(echo "$BOX" | grep -oP '^\d+') - 5 ))/"
+    | sed -E "s/^([0-9]+)/$(( $(echo "$BOX" | grep -oP '^\d+') - 10 ))/"
   );
   echo "Cropping to $BOX";
 

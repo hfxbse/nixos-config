@@ -62,7 +62,6 @@ in
         geary
         totem
         yelp
-        simple-scan
         gnome-music
         gnome-maps
         gnome-contacts

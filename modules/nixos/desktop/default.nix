@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -49,6 +50,15 @@ in
     users.groups.input.members = lib.optional config.hardware.wooting.enable user.name;
 
     services.printing.enable = true;
+    hardware.sane = {
+      enable = true;
+      backends-package = pkgs.sane-backends.overrideAttrs {
+        # Enable potentially dangerous Canon 4400F support
+        fixupPhase = ''
+          sed -i 's/#usb 0x04a9 0x2228/usb 0x04a9 0x2228/' $out/etc/sane.d/genesys.conf
+        '';
+      };
+    };
 
     # Enable automatic login for the user.
     services.displayManager.autoLogin.enable = cfg.login == "auto";
