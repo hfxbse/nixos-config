@@ -41,6 +41,7 @@ in
       ++ lib.optionals cfg.imageEditing.enable (
         with pkgs;
         [
+          darktable
           gimp
           inkscape
         ]
