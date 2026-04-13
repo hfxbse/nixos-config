@@ -15,6 +15,9 @@ in
     networking.networkmanager.enable = true;
     users.users.${config.user.name}.extraGroups = [ "networkmanager" ];
 
+    # Required for enterprise WiFi like eduroam via NetworkManager
+    networking.wireless.enableHardening = false;
+
     # Allow sharing network connections on demand
     networking.firewall = {
       enable = lib.mkDefault true;
