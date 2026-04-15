@@ -24,6 +24,7 @@
     clangd.enable = true;
     cssls.enable = true;
     ltex.enable = true;
+    metals.enable = true;
     nixd = {
       enable = true;
       config.formatting = {
