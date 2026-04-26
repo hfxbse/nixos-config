@@ -11,7 +11,7 @@ let
     ]
   );
 in
-writeShellScriptBin "compile-latex" ''
+writeShellScriptBin "compile-latex" /* bash */ ''
   set -e;
 
   DOC="$(pwd)/main.tex";
@@ -20,9 +20,9 @@ writeShellScriptBin "compile-latex" ''
 
   while getopts "f:o:h" OPT; do
     case $OPT in
-      f) DOC=$(readlink -f "$OPTARG");;
+      f) DOC="$(readlink -f "$OPTARG")";;
       h) HELP=true;;
-      o) OUT=$(readlink -f "$OPTARG");;
+      o) OUT="$(readlink -f "$OPTARG")";;
     esac
   done
 
@@ -41,13 +41,13 @@ writeShellScriptBin "compile-latex" ''
 
   # Mirror the structure of the source directories
   # pdflatex cannot write the output files otherwise
-  DOC_DIR=$(dirname $DOC);
-  for SRC_DIR in $(find $DOC_DIR -type d -not -path "$OUT*"); do
-    mkdir -p "''${SRC_DIR/$DOC_DIR/$OUT}";
-  done
+  DOC_DIR="$(dirname "$DOC")";
+  echo $DOC $DOC_DIR
+  find "$DOC_DIR" -type d -not -path "$OUT*" -exec bash -c \
+    'mkdir -p "''${1/$2/$3}"' _ {} "$DOC_DIR" "$OUT" \;
 
   # Required to get relative paths inside LaTeX to work
-  cd $DOC_DIR;
+  cd "$DOC_DIR";
 
   ${tools}/bin/pdflatex $pdflatexOptions -output-directory="$OUT" "$DOC";
   set +e;
