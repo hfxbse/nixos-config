@@ -48,12 +48,18 @@ in
       type = lib.types.ints.unsigned;
       description = "Time between the last backup completion and the next start";
     };
+
+    optOutFilenames = lib.mkOption {
+      default = [ ];
+      type = lib.types.listOf lib.types.str;
+      description = "Excludes the directoy from the backup if a file matches any of the specified names";
+    };
   };
 
   config.services.restic.backups =
     let
       environment = "${pkgs.writeText "restic-environment" ''
-        GOMAXPROCS=${builtins.toString cfg.cpuLimit}
+        GOMAXPROCS=${toString cfg.cpuLimit}
       ''}";
 
       paths = lib.concatStringsSep " " cfg.volumePaths;
@@ -69,7 +75,7 @@ in
         passwordFile = cfg.repository.passwordFile;
 
         timerConfig = {
-          OnCalendar = "*-*-* 0/${builtins.toString cfg.interval}:00:00";
+          OnCalendar = "*-*-* 0/${toString cfg.interval}:00:00";
           Persistent = true;
           RandomizedDelaySec = "10m";
         };
@@ -89,7 +95,8 @@ in
           "--compression=max"
           "--exclude-caches"
           "--exclude-file=${./exclude.txt}"
-        ];
+        ]
+        ++ map (filename: "--exclude-if-present ${filename}") cfg.optOutFilenames;
       };
     };
 }

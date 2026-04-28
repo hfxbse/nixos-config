@@ -71,5 +71,7 @@ in
 
     system.autoUpgrade.allowReboot = false;
     nixpkgs.config.allowUnfree = true;
+
+    backups.optOutFilenames = [ ".no-backup" ];
   };
 }
