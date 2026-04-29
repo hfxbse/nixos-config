@@ -72,8 +72,7 @@
             "flaketex"
             "jeniffer2"
             "neural-pixel"
-            "ollamadiffuser"
-            "sd-cpp-webui"
+            "sdcpp-webui"
             "quick-template"
             "scan-crop"
           ]
@@ -94,10 +93,12 @@
             inherit pkgs;
             module = ./modules/neovim/neovim.nix;
           };
+          stable-diffusion-cpp-vulkan = pkgs.stable-diffusion-cpp-vulkan;
         };
 
       overlays = lib.genAttrs [
         "image-nvim"
+        "stable-diffusion-cpp"
         "sieve-editor-gui"
       ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; }));
 
