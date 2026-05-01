@@ -21,7 +21,7 @@
     "zswap.shrinker_enabled=1"
 
     "amdgpu.gpu_recovery=1"
-    "amdgpu.lockup_timeout=10000"
+    "amdgpu.lockup_timeout=3600000"
     "iommu=pt"
     "amdgpu.ppfeaturemask=0xffffffff"
   ];
