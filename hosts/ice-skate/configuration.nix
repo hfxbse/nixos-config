@@ -12,6 +12,7 @@
   ];
 
   boot.defaults.secureBoot = true;
+  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v4;
 
   boot.kernelParams = [
     "zswap.enabled=1"
