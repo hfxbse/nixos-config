@@ -10,7 +10,7 @@ in
       domain = "*.${domain}";
       dnsProvider = "porkbun";
       dnsPropagationCheck = true;
-      credentialsFile = "/var/lib/secrets/porkbun/${domain}";
+      environmentFile = "/var/lib/secrets/porkbun/${domain}";
     };
   };
 
@@ -18,6 +18,6 @@ in
 
   virtualisation.vmVariant.security.acme.certs.${domain} = {
     dnsProvider = lib.mkForce "";
-    credentialsFile = lib.mkForce null;
+    environmentFile = lib.mkForce null;
   };
 }
