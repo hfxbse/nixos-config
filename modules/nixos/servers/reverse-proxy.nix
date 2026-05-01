@@ -9,12 +9,12 @@ let
 
   cfg = config.server.services.reverse-proxy;
   containerName = "reverse-proxy";
-  bridgeName = "br-http";
-  ulaPrefix = "fd00:9d1f:b7b7:1721";
+  bridgeName = zone: "br-http-${zone}";
 
   lanVb = "vb-rp-lan";
   wanVb = "vb-rp-wan";
-  veth = "vb-http";
+  lanVeth = "vb-http-lan";
+  wanVeth = "vb-http-wan";
 
   portNumber = types.ints.between 0 65535;
 
@@ -55,7 +55,7 @@ in
 
         type = types.attrsOf (
           types.submodule (
-            { ... }:
+            { name, ... }:
             {
               options = {
                 port = lib.mkOption {
@@ -78,8 +78,12 @@ in
                   description = "Allow access from the public internet.";
                 };
 
-                internal = lib.mkEnableOption {
-                  description = "Allow access from other HTTP services";
+                origin = lib.mkOption {
+                  description = "Full HTTPS origin of the virtual host";
+                  type = types.str;
+                  default = "https://${name}${
+                    lib.optionalString (cfg.ports.https != 443) ":${(toString cfg.ports.https)}"
+                  }";
                 };
               };
             }
@@ -144,20 +148,29 @@ in
         };
     };
 
-    systemd.network = {
-      enable = true;
-      netdevs."25-${bridgeName}" = {
-        netdevConfig = {
-          Kind = "bridge";
-          Name = bridgeName;
+    systemd.network =
+      let
+        dev = bridge: {
+          "25-${bridge}" = {
+            netdevConfig = {
+              Kind = "bridge";
+              Name = bridge;
+            };
+          };
         };
-      };
 
-      networks."45-${bridgeName}" = {
-        matchConfig.Name = bridgeName;
-        networkConfig.ConfigureWithoutCarrier = true;
+        net = bridge: {
+          "45-${bridge}" = {
+            matchConfig.Name = bridge;
+            networkConfig.ConfigureWithoutCarrier = true;
+          };
+        };
+      in
+      {
+        enable = true;
+        netdevs = dev (bridgeName "lan") // dev (bridgeName "wan");
+        networks = net (bridgeName "lan") // net (bridgeName "wan");
       };
-    };
 
     containers = {
       ${containerName} = {
@@ -165,7 +178,8 @@ in
         extraVeths = with config.server.ingress; {
           ${lanVb}.hostBridge = bridgeNames.lan;
           ${wanVb}.hostBridge = bridgeNames.wan;
-          ${veth}.hostBridge = bridgeName;
+          ${lanVeth}.hostBridge = bridgeName "lan";
+          ${wanVeth}.hostBridge = bridgeName "wan";
         };
 
         config = {
@@ -177,7 +191,7 @@ in
           services.resolved.settings.Resolve.MulticastDNS = "resolve";
           networking.firewall = {
             checkReversePath = "loose";
-            interfaces = lib.genAttrs [ veth lanVb ] (_: {
+            interfaces = lib.genAttrs [ lanVeth wanVeth lanVb ] (_: {
               allowedUDPPorts = [ 5353 ]; # mDNS
             });
           };
@@ -200,23 +214,29 @@ in
                       ipv6AcceptRAConfig.RouteMetric = metric;
                     };
                   };
+
+                veth =
+                  veth:
+                  { ulaPrefix }:
+                  {
+                    "40-${veth}" = {
+                      matchConfig.Name = veth;
+
+                      address = [ "${ulaPrefix}::1/64" ];
+                      ipv6Prefixes = [ { Prefix = "${ulaPrefix}::/64"; } ];
+                      networkConfig = {
+                        IPv6SendRA = true;
+                        IPv6AcceptRA = false;
+                        IPv6Forwarding = true;
+                        MulticastDNS = "resolve";
+                      };
+                    };
+                  };
               in
               vbNet lanVb { metric = 500; }
               // vbNet wanVb { metric = 100; }
-              // {
-                "40-${veth}" = {
-                  matchConfig.Name = veth;
-
-                  address = [ "${ulaPrefix}::1/64" ];
-                  ipv6Prefixes = [ { Prefix = "${ulaPrefix}::/64"; } ];
-                  networkConfig = {
-                    IPv6SendRA = true;
-                    IPv6AcceptRA = false;
-                    IPv6Forwarding = true;
-                    MulticastDNS = "resolve";
-                  };
-                };
-              };
+              // veth wanVeth { ulaPrefix = "fdd8:8192:8ad1:a1de"; }
+              // veth lanVeth { ulaPrefix = "fd00:9d1f:b7b7:1721"; };
           };
 
           # NAT66 for the HTTP network
@@ -229,7 +249,7 @@ in
                 content = ''
                   chain postrouting {
                     type nat hook postrouting priority srcnat; policy accept;
-                    iifname "${veth}" oifname { "${lanVb}", "${wanVb}" } masquerade
+                    iifname { "${lanVeth}", "${wanVeth}" } oifname { "${lanVb}", "${wanVb}" } masquerade
                   }
                 '';
               };
@@ -239,8 +259,10 @@ in
                   chain forward {
                     type filter hook forward priority 0; policy accept;
                     ct state established,related accept
-                    iifname { "${lanVb}", "${wanVb}" } oifname ${veth} drop;
-                    iifname "${veth}" fib daddr oifname "${lanVb}" drop;
+                    iifname { "${lanVb}", "${wanVb}" } oifname { "${lanVeth}", "${wanVeth}" } drop;
+                    iifname { "${lanVeth}", "${wanVeth}" } fib daddr oifname "${lanVb}" drop;
+                    iifname "${wanVeth}" fib daddr oifname "${lanVeth}" drop;
+                    iifname "${lanVeth}" fib daddr oifname "${wanVeth}" drop;
                   }
                 '';
               };
@@ -282,9 +304,10 @@ in
               resolvers sys
                 parse-resolv-conf
             ''
-            + frontend "lan" lanVb
-            + frontend "wan" wanVb
-            + frontend "internal" veth
+            + frontend "lan-ingress" lanVb
+            + frontend "wan-ingress" wanVb
+            + frontend "lan-internal" lanVeth
+            + frontend "wan-internal" wanVeth
             + lib.pipe cfg.virtualHosts [
               (lib.mapAttrsToList (
                 domain: cfgHost:
@@ -303,29 +326,37 @@ in
                       server ${serverName} ${origin} resolvers sys init-addr last,none
                   '';
                 in
-                backend "lan"
-                + lib.optionalString cfgHost.internal (backend "internal")
-                + lib.optionalString cfgHost.public (backend "wan")
+                backend "lan-ingress"
+                + backend "lan-internal"
+                + lib.optionalString cfgHost.public (backend "wan-ingress")
+                + lib.optionalString cfgHost.public (backend "wan-internal")
               ))
               lib.concatStrings
             ];
         };
       };
     }
-    // lib.genAttrs containerNames (name: {
-      hostBridge = bridgeName;
-      config = {
-        services.avahi = {
-          allowInterfaces = [ "eth0" ];
-          enable = true;
-          ipv4 = false;
-          publish = {
-            enable = true;
-            addresses = true;
+    // lib.pipe cfg.virtualHosts [
+      builtins.attrValues
+      (map (cfgHost: {
+        name = cfgHost.containerName;
+        value = {
+          hostBridge = bridgeName (if cfgHost.public then "wan" else "lan");
+          config = {
+            services.avahi = {
+              allowInterfaces = [ "eth0" ];
+              enable = true;
+              ipv4 = false;
+              publish = {
+                enable = true;
+                addresses = true;
+              };
+            };
           };
         };
-      };
-    });
+      }))
+      builtins.listToAttrs
+    ];
 
     virtualisation.vmVariant.containers.${containerName}.config = {
       # Networking breakes without GUA

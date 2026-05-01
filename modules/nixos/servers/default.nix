@@ -16,6 +16,7 @@ in
     ./dummy-http.nix
     ./gallery.nix
     ./ingress.nix
+    ./monitoring.nix
     ./oidc.nix
     ./reverse-proxy.nix
   ];

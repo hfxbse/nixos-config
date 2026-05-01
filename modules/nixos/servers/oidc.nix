@@ -42,10 +42,9 @@ in
           inherit containerName;
           port = pocket-id.settings.PORT;
           public = true;
-          internal = true;
         };
 
-        containers.oidc = {
+        containers.${containerName} = {
           secrets."${containerName}/secrets.env".path = cfg.environmentFile;
           dataDirs.pocket-id = {
             host.path = cfg.dataDir;
@@ -81,9 +80,7 @@ in
                 (builtins.concatStringsSep ".")
               ];
 
-              APP_URL =
-                with reverse-proxy;
-                "https://${cfg.domain}${lib.optionalString (ports.https != 443) (toString ports.https)}";
+              APP_URL = reverse-proxy.virtualHosts.${cfg.domain}.origin;
 
               EMAIL_LOGIN_NOTIFICATION_ENABLED = true;
               EMAIL_VERIFICATION_ENABLED = true;
