@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -34,6 +35,29 @@ in
       environmentFile = lib.mkOption {
         description = "Path to the environment file which holdes the secrets.";
         type = types.path;
+      };
+
+      extraVolumes = lib.mkOption {
+        description = "Which mount points to monitor besides the filesystem root.";
+        type = types.attrsOf (
+          types.submodule (
+            { name, ... }:
+            {
+              options = {
+                label = lib.mkOption {
+                  description = "The label to show for this mount point in the UI";
+                  type = types.str;
+                };
+
+                path = lib.mkOption {
+                  description = "Path to the mount point.";
+                  type = types.path;
+                  default = name;
+                };
+              };
+            }
+          )
+        );
       };
     };
   };
@@ -109,7 +133,13 @@ in
           smartmon.enable = true;
           environmentFile = cfg.agent.environmentFile;
           environment = {
+            LOG_LEVEL = "debug";
             LISTEN = lib.mkIf cfg.ui.enable "/run/beszel-agent/host.socket";
+            EXTRA_FILESYSTEMS = lib.pipe cfg.agent.extraVolumes [
+              builtins.attrValues
+              (map ({ label, path, ... }: "${path}__${label}"))
+              (lib.concatStringsSep ",")
+            ];
           };
         };
 

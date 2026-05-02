@@ -97,6 +97,7 @@
         };
 
       overlays = lib.genAttrs [
+        "beszel"
         "image-nvim"
         "stable-diffusion-cpp"
         "sieve-editor-gui"
