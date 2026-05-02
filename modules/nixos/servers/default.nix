@@ -154,6 +154,7 @@ in
           autoStart = lib.mkDefault true;
           privateUsers = lib.mkDefault "pick";
           config = {
+            nixpkgs.overlays = config.nixpkgs.overlays;
             system.stateVersion = lib.mkDefault config.system.stateVersion;
             environment.systemPackages = with pkgs; [
               dnsutils
