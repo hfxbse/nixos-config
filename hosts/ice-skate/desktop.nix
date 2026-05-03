@@ -31,7 +31,7 @@
 
           # Does get overridden otherwise
           screen-rotate.extensionUuid
-          hibernate-status-button.extensionUuid
+          power-off-options.extensionUuid
         ];
 
         "org/gnome/shell/extensions/unblank".power = false;

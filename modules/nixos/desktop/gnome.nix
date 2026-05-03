@@ -25,7 +25,7 @@ in
         settings = {
           "org/gnome/mutter".experimental-features = [ "scale-monitor-framebuffer" ];
           "org/gnome/shell".enabled-extensions = with pkgs.gnomeExtensions; [
-            hibernate-status-button.extensionUuid
+            power-off-options.extensionUuid
           ];
         };
       }
@@ -39,7 +39,7 @@ in
     environment.systemPackages = with pkgs; [
       blackbox-terminal
       gnome-network-displays
-      gnomeExtensions.hibernate-status-button
+      gnomeExtensions.power-off-options
       papers
     ];
 
