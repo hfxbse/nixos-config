@@ -12,10 +12,10 @@ stdenv.mkDerivation (finalAttrs: {
   version = "0.1.0";
 
   src = fetchFromGitHub {
-    owner = "leejet";
+    owner = "hfxbse";
     repo = "sdcpp-webui";
-    rev = "797ccf80825cc035508ba9b599b2a21953e7f835";
-    hash = "sha256-j/DAhXl8x0IPwEQoxT4GeQ8KCpBh/otS0NWh8GhiElU=";
+    rev = "6cdbbd81a679327deccc890e62f00074149319d7";
+    hash = "sha256-6FKO/YXmxv6jL1JTpeGmbUQdHPZdjZjRXjHOmC0AmI4=";
   };
 
   nativeBuildInputs = [
