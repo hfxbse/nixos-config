@@ -4,8 +4,6 @@
   ...
 }:
 {
-  facter.reportPath = ./facter.json;
-  virtualisation.vmVariant.facter.reportPath = lib.mkForce ./facter-vm.json;
   imports = [
     ./disk-config.nix
     ./remote-access.nix
@@ -13,6 +11,9 @@
     ./wifi-bridge.nix
     ./zram.nix
   ];
+
+  hardware.facter.reportPath = ./facter.json;
+  virtualisation.vmVariant.hardware.facter.reportPath = lib.mkForce ./facter-vm.json;
 
   boot = {
     # Hardened 6.12 LTS does not boot

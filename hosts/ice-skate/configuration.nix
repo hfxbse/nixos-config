@@ -5,7 +5,6 @@
   ...
 }:
 {
-  facter.reportPath = ./facter.json;
   imports = [
     ./desktop.nix
     ./disk-config.nix
@@ -29,6 +28,7 @@
   # Regression bug for ipu6 starting with Linux 6.16
   # See https://github.com/intel/ipu6-drivers/issues/381
   # The issue prevents the device to be suspended or rebootet properly.
+  hardware.facter.reportPath = ./facter.json;
   hardware.ipu6.enable = lib.mkForce false;
 
   user.name = "fxbse";
