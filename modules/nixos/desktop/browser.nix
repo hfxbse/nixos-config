@@ -90,13 +90,6 @@ in
           default_area = "menupanel";
         };
 
-        "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/file/4666829/video_downloadhelper-latest.xpi";
-          installation_mode = "force_installed";
-          private_browsing = true;
-          default_area = "menupanel";
-        };
-
         "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
           install_url = "https://addons.mozilla.org/firefox/downloads/file/4796063/bitwarden_password_manager-latest.xpi";
           installation_mode = "force_installed";
