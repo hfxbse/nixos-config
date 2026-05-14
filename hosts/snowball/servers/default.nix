@@ -5,6 +5,7 @@
     ./immich.nix
     ./monitoring.nix
     ./oidc.nix
+    ./password-manager.nix
     ./tls.nix
   ];
 

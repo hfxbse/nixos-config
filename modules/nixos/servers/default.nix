@@ -18,6 +18,7 @@ in
     ./ingress.nix
     ./monitoring.nix
     ./oidc.nix
+    ./password-manager.nix
     ./reverse-proxy.nix
   ];
 
