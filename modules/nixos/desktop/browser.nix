@@ -39,6 +39,8 @@ in
         Locked = true;
       };
 
+      PasswordManagerEnabled = false;
+
       SearchEngines = {
         Default = "DuckDuckGo";
         PreventInstalls = true;
@@ -74,13 +76,6 @@ in
           default_area = "menupanel";
         };
 
-        "jid1-ZAdIEUB7XOzOJw@jetpack" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/file/4540706/duckduckgo_for_firefox-latest.xpi";
-          installation_mode = "force_installed";
-          private_browsing = true;
-          default_area = "navbar";
-        };
-
         "zotero@chnm.gmu.edu" = {
           install_url = "https://www.zotero.org/download/connector/dl?browser=firefox";
           installation_mode = "normal_installed";
@@ -100,6 +95,13 @@ in
           installation_mode = "force_installed";
           private_browsing = true;
           default_area = "menupanel";
+        };
+
+        "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4796063/bitwarden_password_manager-latest.xpi";
+          installation_mode = "force_installed";
+          private_browsing = true;
+          default_area = "navbar";
         };
 
         "1094918@gmail.com".installation_mode = "allowed";
