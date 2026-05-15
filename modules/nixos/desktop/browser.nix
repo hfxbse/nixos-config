@@ -97,6 +97,9 @@ in
           default_area = "navbar";
         };
 
+        # DuckDuckGo
+        "jid1-ZAdIEUB7XOzOJw@jetpack".installation_mode = "allowed";
+
         "1094918@gmail.com".installation_mode = "allowed";
       };
 
