@@ -62,8 +62,8 @@ in
           default_area = "menupanel";
         };
 
-        "support@netflux.me" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/file/4382056/netflux-latest.xpi";
+        "{221ca73e-12bd-11f1-b1cd-2cf05d5d458e}" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4724248/netflix_1080p_ua-latest.xpi";
           installation_mode = "force_installed";
           private_browsing = true;
           default_area = "menupanel";
