@@ -97,6 +97,11 @@ in
           default_area = "navbar";
         };
 
+        "de-DE@dictionaries.addons.mozilla.org" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4034565/dictionary_german-latest.xpi";
+          installation_mode = "force_installed";
+        };
+
         # DuckDuckGo
         "jid1-ZAdIEUB7XOzOJw@jetpack".installation_mode = "allowed";
 
