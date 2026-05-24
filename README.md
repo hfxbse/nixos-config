@@ -113,13 +113,3 @@ up an authorized key for an SSH connection can be accomplished via
 ```sh
 nix-build iso.nix --argstr authorizedKey "$(cat ~/.ssh/id_rsa.pub)"
 ```
-
-### CGI WSL
-
-WSL2 configuration using [NixOS-WSL](https://github.com/nix-community/NixOS-WSL).
-
-Build an installation file via
-
-```sh
-sudo nix run .#nixosConfigurations.cgi-wsl.config.system.build.tarballBuilder
-```
