@@ -9,7 +9,6 @@
   };
 
   inputs = {
-    nixpkgs-25-11.url = "github:nixos/nixpkgs?ref=nixos-25.11-small";
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     nixpkgs-container-in-vm-fix = {
       url = "github:hfxbse/nixpkgs?ref=nixos-container-inside-vm-fix";
