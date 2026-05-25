@@ -42,6 +42,7 @@ in
         services.reverse-proxy.virtualHosts.${cfg.domain} = {
           inherit containerName;
           port = vaultwarden.config.ROCKET_PORT;
+          public = true;
         };
 
         containers.${containerName} = {
