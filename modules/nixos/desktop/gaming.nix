@@ -13,6 +13,10 @@ in
     steam.enable = lib.mkEnableOption "Steam support" // {
       default = true;
     };
+
+    minecraft.enable = lib.mkEnableOption "Minecraft client" // {
+      default = true;
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -24,6 +28,8 @@ in
 
     hardware.steam-hardware.enable = cfg.steam.enable;
 
-    users.users.${config.user.name}.packages = with pkgs; [ prismlauncher ];
+    users.users.${config.user.name}.packages =
+      with pkgs;
+      lib.optional cfg.minecraft.enable prismlauncher;
   };
 }
