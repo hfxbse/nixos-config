@@ -97,6 +97,13 @@ in
           default_area = "navbar";
         };
 
+        "frankerfacez@frankerfacez.com" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4687253/frankerfacez-latest.xpi";
+          installation_mode = "force_installed";
+          private_browsing = true;
+          default_area = "menupanel";
+        };
+
         "de-DE@dictionaries.addons.mozilla.org" = {
           install_url = "https://addons.mozilla.org/firefox/downloads/file/4034565/dictionary_german-latest.xpi";
           installation_mode = "force_installed";
