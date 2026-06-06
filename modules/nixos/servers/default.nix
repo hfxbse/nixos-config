@@ -16,6 +16,7 @@ in
     ./dummy-http.nix
     ./gallery.nix
     ./ingress.nix
+    ./minecraft.nix
     ./monitoring.nix
     ./oidc.nix
     ./password-manager.nix
@@ -76,6 +77,12 @@ in
             );
           };
 
+          options.dataDirMode = lib.mkOption {
+            description = "What permission mode to use.";
+            type = types.str;
+            default = "0750"; # rwx r-x ---
+          };
+
           options.secrets = lib.mkOption {
             description = "The secret to be loaded into the container.";
             default = { };
@@ -114,6 +121,7 @@ in
             containerName,
             secrets,
             dataDirs,
+            dataDirMode,
             ...
           }:
           {
@@ -137,7 +145,7 @@ in
                   (map (secret: with secret; "${secretId name}:${path}"))
                 ];
 
-                StateDirectoryMode = "0750"; # rwx r-x ---
+                StateDirectoryMode = dataDirMode;
                 StateDirectory = lib.pipe dataDirs [
                   builtins.attrValues
                   (map ({ host, ... }: lib.removePrefix "/var/lib/" host.path))

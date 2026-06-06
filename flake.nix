@@ -19,6 +19,9 @@
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
+    nix-minecraft.url = "github:Infinidoge/nix-minecraft";
+    nix-minecraft.inputs.nixpkgs.follows = "nixpkgs";
+
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -53,6 +56,7 @@
       overlays = builtins.attrValues self.overlays ++ [
         ownPackages
         inputs.nix-cachyos-kernel.overlays.pinned
+        inputs.nix-minecraft.overlay
       ];
 
       pkgs = import nixpkgs {
@@ -118,6 +122,7 @@
             inputs.disko.nixosModules.disko
             inputs.nixos-wsl.nixosModules.default
             inputs.lanzaboote.nixosModules.lanzaboote
+            inputs.nix-minecraft.nixosModules.minecraft-servers
             nixvim.nixosModules.nixvim
             "${inputs.nixpkgs-container-in-vm-fix}/nixos/modules/virtualisation/nixos-containers.nix"
             ./modules/nixos/default.nix
@@ -139,6 +144,7 @@
         lib.genAttrs [ "ice-skate" "snowball" ] (
           name:
           lib.nixosSystem {
+            specialArgs = { inherit inputs; };
             inherit system;
             modules = genericModules ++ [
               ./hosts/${name}/configuration.nix

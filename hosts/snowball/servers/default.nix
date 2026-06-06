@@ -3,6 +3,7 @@
   imports = [
     ./dns.nix
     ./immich.nix
+    ./minecraft.nix
     ./monitoring.nix
     ./oidc.nix
     ./password-manager.nix
