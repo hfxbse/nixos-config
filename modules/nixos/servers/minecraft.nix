@@ -126,6 +126,14 @@ in
                     url = "https://cdn.modrinth.com/data/gvQqBUqZ/versions/GiCfpS6V/lithium-fabric-0.24.5%2Bmc26.1.2.jar";
                     hash = "sha256-VKUsTmpH7ik16EYH+LDCkmaQ6TZsif2vERVCC/G/MLQ=";
                   })
+                  (fetchurl {
+                    url = "https://cdn.modrinth.com/data/Cnejf5xM/versions/spaSLGmu/rightclickharvest-fabric-4.6.2%2B26.1.x.jar";
+                    hash = "sha256-l/4Ncd6OB015Ll5oTIoI39LIsy6faSwvAXiYw8KH7HQ=";
+                  })
+                  (fetchurl {
+                    url = "https://cdn.modrinth.com/data/IYY9Siz8/versions/JcAOa8aS/jamlib-fabric-2.2.0%2B26.1.x.jar";
+                    hash = "sha256-5m0AyhB0ba/sLdnKwkcgVmU2GbTL5VACJhaa5lkRePc=";
+                  })
                 ];
               };
 
