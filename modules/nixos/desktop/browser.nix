@@ -104,6 +104,13 @@ in
           default_area = "menupanel";
         };
 
+        "chrome-mask@overengineer.dev" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/file/4822042/chrome_mask-latest.xpi";
+          installation_mode = "force_installed";
+          private_browsing = true;
+          default_area = "navbar";
+        };
+
         "de-DE@dictionaries.addons.mozilla.org" = {
           install_url = "https://addons.mozilla.org/firefox/downloads/file/4034565/dictionary_german-latest.xpi";
           installation_mode = "force_installed";
