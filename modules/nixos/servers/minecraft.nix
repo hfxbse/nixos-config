@@ -134,6 +134,10 @@ in
                     url = "https://cdn.modrinth.com/data/IYY9Siz8/versions/JcAOa8aS/jamlib-fabric-2.2.0%2B26.1.x.jar";
                     hash = "sha256-5m0AyhB0ba/sLdnKwkcgVmU2GbTL5VACJhaa5lkRePc=";
                   })
+                  (fetchurl {
+                    url = "https://cdn.modrinth.com/data/3Puj7Mln/versions/2bJ7BAen/quickleafdecay-mc26.1-0.5.2.jar";
+                    hash = "sha256-WRvfrWxTs2tR+SFPqENYIfOR2PAbCJQs8+3kRtQHdac=";
+                  })
                 ];
               };
 
