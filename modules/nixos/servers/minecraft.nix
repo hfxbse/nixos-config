@@ -207,23 +207,28 @@ in
         };
       };
 
-      virtualisation.vmVariant = {
-        containers.${containerName} = {
-          # Connecting to the WAN interface somehow breaks internet access inside the VM
-          hostBridge = lib.mkForce config.server.ingress.bridgeNames.lan;
-        };
+      virtualisation.vmVariant =
+        { config, ... }:
+        let
+          cfg = config.server.services.minecraft;
+        in
+        lib.mkIf cfg.enable {
+          containers.${containerName} = {
+            # Connecting to the WAN interface somehow breaks internet access inside the VM
+            hostBridge = lib.mkForce config.server.ingress.bridgeNames.lan;
+          };
 
-        server.ingress.forwardPorts =
-          map
-            (protocol: {
-              inherit containerName;
-              inherit (cfg) port;
-              inherit protocol;
-            })
-            [
-              "tcp"
-              "udp"
-            ];
-      };
+          server.ingress.forwardPorts =
+            map
+              (protocol: {
+                inherit containerName;
+                inherit (cfg) port;
+                inherit protocol;
+              })
+              [
+                "tcp"
+                "udp"
+              ];
+        };
     };
 }
