@@ -16,7 +16,7 @@ in
 {
   options.server.services.minecraft = {
     enable = lib.mkEnableOption {
-      description = "A dummy server without any services.";
+      description = "A modded Minecraft server.";
     };
 
     port = lib.mkOption {
