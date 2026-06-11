@@ -6,8 +6,18 @@
 }:
 let
   cfg = config.desktop;
+  extensions = with pkgs.gnomeExtensions; [
+    caffeine
+    power-off-options
+  ];
 in
 {
+  options.desktop.gnome.extraExtensions = lib.mkOption {
+    description = "Extra extensions to be install in the GNOME extensions.";
+    type = lib.types.listOf lib.types.package;
+    default = [ ];
+  };
+
   config = lib.mkIf (cfg.enable && cfg.type == "gnome") {
     # https://github.com/NixOS/nixpkgs/issues/149812#issuecomment-3647060694
     environment.extraInit = ''
@@ -24,9 +34,9 @@ in
       {
         settings = {
           "org/gnome/mutter".experimental-features = [ "scale-monitor-framebuffer" ];
-          "org/gnome/shell".enabled-extensions = with pkgs.gnomeExtensions; [
-            power-off-options.extensionUuid
-          ];
+          "org/gnome/shell".enabled-extensions = map ({ extensionUuid, ... }: extensionUuid) (
+            cfg.gnome.extraExtensions ++ extensions
+          );
         };
       }
     ];
@@ -36,12 +46,15 @@ in
       terminal = "blackbox";
     };
 
-    environment.systemPackages = with pkgs; [
-      blackbox-terminal
-      gnome-network-displays
-      gnomeExtensions.power-off-options
-      papers
-    ];
+    environment.systemPackages =
+      with pkgs;
+      [
+        blackbox-terminal
+        gnome-network-displays
+        papers
+      ]
+      ++ extensions
+      ++ cfg.gnome.extraExtensions;
 
     # For network displays
     networking.firewall.allowedTCPPorts = [

@@ -12,14 +12,6 @@ in
 
   config = lib.mkIf cfg.enable {
     hardware.sensor.iio.enable = true;
-    environment.systemPackages = with pkgs.gnomeExtensions; [ screen-rotate ];
-
-    programs.dconf.profiles.user.databases = [
-      {
-        settings = with pkgs.gnomeExtensions; {
-          "org/gnome/shell".enabled-extensions = [ screen-rotate.extensionUuid ];
-        };
-      }
-    ];
+    desktop.gnome.extraExtensions = with pkgs.gnomeExtensions; [ screen-rotate ];
   };
 }

@@ -7,12 +7,11 @@
   desktop = {
     enable = true;
     auto-rotate.enable = true;
-  };
 
-  environment.systemPackages = with pkgs.gnomeExtensions; [
-    caffeine
-    unblank
-  ];
+    gnome.extraExtensions = with pkgs.gnomeExtensions; [
+      unblank
+    ];
+  };
 
   programs.dconf.profiles.user.databases = [
     {
@@ -24,15 +23,6 @@
           sleep-inactive-battery-timeout = lib.gvariant.mkInt32 180;
           sleep-inactive-ac-timeout = lib.gvariant.mkInt32 420;
         };
-
-        "org/gnome/shell".enabled-extensions = with pkgs.gnomeExtensions; [
-          caffeine.extensionUuid
-          unblank.extensionUuid
-
-          # Does get overridden otherwise
-          screen-rotate.extensionUuid
-          power-off-options.extensionUuid
-        ];
 
         "org/gnome/shell/extensions/unblank".power = false;
       };
