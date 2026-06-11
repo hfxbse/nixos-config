@@ -35,6 +35,11 @@
                         mountpoint = "/mnt/immich/memory-card";
                       };
 
+                      "@papra" = {
+                        inherit mountOptions;
+                        mountpoint = "/mnt/papra/memory-card";
+                      };
+
                       "@snapshots".mountpoint = "/mnt/snapshots/memory-card";
                     };
                   };
@@ -64,6 +69,11 @@
                       "@immich" = {
                         inherit mountOptions;
                         mountpoint = "/mnt/immich/usb-drive";
+                      };
+
+                      "@papra" = {
+                        inherit mountOptions;
+                        mountpoint = "/mnt/papra/usb-drive";
                       };
 
                       "@snapshots".mountpoint = "/mnt/snapshots/usb-drive";
@@ -130,6 +140,11 @@
                       "@immich" = {
                         inherit mountOptions;
                         mountpoint = "/mnt/immich/boot-drive";
+                      };
+
+                      "@papra" = {
+                        inherit mountOptions;
+                        mountpoint = "/mnt/papra/boot-drive";
                       };
 
                       "@snapshots".mountpoint = "/mnt/snapshots/boot-drive";

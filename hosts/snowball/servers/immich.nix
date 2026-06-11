@@ -50,8 +50,7 @@ in
     in
     {
       users.${user} = {
-        inherit uid;
-        group = services.immich.group;
+        inherit uid group;
         isSystemUser = true;
       };
       groups.${group}.gid = gid;

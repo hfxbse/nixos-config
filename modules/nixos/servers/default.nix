@@ -12,6 +12,7 @@ in
   imports = [
     ./ddns.nix
     ./dns.nix
+    ./document-management.nix
     ./dummy.nix
     ./dummy-http.nix
     ./gallery.nix

@@ -6,6 +6,7 @@
     ./minecraft.nix
     ./monitoring.nix
     ./oidc.nix
+    ./papra.nix
     ./password-manager.nix
     ./tls.nix
   ];
