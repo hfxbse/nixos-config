@@ -9,6 +9,7 @@ let
   extensions = with pkgs.gnomeExtensions; [
     caffeine
     power-off-options
+    quick-settings-audio-panel
   ];
 in
 {
@@ -37,6 +38,18 @@ in
           "org/gnome/shell".enabled-extensions = map ({ extensionUuid, ... }: extensionUuid) (
             cfg.gnome.extraExtensions ++ extensions
           );
+
+          "org/gnome/shell/extensions/quick-settings-audio-panel" = {
+            panel-type = "merged-panel";
+            merged-panel-position = "top";
+            pactl-path = lib.getExe' pkgs.pulseaudio "pactl";
+
+            create-mpris-controllers = false;
+            mpris-controllers-are-moved = false;
+
+            create-applications-volume-sliders = true;
+            group-applications-volume-sliders = true;
+          };
         };
       }
     ];
