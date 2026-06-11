@@ -39,6 +39,13 @@ in
             cfg.gnome.extraExtensions ++ extensions
           );
 
+          "org/gnome/shell/extensions/caffeine".enable-fullscreen = false;
+          "org/gnome/shell/extensions/power-off-options" = {
+            show-settings = false;
+            show-hibernate = true;
+            show-soft-reboot = true;
+          };
+
           "org/gnome/shell/extensions/quick-settings-audio-panel" = {
             panel-type = "merged-panel";
             merged-panel-position = "top";
