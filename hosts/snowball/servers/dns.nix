@@ -4,9 +4,9 @@
   server.services.dns = {
     enable = true;
     filterLists = [
-      "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/light.txt"
-      "https://gitlab.com/hagezi/mirror/-/raw/main/dns-blocklists/wildcard/light.txt"
-      "https://codeberg.org/hagezi/mirror2/raw/branch/main/dns-blocklists/wildcard/light.txt"
+      "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/multi.txt"
+      "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/multi.txt"
+      "https://gitlab.com/hagezi/mirror/-/raw/main/dns-blocklists/wildcard/multi.txt"
     ];
 
     fallbackDNS.quad9 = {
