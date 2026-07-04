@@ -28,7 +28,7 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
 
-    lanzaboote.url = "github:nix-community/lanzaboote/v0.4.3";
+    lanzaboote.url = "github:nix-community/lanzaboote/v1.1.0";
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
     flake-compat.url = "github:edolstra/flake-compat";
   };
@@ -105,7 +105,15 @@
       ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; }));
 
       devShells.${system} = {
-        sbom = pkgs.mkShell { packages = with pkgs; [ sbomnix ]; };
+        sbom = pkgs.mkShell {
+          packages = with pkgs; [
+            (sbomnix.override {
+              nixVersions = nixVersions // {
+                nix_2_31 = nix;   # See https://github.com/NixOS/nixpkgs/pull/538534
+              };
+            })
+          ];
+        };
       };
 
       templates = {
