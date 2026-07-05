@@ -1,0 +1,45 @@
+name: update-sbom
+run-name: "Generate SBOM – ${{ github.event.workflow_run.head_commit.message }}"
+on:
+  workflow_call:
+    inputs:
+      drv:
+        required: true
+        type: string
+      submit_to_github:
+        required: true
+        type: boolean
+
+jobs:
+  update-sbom:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+        name: "Checkout repository"
+
+      - uses: ./.github/actions/nix-setup
+        name: "Setup Nix"
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: >
+          nix develop ${{ github.workspace }}#sbom -c --
+          sbomnix ${{ github.workspace }}#${{ inputs.drv }}
+        name: "Generate SBOM"
+
+      - if: ${{ inputs.submit_to_github == true }}
+        uses: advanced-security/spdx-dependency-submission-action@v0.2.0
+        name: "Submit SBOM to GitHub"
+        with:
+          filePath: "${{ github.workspace }}"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: "sbom"
+          path: "sbom.*"
+          if-no-files-found: error

@@ -1,11 +1,7 @@
 name: check-flake
 run-name: "Check Flake – ${{ github.event.head_commit.message }}"
 on:
-  push:
-    paths-ignore:
-      - '.editorconfig'
-      - '.gitignore'
-      - '*.md'
+  workflow_call:
 
 jobs:
   check-flake:
@@ -16,6 +12,7 @@ jobs:
         name: "Checkout repository"
 
       - uses: ./.github/actions/nix-setup
+        name: "Setup Nix"
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 

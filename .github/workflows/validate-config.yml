@@ -1,0 +1,28 @@
+name: validate-config
+run-name: "Validate config – ${{ github.event.head_commit.message }}"
+on:
+  push:
+    paths-ignore:
+      - '.editorconfig'
+      - '.gitignore'
+      - '*.md'
+
+jobs:
+  check-flake:
+    name: "Check flake"
+    uses: ./.github/workflows/check-flake.yml
+    secrets: inherit
+
+  generate-snowflake-sbom:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: check-flake
+
+    permissions:
+      id-token: write
+      contents: write
+
+    uses: ./.github/workflows/generate-sbom.yml
+    name: "Generate and submit snowball's SBOM"
+    with:
+      drv: "nixosConfigurations.snowball.config.system.build.toplevel"
+      submit_to_github: true
