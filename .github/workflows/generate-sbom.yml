@@ -1,4 +1,4 @@
-name: update-sbom
+name: generate-sbom
 run-name: "Generate SBOM – ${{ github.event.workflow_run.head_commit.message }}"
 on:
   workflow_call:
@@ -10,8 +10,12 @@ on:
         required: true
         type: boolean
 
+concurrency:
+  group: sbom-${{ inputs.drv }}
+  cancel-in-progress: true
+
 jobs:
-  update-sbom:
+  generate-sbom:
     runs-on: ubuntu-latest
 
     permissions:
