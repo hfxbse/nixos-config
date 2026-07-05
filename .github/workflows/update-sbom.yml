@@ -19,7 +19,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         name: "Checkout repository"
 
       - uses: wimpysworld/nothing-but-nix@main
@@ -35,7 +35,7 @@ jobs:
           sbomnix ${{ github.workspace }}#nixosConfigurations.snowball.config.system.build.toplevel
         name: "Generate SBOM"
 
-      - uses: advanced-security/spdx-dependency-submission-action@v0.1.1
+      - uses: advanced-security/spdx-dependency-submission-action@v0.2.0
         name: "Submit SBOM to GitHub"
         with:
           filePath: "${{ github.workspace }}"
