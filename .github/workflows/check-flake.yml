@@ -12,13 +12,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: cachix/install-nix-action@v31
-        name: "Install Nix"
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: actions/checkout@v7
         name: "Checkout repository"
+
+      - uses: ./.github/actions/nix-setup
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - run: nix flake check
         name: "Check Flake"

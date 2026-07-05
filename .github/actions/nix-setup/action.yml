@@ -1,0 +1,15 @@
+name: "Nix setup"
+description: "Install Nix and make space for its store"
+inputs:
+  github_token:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: wimpysworld/nothing-but-nix@main
+      name: "Free up runner storage space"
+
+    - uses: cachix/install-nix-action@v31
+      name: "Install Nix"
+      with:
+        github_access_token: ${{ inputs.github_token }}
