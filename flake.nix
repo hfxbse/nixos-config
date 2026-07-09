@@ -101,7 +101,6 @@
         "beszel"
         "image-nvim"
         "stable-diffusion-cpp"
-        "sieve-editor-gui"
       ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; }));
 
       devShells.${system} = {
