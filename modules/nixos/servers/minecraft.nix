@@ -111,7 +111,7 @@ in
               enable = true;
               package =
                 with pkgs;
-                fabricServers.fabric-26_1_2.override {
+                fabricServers.fabric-26_2.override {
                   # See https://github.com/Infinidoge/nix-minecraft/issues/211
                   jre_headless = openjdk25_headless;
                 };
@@ -119,24 +119,24 @@ in
               symlinks = {
                 mods = pkgs.linkFarmFromDrvs "mods" [
                   (fetchurl {
-                    url = "https://cdn.modrinth.com/data/P7dR8mSH/versions/E1mjhYMF/fabric-api-0.150.0%2B26.1.2.jar";
-                    hash = "sha256-Q738WaIaziAjRbxMQsdR+ja4BhemHPey+MNpi4BjBdg=";
+                    url = "https://cdn.modrinth.com/data/P7dR8mSH/versions/Kr4WG5mG/fabric-api-0.154.2%2B26.2.jar";
+                    hash = "sha256-BebDzJi8U0rvfx8Eg8C7/RRUvRzzd1GHH4/xpm6ddEY=";
                   })
                   (fetchurl {
-                    url = "https://cdn.modrinth.com/data/gvQqBUqZ/versions/GiCfpS6V/lithium-fabric-0.24.5%2Bmc26.1.2.jar";
-                    hash = "sha256-VKUsTmpH7ik16EYH+LDCkmaQ6TZsif2vERVCC/G/MLQ=";
+                    url = "https://cdn.modrinth.com/data/gvQqBUqZ/versions/UPNexAfy/lithium-fabric-0.25.2%2Bmc26.2.jar";
+                    hash = "sha256-dYjUp2mJSY9W4R5jorEXD/9Hbo2cSqyU4xCz59tGng8=";
                   })
                   (fetchurl {
-                    url = "https://cdn.modrinth.com/data/Cnejf5xM/versions/spaSLGmu/rightclickharvest-fabric-4.6.2%2B26.1.x.jar";
-                    hash = "sha256-l/4Ncd6OB015Ll5oTIoI39LIsy6faSwvAXiYw8KH7HQ=";
+                    url = "https://cdn.modrinth.com/data/Cnejf5xM/versions/MMi9Zx44/rightclickharvest-fabric-4.6.2%2B26.2.x.jar";
+                    hash = "sha256-ZaE8rxhEsi8BBzyxgMg/8PKl59mJeyQ8V51mf5blGqI=";
                   })
                   (fetchurl {
-                    url = "https://cdn.modrinth.com/data/IYY9Siz8/versions/JcAOa8aS/jamlib-fabric-2.2.0%2B26.1.x.jar";
-                    hash = "sha256-5m0AyhB0ba/sLdnKwkcgVmU2GbTL5VACJhaa5lkRePc=";
+                    url = "https://cdn.modrinth.com/data/IYY9Siz8/versions/4KQpfS7o/jamlib-fabric-2.3.1%2B26.2.x.jar";
+                    hash = "sha256-VyIfkbMOE9WLkw8gYa6qXwFQnthZwWF8KR0N9BdA2pg=";
                   })
                   (fetchurl {
-                    url = "https://cdn.modrinth.com/data/3Puj7Mln/versions/2bJ7BAen/quickleafdecay-mc26.1-0.5.2.jar";
-                    hash = "sha256-WRvfrWxTs2tR+SFPqENYIfOR2PAbCJQs8+3kRtQHdac=";
+                    url = "https://cdn.modrinth.com/data/3Puj7Mln/versions/GNAB0Vml/quickleafdecay-mc26.2-0.5.3.jar";
+                    hash = "sha256-4d5uiIjiyQ1pYEnkYlzuWXJfUd6gyFMQVRYoNS5gh9s=";
                   })
                 ];
               };

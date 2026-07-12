@@ -106,11 +106,7 @@
       devShells.${system} = {
         sbom = pkgs.mkShell {
           packages = with pkgs; [
-            (sbomnix.override {
-              nixVersions = nixVersions // {
-                nix_2_31 = nix;   # See https://github.com/NixOS/nixpkgs/pull/538534
-              };
-            })
+            sbomnix
           ];
         };
       };
