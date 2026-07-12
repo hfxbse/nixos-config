@@ -140,6 +140,7 @@ in
       };
 
       containers.gallery = {
+        timeoutStartSec = "5min";
         allowedDevices = lib.flip map cfg.accelerationDevices (device: {
           node = device;
           modifier = "rw";
