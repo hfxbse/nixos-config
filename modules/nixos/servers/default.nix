@@ -20,6 +20,7 @@ in
     ./minecraft.nix
     ./monitoring.nix
     ./oidc.nix
+    ./oomd.nix
     ./password-manager.nix
     ./reverse-proxy.nix
   ];
