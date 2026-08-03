@@ -139,6 +139,13 @@ in
                     hash = "sha256-4d5uiIjiyQ1pYEnkYlzuWXJfUd6gyFMQVRYoNS5gh9s=";
                   })
                 ];
+
+                "world/datapacks" = pkgs.linkFarmFromDrvs "datapacks" [
+                  (fetchurl {
+                    url = "https://cdn.modrinth.com/data/zMz4B9Un/versions/s5iWrzr7/simple-sleep-v5-1.21.11-26.2.zip";
+                    hash = "sha256-syxpmIkPCT7KlopIBulY7j+1XNHWI2h0neYPBoEP7lE=";
+                  })
+                ];
               };
 
               serverProperties = {
