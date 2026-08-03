@@ -1,0 +1,45 @@
+name: derivation-updater
+run-name: "Check for derivation updates"
+on:
+  workflow_dispatch:
+
+jobs:
+  check-for-updates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        name: "Checkout repository"
+
+      - uses: ./.github/actions/nix-setup
+        name: "Setup Nix"
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: nix run --accept-flake-config .#ci-version-checker -- ci-version-checks.yml > old.txt
+        name: "Evaluate old versions"
+
+      - run: nix flake update
+        name: "Update Nix flake"
+
+      - run: nix run --accept-flake-config .#ci-version-checker -- ci-version-checks.yml > new.txt
+        name: "Evaluate new versions"
+
+      - run: |
+          {
+            echo 'result<<EOF'
+            diff old.txt new.txt | grep '^>' | sed 's/^> //' || true
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+        id: changed-versions
+        name: "Find changed versions"
+
+      - run: echo "No version change detected" >> "$GITHUB_STEP_SUMMARY"
+        if: ${{ steps.changed-versions.outputs.result == '' }}
+        name: "Generate summary of no change"
+
+      - run: |
+          echo "Changed versions:" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.changed-versions.outputs.result }}" >> "$GITHUB_STEP_SUMMARY"
+        if: ${{ steps.changed-versions.outputs.result != '' }}
+        name: "Generate version change summary"

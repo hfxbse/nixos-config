@@ -1,0 +1,8 @@
+Beszel: .#nixosConfigurations.snowball.config.containers.monitoring.config.services.beszel.hub.package.version
+Blocky: .#nixosConfigurations.snowball.config.containers.dns.config.services.blocky.package.version
+HAProxy: .#nixosConfigurations.snowball.config.containers.reverse-proxy.config.services.haproxy.package.version
+Immich: .#nixosConfigurations.snowball.config.containers.gallery.config.services.immich.package.version
+Minecraft: .#nixosConfigurations.snowball.config.containers.minecraft.config.services.minecraft-servers.servers.default.package.version
+Papra: .#nixosConfigurations.snowball.config.containers.doc-management.config.services.papra.package.version
+Pocket ID: .#nixosConfigurations.snowball.config.containers.oidc.config.services.pocket-id.package.version
+Vaultwarden: .#nixosConfigurations.snowball.config.containers.password-manager.config.services.vaultwarden.package.version

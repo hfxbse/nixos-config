@@ -69,6 +69,7 @@
         lib.genAttrs
           [
             "by-disk-snapshotter"
+            "ci-version-checker"
             "cups-brother-hl3172cdw"
             "flaketex"
             "jeniffer2"
