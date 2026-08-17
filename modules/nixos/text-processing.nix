@@ -11,25 +11,8 @@
   };
 
   config =
-    let
-      editor = (
-        pkgs.stdenvNoCC.mkDerivation {
-          name = "nixvim";
-
-          dontUnpack = true;
-          installPhase = ''
-            mkdir -p $out/bin;
-            ln -s ${lib.getExe pkgs.nvim} $out/bin/nvim;
-            ln -s $out/bin/nvim $out/bin/vi;
-          '';
-
-          meta.mainProgram = "nvim";
-        }
-      );
-
-      editorPath = lib.getExe editor;
-    in
     {
+      programs.nixvim.enable = true;
       programs.bash.interactiveShellInit = ''
         set -o vi
 
@@ -40,14 +23,8 @@
       programs.git.enable = true;
       programs.git.config = {
         init.defaultBranch = "main";
-        core.editor = editorPath;
         user.name = config.user.fullName;
         pull.rebase = true;
-      };
-
-      environment = {
-        systemPackages = [ editor ];
-        variables = lib.genAttrs [ "VISUAL" "EDITOR" ] (name: editorPath);
       };
 
       fonts.packages = lib.mkIf config.desktop.enable (

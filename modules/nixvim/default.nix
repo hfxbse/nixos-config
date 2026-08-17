@@ -19,12 +19,12 @@ let
 in
 {
   imports = [
-    ./theme.nix
-    ./telescope.nix
-    ./completion.nix
+    ./config/theme.nix
+    ./config/telescope.nix
+    ./config/completion.nix
   ];
 
-  clipboard.providers.wl-copy.enable = lib.mkDefault true;
+  clipboard.providers.wl-copy.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
 
   keymaps = [
     {

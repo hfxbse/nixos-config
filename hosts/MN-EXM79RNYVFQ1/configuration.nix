@@ -1,4 +1,5 @@
 {
+  programs.nixvim.enable = true;
   nixpkgs.hostPlatform = "aarch64-darwin";
 
   # DO NOT CHANGE AFTER INSTALLING THE SYSTEM

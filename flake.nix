@@ -48,6 +48,7 @@
       lib = nixpkgs.lib;
 
       ownPackages =
+        { system }:
         let
           packages = self.packages.${system};
           packageNames = builtins.filter (
@@ -57,7 +58,8 @@
         (final: prev: lib.genAttrs packageNames (name: packages.${name}));
 
       overlays = builtins.attrValues self.overlays ++ [
-        ownPackages
+        (ownPackages { inherit system; })
+        (ownPackages { system = "aarch64-darwin"; })
         inputs.nix-cachyos-kernel.overlays.pinned
         inputs.nix-minecraft.overlay
       ];
@@ -72,7 +74,6 @@
         inputs.nixos-wsl.nixosModules.default
         inputs.lanzaboote.nixosModules.lanzaboote
         inputs.nix-minecraft.nixosModules.minecraft-servers
-        nixvim.nixosModules.nixvim
         "${inputs.nixpkgs-container-in-vm-fix}/nixos/modules/virtualisation/nixos-containers.nix"
         ./modules/nixos/default.nix
         {
@@ -93,7 +94,7 @@
       packages.aarch64-darwin = {
         nvim = nixvim.legacyPackages.aarch64-darwin.makeNixvimWithModule {
           pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-          module = ./modules/neovim/neovim.nix;
+          module = ./modules/nixvim;
         };
       };
 
@@ -125,7 +126,7 @@
           blackbox-terminal = pkgs.blackbox-terminal;
           nvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
             inherit pkgs;
-            module = ./modules/neovim/neovim.nix;
+            module = ./modules/nixvim;
           };
           stable-diffusion-cpp-vulkan = pkgs.stable-diffusion-cpp-vulkan;
         };
@@ -159,6 +160,8 @@
             specialArgs = { inherit inputs; };
             inherit system;
             modules = genericModules ++ [
+              nixvim.nixosModules.nixvim
+              ./modules/nixvim/module.nix
               ./hosts/${name}/configuration.nix
             ];
           }
@@ -172,6 +175,8 @@
                   hostPlatform = system;
                 };
               }
+              nixvim.nixosModules.nixvim
+              ./modules/nixvim/module.nix
               ./hosts/iso/configuration.nix
             ];
           };
@@ -179,7 +184,11 @@
 
       darwinConfigurations."MN-EXM79RNYVFQ1" = inputs.nix-darwin.lib.darwinSystem {
         modules = [
+          {
+            nixpkgs.overlays = overlays;
+          }
           nixvim.nixDarwinModules.nixvim
+          ./modules/nixvim/module.nix
           ./hosts/MN-EXM79RNYVFQ1/configuration.nix
         ];
       };
