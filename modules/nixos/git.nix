@@ -1,10 +1,8 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
-with pkgs.stdenv.hostPlatform;
 {
   options = {
     user.fullName = lib.mkOption {
@@ -13,8 +11,8 @@ with pkgs.stdenv.hostPlatform;
     };
   };
 
-  config.programs = lib.mkIf isLinux {
-    git = {
+  config = {
+    programs.git = {
       enable = true;
       config = {
         init.defaultBranch = "main";
