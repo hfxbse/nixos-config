@@ -59,7 +59,6 @@
 
       overlays = builtins.attrValues self.overlays ++ [
         (ownPackages { inherit system; })
-        (ownPackages { system = "aarch64-darwin"; })
         inputs.nix-cachyos-kernel.overlays.pinned
         inputs.nix-minecraft.overlay
       ];
@@ -161,6 +160,7 @@
             inherit system;
             modules = genericModules ++ [
               nixvim.nixosModules.nixvim
+              ./modules/generic
               ./modules/nixvim/module.nix
               ./hosts/${name}/configuration.nix
             ];
@@ -176,6 +176,7 @@
                 };
               }
               nixvim.nixosModules.nixvim
+              ./modules/generic
               ./modules/nixvim/module.nix
               ./hosts/iso/configuration.nix
             ];
@@ -185,9 +186,12 @@
       darwinConfigurations."MN-EXM79RNYVFQ1" = inputs.nix-darwin.lib.darwinSystem {
         modules = [
           {
-            nixpkgs.overlays = overlays;
+            nixpkgs.overlays = overlays ++ [
+              (ownPackages { system = "aarch64-darwin"; })
+            ];
           }
           nixvim.nixDarwinModules.nixvim
+          ./modules/generic
           ./modules/nixvim/module.nix
           ./hosts/MN-EXM79RNYVFQ1/configuration.nix
         ];
