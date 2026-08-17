@@ -12,7 +12,6 @@
 
   config =
     {
-      programs.nixvim.enable = true;
       programs.bash.interactiveShellInit = ''
         set -o vi
 
