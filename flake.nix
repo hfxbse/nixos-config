@@ -192,6 +192,7 @@
           }
           nixvim.nixDarwinModules.nixvim
           ./modules/generic
+          ./modules/darwin
           ./modules/nixvim/module.nix
           ./hosts/MN-EXM79RNYVFQ1/configuration.nix
         ];
