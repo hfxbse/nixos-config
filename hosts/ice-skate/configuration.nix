@@ -3,7 +3,7 @@
   pkgs,
   ...
 }:
-{
+rec {
   imports = [
     ./desktop.nix
     ./disk-config.nix

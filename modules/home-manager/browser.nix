@@ -1,18 +1,16 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
-  cfg = config.desktop.browser;
+  cfg = config.browser;
 in
 {
-  options.desktop.browser.enable = lib.mkEnableOption "webbrowsing" // {
-    default = config.desktop.enable;
-  };
+  options.browser.enable = lib.mkEnableOption "web-browsing";
 
   config.programs.firefox = lib.mkIf cfg.enable {
+    configPath = "${config.xdg.configHome}/mozilla/firefox";
     enable = true;
 
     policies = {

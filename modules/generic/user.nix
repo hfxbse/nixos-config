@@ -1,7 +1,13 @@
-{ config, lib, ...}:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.user;
 in
+with pkgs.stdenv.hostPlatform;
 {
 
   options.user.name = lib.mkOption {
@@ -10,5 +16,11 @@ in
     default = "nixos";
   };
 
-  config.users.users.${cfg.name}.isNormalUser = true;
+  config.users.users.${cfg.name} =
+    lib.optionalAttrs isLinux {
+      isNormalUser = true;
+    }
+    // lib.optionalAttrs isDarwin {
+      home = "/Users/${cfg.name}";
+    };
 }

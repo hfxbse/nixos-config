@@ -34,11 +34,15 @@
 
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
     {
       self,
+      home-manager,
       nixpkgs,
       nixvim,
       ...
@@ -160,7 +164,9 @@
             inherit system;
             modules = genericModules ++ [
               nixvim.nixosModules.nixvim
+              home-manager.nixosModules.home-manager
               ./modules/generic
+              ./modules/home-manager
               ./modules/nixvim/module.nix
               ./hosts/${name}/configuration.nix
             ];
@@ -176,7 +182,9 @@
                 };
               }
               nixvim.nixosModules.nixvim
+              home-manager.nixosModules.home-manager
               ./modules/generic
+              ./modules/home-manager
               ./modules/nixvim/module.nix
               ./hosts/iso/configuration.nix
             ];
@@ -191,8 +199,10 @@
             ];
           }
           nixvim.nixDarwinModules.nixvim
+          home-manager.darwinModules.home-manager
           ./modules/generic
           ./modules/darwin
+          ./modules/home-manager
           ./modules/nixvim/module.nix
           ./hosts/MN-EXM79RNYVFQ1/configuration.nix
         ];

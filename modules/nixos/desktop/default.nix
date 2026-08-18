@@ -12,7 +12,6 @@ in
   imports = [
     ./3d-printing.nix
     ./auto-rotate.nix
-    ./browser.nix
     ./email.nix
     ./fonts.nix
     ./gaming.nix
@@ -45,6 +44,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    home-manager.users.${user.name} = {
+      browser.enable = true;
+    };
+
     desktop.networking.enable = lib.mkDefault true;
     services.libinput.enable = lib.mkDefault cfg.touchpad.enable;
     users.groups.input.members = lib.optional config.hardware.wooting.enable user.name;
