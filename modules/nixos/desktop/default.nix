@@ -16,7 +16,6 @@ in
     ./fonts.nix
     ./gaming.nix
     ./gnome.nix
-    ./multimedia.nix
     ./networking.nix
   ];
 
@@ -44,6 +43,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    multimedia.enable = true;
     home-manager.users.${user.name} = {
       browser.enable = true;
     };
