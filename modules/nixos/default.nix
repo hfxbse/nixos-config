@@ -5,7 +5,6 @@
     ./boot.nix
     ./desktop
     ./development
-    ./git.nix
     ./localization.nix
     ./permissions.nix
     ./printing.nix

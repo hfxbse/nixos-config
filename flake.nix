@@ -79,14 +79,14 @@
         inputs.nix-minecraft.nixosModules.minecraft-servers
         "${inputs.nixpkgs-container-in-vm-fix}/nixos/modules/virtualisation/nixos-containers.nix"
         ./modules/nixos/default.nix
-        {
+        ({ config, ... }: {
           # Container in VM fix
           # See https://discourse.nixos.org/t/using-changes-from-a-nixpkgs-pr-in-your-flake/60948
           disabledModules = [ "virtualisation/nixos-containers.nix" ];
 
           nixpkgs.overlays = overlays;
-          user.fullName = "Fabian Haas";
-        }
+          home-manager.users.${config.user.name}.user.fullName = "Fabian Haas";
+        })
         {
           nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];
           nix.settings.trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
@@ -193,11 +193,16 @@
 
       darwinConfigurations."MN-EXM79RNYVFQ1" = inputs.nix-darwin.lib.darwinSystem {
         modules = [
-          {
-            nixpkgs.overlays = overlays ++ [
-              (ownPackages { system = "aarch64-darwin"; })
-            ];
-          }
+          (
+            { config, ... }:
+            {
+              nixpkgs.overlays = overlays ++ [
+                (ownPackages { system = "aarch64-darwin"; })
+              ];
+
+              home-manager.users.${config.user.name}.user.fullName = "Fabian Haas";
+            }
+          )
           nixvim.nixDarwinModules.nixvim
           home-manager.darwinModules.home-manager
           ./modules/generic

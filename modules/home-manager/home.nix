@@ -11,6 +11,7 @@ in
 {
   imports = [
     ./browser.nix
+    ./git.nix
   ];
 
   home.homeDirectory = lib.mkDefault (
