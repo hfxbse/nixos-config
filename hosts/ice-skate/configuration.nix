@@ -28,6 +28,14 @@
   hardware.facter.reportPath = ./facter.json;
   hardware.ipu6.videoDeviceNumber = 99;
 
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+      intel-vaapi-driver
+    ];
+  };
+
   user.name = "fxbse";
   networking.hostName = "ice-skate";
 
