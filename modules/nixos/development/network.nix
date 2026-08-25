@@ -26,7 +26,7 @@ in
     services.iperf3 = lib.mkIf (cfg.role == "server") {
       enable = true;
       openFirewall = true;
-      bind = "0.0.0.0";
+      bind = "::";
     };
 
     users.users.${config.user.name}.packages = with pkgs; [
