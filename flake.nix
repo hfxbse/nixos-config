@@ -145,7 +145,7 @@
           ];
 
         in
-        lib.genAttrs [ "ice-skate" "snowball" ] (
+        lib.genAttrs [ "ice-skate" "snowball" "geras" ] (
           name:
           lib.nixosSystem {
             specialArgs = { inherit inputs; };
