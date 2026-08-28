@@ -37,6 +37,7 @@
   localization.language = "de";
   desktop = {
     enable = true;
+    "3d-printing".enable = true;
     email.sieve = false;
     office.suite.enable = true;
   };
