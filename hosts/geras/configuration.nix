@@ -38,6 +38,7 @@
   desktop = {
     enable = true;
     email.sieve = false;
+    office.suite.enable = true;
   };
 
   # DO NOT CHANGE AFTER INSTALLING THE SYSTEM

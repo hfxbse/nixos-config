@@ -19,6 +19,7 @@ in
     ./gnome.nix
     ./multimedia.nix
     ./networking.nix
+    ./office.nix
   ];
 
   options.desktop = {
