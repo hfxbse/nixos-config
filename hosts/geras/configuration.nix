@@ -9,6 +9,12 @@
 
   boot.defaults.secureBoot = true;
   boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
+  boot.kernelParams = [
+    "zswap.enabled=1"
+    "zswap.compressor=zstd"
+    "zswap.max_pool_percent=25"
+    "zswap.shrinker_enabled=1"
+  ];
 
   hardware.facter.reportPath = ./facter.json;
 
