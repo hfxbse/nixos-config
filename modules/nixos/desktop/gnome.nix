@@ -90,6 +90,7 @@ in
         gnome-tour
         gnome-2048
         cheese
+        decibels
         epiphany
         evince
         geary
@@ -99,6 +100,7 @@ in
         gnome-maps
         gnome-contacts
         gnome-console
+        showtime
         tali
         iagno
         hitori
