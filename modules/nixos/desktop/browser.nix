@@ -8,12 +8,28 @@ let
   cfg = config.desktop.browser;
 in
 {
-  options.desktop.browser.enable = lib.mkEnableOption "webbrowsing" // {
-    default = config.desktop.enable;
+  options.desktop.browser = {
+    enable = lib.mkEnableOption "webbrowsing" // {
+      default = config.desktop.enable;
+    };
+
+    language = lib.mkOption {
+      default = config.localization.language;
+      type = lib.types.enum [
+        "en"
+        "de"
+      ];
+    };
   };
 
   config.programs.firefox = lib.mkIf cfg.enable {
     enable = true;
+
+    languagePacks = [ (if cfg.language == "en" then "en-US" else "de") ];
+
+    preferences = {
+      "intl.regional_prefs.use_os_locales" = true;
+    };
 
     policies = {
       AppAutoUpdate = false;
@@ -40,6 +56,8 @@ in
       };
 
       PasswordManagerEnabled = false;
+      AutofillAddressEnabled = false;
+      AutofillCreditCardEnabled = false;
 
       SearchEngines = {
         Default = "DuckDuckGo";
@@ -149,12 +167,18 @@ in
       };
 
       PromptForDownloadLocation = true;
-      RequestedLocales = [
-        "en-US"
-        "en"
-        "de-DE"
-        "de"
-      ];
+      RequestedLocales =
+        let
+          de = [
+            "de-de"
+            "de"
+          ];
+          en = [
+            "en-us"
+            "en"
+          ];
+        in
+        builtins.concatStringsSep "," (if cfg.language == "en" then en ++ de else de ++ en);
 
       ShowHomeButton = false;
       SkipTermsOfUse = true;
