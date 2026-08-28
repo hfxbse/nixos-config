@@ -28,6 +28,7 @@
     ];
   };
 
+  localization.language = "de";
   desktop = {
     enable = true;
     email.sieve = false;

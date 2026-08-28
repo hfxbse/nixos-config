@@ -7,15 +7,25 @@ let
   cfg = config.localization;
 in
 {
-  options.localization.enable = lib.mkEnableOption "English as language but German formatting." // {
-    default = true;
+  options.localization = {
+    enable = lib.mkEnableOption "English as language but German formatting." // {
+      default = true;
+    };
+
+    language = lib.mkOption {
+      default = "en";
+      type = lib.types.enum [
+        "de"
+        "en"
+      ];
+    };
   };
 
   config = lib.mkIf cfg.enable {
     console.keyMap = "de";
     time.timeZone = lib.mkDefault "Europe/Berlin";
     i18n = {
-      defaultLocale = "en_US.UTF-8";
+      defaultLocale = if cfg.language == "en" then "en_US.UTF-8" else "de_DE.UTF-8";
       extraLocaleSettings = {
         LC_ADDRESS = "de_DE.UTF-8";
         LC_IDENTIFICATION = "de_DE.UTF-8";
