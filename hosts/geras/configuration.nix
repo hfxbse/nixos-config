@@ -28,7 +28,10 @@
     ];
   };
 
-  desktop.enable = true;
+  desktop = {
+    enable = true;
+    email.sieve = false;
+  };
 
   # DO NOT CHANGE AFTER INSTALLING THE SYSTEM
   system.stateVersion = "26.05"; # Did you read the comment?
