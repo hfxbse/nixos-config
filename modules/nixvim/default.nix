@@ -17,6 +17,7 @@
         ./buffers.nix
         ./color-scheme.nix
         ./file-manager.nix
+        ./fuzzy-finder.nix
         ./keymaps.nix
       ];
 }

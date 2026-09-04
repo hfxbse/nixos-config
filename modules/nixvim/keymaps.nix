@@ -12,15 +12,22 @@ in
   };
 
   file-manager.keymaps = {
-    view.project = mkNormal "<leader>-";
-    view.changes = mkNormal "<leader>s-";
     view.buffers = mkNormal "<leader>o-";
+    view.changes = mkNormal "<leader>s-";
+    view.project = mkNormal "<leader>-";
   };
 
   buffers.keymaps = {
-    buffer.next = mkNormal "<leader>b";
-    buffer.previous = mkNormal "<leader>B";
     buffer.close = mkNormal "<leader>cb";
     buffer.forceClose = mkNormal "<leader>Cb";
+    buffer.next = mkNormal "<leader>b";
+    buffer.previous = mkNormal "<leader>B";
+  };
+
+  fuzzy-finder.keymaps = {
+    view.buffers = mkNormal "<leader>of";
+    view.changes = mkNormal "<leader>sf";
+    view.project = mkNormal "<leader>f";
+    view.text = mkNormal "<leader>gf";
   };
 }
