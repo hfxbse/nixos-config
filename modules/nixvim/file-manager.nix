@@ -22,7 +22,7 @@ in
     };
 
     keymaps =
-      mkKeymaps "<CMD>Neotree<cr>" cfg.keymaps.view.project
+      mkKeymaps "<CMD>Neotree reveal=true<cr>" cfg.keymaps.view.project
       ++ mkKeymaps "<CMD>Neotree source=git_status<cr>" cfg.keymaps.view.changes
       ++ mkKeymaps "<CMD>Neotree source=buffers<cr>" cfg.keymaps.view.buffers;
 
