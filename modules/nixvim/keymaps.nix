@@ -3,10 +3,26 @@
     mapleader = " ";
   };
 
-  file-manager.keymaps.open = [
-    {
-      mode = [ "n" ];
-      key = "<leader>-";
-    }
-  ];
+  file-manager.keymaps = {
+    view.project = [
+      {
+        mode = [ "n" ];
+        key = "<leader>-";
+      }
+    ];
+
+    view.changes = [
+      {
+        mode = [ "n" ];
+        key = "<leader>s-";
+      }
+    ];
+
+    view.buffers = [
+      {
+        mode = [ "n" ];
+        key = "<leader>b-";
+      }
+    ];
+  };
 }
