@@ -93,7 +93,7 @@
           blackbox-terminal = pkgs.blackbox-terminal;
           nvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
             inherit pkgs;
-            module = ./modules/neovim/neovim.nix;
+            module = ./modules/nixvim;
           };
           stable-diffusion-cpp-vulkan = pkgs.stable-diffusion-cpp-vulkan;
         };
