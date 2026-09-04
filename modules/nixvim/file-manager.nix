@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
@@ -26,41 +25,36 @@ let
 in
 {
   options.file-manager.keymaps = {
-    open = mkKeymapOption { };
+    view.project = mkKeymapOption { };
+    view.changes = mkKeymapOption { };
+    view.buffers = mkKeymapOption { };
   };
 
   config = {
     globals = {
-      # See https://vimhelp.org/pi_netrw.txt.html#netrw-var
-      netrw_banner = 0;
-      netrw_browse_split = 0;
-      netrw_hide = 0;
-      netrw_liststyle = 3;
+      # Disable builtin plugin netrw by pretending it is already loaded
+      loaded_netrwPlugin = 1;
+      loaded_netrw = 1;
     };
 
     keymaps =
       let
         mkKeymaps = action: map (keymap: keymap // { inherit action; });
       in
-      mkKeymaps "<CMD>Explore<cr>" cfg.keymaps.open;
+      mkKeymaps "<CMD>Neotree<cr>" cfg.keymaps.view.project
+      ++ mkKeymaps "<CMD>Neotree source=git_status<cr>" cfg.keymaps.view.changes
+      ++ mkKeymaps "<CMD>Neotree source=buffers<cr>" cfg.keymaps.view.buffers;
 
-    plugins.web-devicons.enable = true;
-    extraPlugins = with pkgs.vimPlugins; [
-      netrw-nvim
-    ];
+    plugins = {
+      neo-tree = {
+        enable = true;
+        settings = {
+          window.position = "current";
+          filesystem.filtered_items.visible = true;
+        };
+      };
 
-    extraConfigLua = ''
-      require("netrw").setup({
-        -- File icons to use when `use_devicons` is false or if
-        -- no icon is found for the given file type.
-        icons = {
-          symlink = '',
-          directory = '',
-          file = '',
-        },
-        -- Uses mini.icon or nvim-web-devicons if true, otherwise use the file icon specified above
-        use_devicons = true
-      })
-    '';
+      web-devicons.enable = true;
+    };
   };
 }
