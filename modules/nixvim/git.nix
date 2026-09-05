@@ -20,10 +20,13 @@ in
   };
 
   config = {
-    plugins.gitsigns = {
-      enable = true;
-      settings = {
-        signs_staged_enable = true;
+    plugins = {
+      lualine.enable = true;
+      gitsigns = {
+        enable = true;
+        settings = {
+          signs_staged_enable = true;
+        };
       };
     };
 

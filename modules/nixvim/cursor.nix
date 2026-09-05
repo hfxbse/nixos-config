@@ -4,4 +4,6 @@
     relativenumber = true;
     cursorline = true;
   };
+
+  plugins.lualine.enable = true;
 }
