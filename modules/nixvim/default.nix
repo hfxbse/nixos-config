@@ -18,6 +18,7 @@
         ./color-scheme.nix
         ./file-manager.nix
         ./fuzzy-finder.nix
+        ./git.nix
         ./keymaps.nix
       ];
 }
