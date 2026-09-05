@@ -21,5 +21,6 @@
         ./fuzzy-finder.nix
         ./git.nix
         ./keymaps.nix
+        ./whitespaces.nix
       ];
 }
