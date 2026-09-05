@@ -16,6 +16,7 @@
       [
         ./buffers.nix
         ./clipboard.nix
+        ./cmd.nix
         ./color-scheme.nix
         ./file-manager.nix
         ./fuzzy-finder.nix
