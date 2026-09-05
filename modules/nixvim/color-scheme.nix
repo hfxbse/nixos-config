@@ -11,4 +11,7 @@
   };
 
   extraPlugins = with pkgs.vimPlugins; [ auto-dark-mode-nvim ];
+  extraConfigLua = ''
+    require("auto-dark-mode").setup({})
+  '';
 }
