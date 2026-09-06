@@ -1,11 +1,11 @@
 {
   config,
-  lib,
+  lib',
   pkgs,
   ...
 }:
 let
-  inherit (lib) mkKeymaps mkKeymapsOption;
+  inherit (lib') mkKeymaps mkKeymapsOption;
   cfg = config.fuzzy-finder;
 in
 {

@@ -1,21 +1,25 @@
-{config, lib, ... }:
+{
+  config,
+  lib',
+  ...
+}:
 let
-  inherit (lib) mkKeymaps mkKeymapsOption;
+  inherit (lib') mkKeymaps mkKeymapsOption;
   cfg = config.git;
 in
 {
   options.git.keymaps = {
     hunk = {
-      next = mkKeymapsOption {};
-      preview = mkKeymapsOption {};
-      previous = mkKeymapsOption {};
-      reset = mkKeymapsOption {};
-      toggleStaging = mkKeymapsOption {};
+      next = mkKeymapsOption { };
+      preview = mkKeymapsOption { };
+      previous = mkKeymapsOption { };
+      reset = mkKeymapsOption { };
+      toggleStaging = mkKeymapsOption { };
     };
 
     buffer = {
-      reset = mkKeymapsOption {};
-      toggleStaging = mkKeymapsOption {};
+      reset = mkKeymapsOption { };
+      toggleStaging = mkKeymapsOption { };
     };
   };
 

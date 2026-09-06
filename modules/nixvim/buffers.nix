@@ -1,10 +1,10 @@
 {
   config,
-  lib,
+  lib',
   ...
 }:
 let
-  inherit (lib) mkKeymaps mkKeymapsOption;
+  inherit (lib') mkKeymaps mkKeymapsOption;
   cfg = config.buffers;
 in
 {

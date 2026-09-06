@@ -7,17 +7,17 @@ in
     mapleader = " ";
   };
 
-  file-manager.keymaps = {
-    view.buffers = mkNormal "<leader>o-";
-    view.changes = mkNormal "<leader>s-";
-    view.project = mkNormal "<leader>-";
-  };
-
   buffers.keymaps = {
     buffer.close = mkNormal "<leader>cb";
     buffer.forceClose = mkNormal "<leader>Cb";
     buffer.next = mkNormal "<leader>b";
     buffer.previous = mkNormal "<leader>B";
+  };
+
+  file-manager.keymaps = {
+    view.buffers = mkNormal "<leader>o-";
+    view.changes = mkNormal "<leader>s-";
+    view.project = mkNormal "<leader>-";
   };
 
   fuzzy-finder.keymaps = {
@@ -35,5 +35,9 @@ in
     hunk.toggleStaging = mkNormal "<leader>sg";
     buffer.reset = mkNormal "<leader>Rg";
     buffer.toggleStaging = mkNormal "<leader>Sg";
+  };
+
+  lsp-client.keymaps = {
+    buffer.format = mkNormal "g=";
   };
 }
