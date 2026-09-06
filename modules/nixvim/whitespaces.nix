@@ -7,5 +7,11 @@
     shiftwidth = 2;
   };
 
-  plugins.trim.enable = true;
+  plugins= {
+    trim.enable = true;
+    treesitter = {
+      enable = true;
+      settings.indent.enable = true;
+    };
+  };
 }
