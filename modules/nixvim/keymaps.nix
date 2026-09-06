@@ -28,9 +28,9 @@ in
   };
 
   git.keymaps = {
-    hunk.next = mkNormal "<leader>ng";
-    hunk.preview = mkNormal "<leader>g";
-    hunk.previous = mkNormal "<leader>pg";
+    hunk.next = mkNormal "<leader>g";
+    hunk.preview = mkNormal "<leader>pg";
+    hunk.previous = mkNormal "<leader>G";
     hunk.reset = mkNormal "<leader>rg";
     hunk.toggleStaging = mkNormal "<leader>sg";
     buffer.reset = mkNormal "<leader>Rg";
