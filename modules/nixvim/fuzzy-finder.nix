@@ -38,15 +38,29 @@ in
           ];
         in
         {
-          defaults.vimgrep_arguments = [
-            "rg"
-            "--color=never"
-            "--no-heading"
-            "--with-filename"
-            "--line-number"
-            "--column"
-          ]
-          ++ hiddenFiles;
+          defaults= {
+            layout_strategy = "flex";
+            layout_config = {
+              width.__raw = "{ 0.925, max = 180 }";
+              flex.flip_columns = 120;
+              vertical.preview_cutoff = 30;
+              horizontal.preview_width.__raw = let resultWidth = 65; in ''
+                function(_, max_columns, _)
+                  return max_columns - ${toString resultWidth} - 2  -- 2 cols for the border between panes
+                end;
+              '';
+            };
+            vimgrep_arguments = [
+              "rg"
+                "--color=never"
+                "--no-heading"
+                "--with-filename"
+                "--line-number"
+                "--column"
+            ]
+            ++ hiddenFiles;
+          };
+
           pickers.find_files.find_command = [
             "rg"
             "--files"
