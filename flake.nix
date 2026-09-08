@@ -65,6 +65,13 @@
       };
     in
     {
+      packages.aarch64-darwin = {
+        nvim = nixvim.legacyPackages.aarch64-darwin.makeNixvimWithModule {
+          pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+          module = ./modules/nixvim;
+        };
+      };
+
       packages.${system} =
         lib.genAttrs
           [

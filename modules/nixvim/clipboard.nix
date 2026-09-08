@@ -1,5 +1,5 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 {
   opts.clipboard = "unnamedplus";
-  clipboard.providers.wl-copy.enable = lib.mkDefault true;
+  clipboard.providers.wl-copy.enable = lib.mkDefault (!pkgs.stdenv.hostPlatform.isDarwin);
 }
