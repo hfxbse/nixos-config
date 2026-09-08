@@ -24,6 +24,7 @@ in
     view.buffers = mkNormal "<leader>of";
     view.changes = mkNormal "<leader>sf";
     view.diagnostics = mkNormal "<leader>df";
+    view.marks = mkNormal "<leader>mf";
     view.project = mkNormal "<leader>f";
     view.text = mkNormal "<leader>F";
   };

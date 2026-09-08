@@ -1,10 +1,24 @@
 {
   config,
   lib',
+  pkgs,
   ...
 }:
 let
+  inherit (pkgs) fetchFromGitHub vimUtils;
   inherit (lib') mkKeymaps mkKeymapsOption;
+
+  marko-nvim = vimUtils.buildVimPlugin rec {
+    name = "marko.nvim";
+    dependencies = with pkgs.vimPlugins; [ snacks-nvim ];
+    src = fetchFromGitHub {
+      repo = name;
+      owner = "mohseenrm";
+      rev = "7128e7a08fc20fb666c22098a47b1827b500dcd2";
+      hash = "sha256-iwOr/uEGQWvbQIJpcgCkIyMlEkcSsQeO8OYOO6Rsp64=";
+    };
+  };
+
   cfg = config.buffers;
 in
 {
@@ -16,7 +30,10 @@ in
   };
 
   config = {
-    plugins.bufferline.enable = true;
+    extraPlugins = [ marko-nvim ];
+    extraConfigLua = ''
+      require("marko").setup()
+    '';
 
     keymaps =
       mkKeymaps "<CMD>bnext<cr>" cfg.keymaps.buffer.next
