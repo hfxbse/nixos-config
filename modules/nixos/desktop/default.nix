@@ -17,6 +17,7 @@ in
     ./gaming.nix
     ./gnome.nix
     ./networking.nix
+    ./office.nix
   ];
 
   options.desktop = {

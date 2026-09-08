@@ -7,11 +7,23 @@ let
   cfg = config.browser;
 in
 {
-  options.browser.enable = lib.mkEnableOption "web-browsing";
+  options.browser = {
+    enable = lib.mkEnableOption "webbrowsing";
+
+    language = lib.mkOption {
+      default = "en";
+      type = lib.types.enum [
+        "en"
+        "de"
+      ];
+    };
+  };
 
   config.programs.firefox = lib.mkIf cfg.enable {
     configPath = "${config.xdg.configHome}/mozilla/firefox";
     enable = true;
+
+    languagePacks = [ (if cfg.language == "en" then "en-US" else "de") ];
 
     policies = {
       AppAutoUpdate = false;
@@ -38,6 +50,8 @@ in
       };
 
       PasswordManagerEnabled = false;
+      AutofillAddressEnabled = false;
+      AutofillCreditCardEnabled = false;
 
       SearchEngines = {
         Default = "DuckDuckGo";
@@ -147,12 +161,18 @@ in
       };
 
       PromptForDownloadLocation = true;
-      RequestedLocales = [
-        "en-US"
-        "en"
-        "de-DE"
-        "de"
-      ];
+      RequestedLocales =
+        let
+          de = [
+            "de-de"
+            "de"
+          ];
+          en = [
+            "en-us"
+            "en"
+          ];
+        in
+        builtins.concatStringsSep "," (if cfg.language == "en" then en ++ de else de ++ en);
 
       ShowHomeButton = false;
       SkipTermsOfUse = true;

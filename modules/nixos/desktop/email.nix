@@ -16,6 +16,10 @@ in
     backgroundSync = lib.mkEnableOption "background syncronization and notifications of emails" // {
       default = true;
     };
+
+    sieve = lib.mkEnableOption "sieve editor" // {
+      default = true;
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -27,7 +31,7 @@ in
       };
     };
 
-    users.users.${config.user.name}.packages = with pkgs; [ sieve-editor-gui ];
+    users.users.${config.user.name}.packages = lib.optional cfg.sieve pkgs.sieve-editor-gui;
 
     # Use two systemd services to run Thunderbird.
     # One for the GUI and one for the headless background sync.
