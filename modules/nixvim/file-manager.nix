@@ -1,11 +1,24 @@
 {
   config,
   lib',
+  pkgs,
   ...
 }:
 let
   inherit (lib') mkKeymaps mkKeymapsOption;
+  inherit (pkgs) fetchFromGitHub vimUtils;
   cfg = config.file-manager;
+
+  nvim-lsp-file-operations = vimUtils.buildVimPlugin rec {
+    name = "nvim-lsp-file-operations";
+    dependencies = with pkgs.vimPlugins; [ plenary-nvim ];
+    src = fetchFromGitHub {
+      repo = name;
+      owner = "antosha417";
+      rev = "276f096ef324c140d00bd0188a0e70382e156771";
+      hash = "sha256-FObv42EGkIao2Rmq9CG+G4JsntO+00CFNaNIXc7IK7A=";
+    };
+  };
 in
 {
   options.file-manager.keymaps = {
@@ -37,5 +50,10 @@ in
 
       web-devicons.enable = true;
     };
+
+    extraPlugins = [ nvim-lsp-file-operations ];
+    extraConfigLua = ''
+      require("lsp-file-operations").setup();
+    '';
   };
 }
