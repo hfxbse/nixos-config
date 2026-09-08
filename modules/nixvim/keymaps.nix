@@ -35,7 +35,7 @@ in
     hunk.reset = mkNormal "<leader>rg";
     hunk.toggleStaging = mkNormal "<leader>sg";
     buffer.reset = mkNormal "<leader>Rg";
-    buffer.toggleStaging = mkNormal "<leader>Sg";
+    buffer.stage = mkNormal "<leader>sG";
   };
 
   lsp-client.keymaps = {

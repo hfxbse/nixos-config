@@ -19,7 +19,7 @@ in
 
     buffer = {
       reset = mkKeymapsOption { };
-      toggleStaging = mkKeymapsOption { };
+      stage = mkKeymapsOption { };
     };
   };
 
@@ -41,6 +41,6 @@ in
       ++ mkKeymaps "<CMD>Gitsigns reset_hunk<cr>" cfg.keymaps.hunk.reset
       ++ mkKeymaps "<CMD>Gitsigns stage_hunk<cr>" cfg.keymaps.hunk.toggleStaging
       ++ mkKeymaps "<CMD>Gitsigns reset_buffer<cr>" cfg.keymaps.buffer.reset
-      ++ mkKeymaps "<CMD>Gitsigns stage_buffer<cr>" cfg.keymaps.buffer.toggleStaging;
+      ++ mkKeymaps "<CMD>Gitsigns stage_buffer<cr>" cfg.keymaps.buffer.stage;
   };
 }
