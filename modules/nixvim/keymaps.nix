@@ -23,6 +23,7 @@ in
   fuzzy-finder.keymaps = {
     view.buffers = mkNormal "<leader>of";
     view.changes = mkNormal "<leader>sf";
+    view.diagnostics = mkNormal "<leader>df";
     view.project = mkNormal "<leader>f";
     view.text = mkNormal "<leader>F";
   };
@@ -38,6 +39,7 @@ in
   };
 
   lsp-client.keymaps = {
+    actions.show = mkNormal "<leader>af";
     buffer.format = mkNormal "g=";
   };
 }

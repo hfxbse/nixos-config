@@ -12,6 +12,7 @@ in
   options.fuzzy-finder.keymaps = {
     view.buffers = mkKeymapsOption { };
     view.changes = mkKeymapsOption { };
+    view.diagnostics = mkKeymapsOption { };
     view.project = mkKeymapsOption { };
     view.text = mkKeymapsOption { };
   };
@@ -20,6 +21,7 @@ in
     keymaps =
       mkKeymaps "<CMD>Telescope find_files<cr>" cfg.keymaps.view.project
       ++ mkKeymaps "<CMD>Telescope git_status<cr>" cfg.keymaps.view.changes
+      ++ mkKeymaps "<CMD>Telescope diagnostics<cr>" cfg.keymaps.view.diagnostics
       ++ mkKeymaps "<CMD>Telescope live_grep<cr>" cfg.keymaps.view.text
       ++ mkKeymaps "<CMD>Telescope buffers<cr>" cfg.keymaps.view.buffers;
 
@@ -42,7 +44,7 @@ in
             layout_strategy = "flex";
             layout_config = {
               width.__raw = "{ 0.925, max = 180 }";
-              flex.flip_columns = 120;
+              flex.flip_columns = 140;
               vertical.preview_cutoff = 30;
               horizontal.preview_width.__raw = let resultWidth = 65; in ''
                 function(_, max_columns, _)
