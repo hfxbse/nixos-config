@@ -1,43 +1,11 @@
 {
-  pkgs,
-  ...
-}:
-{
-  plugins = {
-    blink-cmp = {
-      enable = true;
-      settings = {
-        cmdline.enabled = false;
-        keymap = {
-          preset = "default";
-          "<C-j>" = [ "select_and_accept" ];
-        };
+  plugins.blink-cmp = {
+    enable = true;
+    settings = {
+      keymap = {
+        preset = "default";
+        "<C-j>" = [ "select_and_accept" ];
       };
     };
-    lspconfig.enable = true;
-    nvim-autopairs.enable = true;
-    tiny-inline-diagnostic.enable = true;
   };
-
-  lsp.inlayHints.enable = true;
-  lsp.servers = {
-    clangd.enable = true;
-    cssls.enable = true;
-    ltex.enable = true;
-    metals.enable = true;
-    nixd = {
-      enable = true;
-      config.formatting = {
-        command = [ "nixfmt" ];
-      };
-    };
-    ruff.enable = true;
-    texlab.enable = true;
-    ts_ls.enable = true;
-    ty.enable = true;
-  };
-
-  extraPackages = with pkgs; [
-    nixfmt
-  ];
 }

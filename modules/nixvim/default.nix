@@ -6,6 +6,7 @@
     ./clipboard.nix
     ./cmd.nix
     ./color-scheme.nix
+    ./completion.nix
     ./cursor.nix
     ./file-manager.nix
     ./fuzzy-finder.nix

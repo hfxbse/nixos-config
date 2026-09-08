@@ -13,6 +13,7 @@ in
     view.buffers = mkKeymapsOption { };
     view.changes = mkKeymapsOption { };
     view.diagnostics = mkKeymapsOption { };
+    view.marks = mkKeymapsOption { };
     view.project = mkKeymapsOption { };
     view.text = mkKeymapsOption { };
   };
@@ -22,6 +23,7 @@ in
       mkKeymaps "<CMD>Telescope find_files<cr>" cfg.keymaps.view.project
       ++ mkKeymaps "<CMD>Telescope git_status<cr>" cfg.keymaps.view.changes
       ++ mkKeymaps "<CMD>Telescope diagnostics<cr>" cfg.keymaps.view.diagnostics
+      ++ mkKeymaps "<CMD>Telescope marks<cr>" cfg.keymaps.view.marks
       ++ mkKeymaps "<CMD>Telescope live_grep<cr>" cfg.keymaps.view.text
       ++ mkKeymaps "<CMD>Telescope buffers<cr>" cfg.keymaps.view.buffers;
 
