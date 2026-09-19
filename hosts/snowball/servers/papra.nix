@@ -27,7 +27,7 @@ in
     ];
   };
 
-  # FUSE based like mergerfs directores do not support id mapping permissions
+  # FUSE based like mergerfs directories do not support id mapping permissions
   containers.doc-management.privateUsers = "identity";
   server.containers.doc-management.dataDirs.papra.idmap = false;
   users =

@@ -66,11 +66,11 @@ in
             users.${user}.uid = 713;
           };
 
-          services.papra ={
+          services.papra = {
             enable = true;
             # Cannot use LoadCredential.
             # This gets added to the service config directly.
-            environmentFile = "/run/credentials/${containerName}/secrets.env";
+            environmentFiles = [ "/run/credentials/${containerName}/secrets.env" ];
             environment = {
               PAPRA_VERSION = papra.package.version;
               APP_BASE_URL = reverse-proxy.virtualHosts.${cfg.domain}.origin;
@@ -83,7 +83,7 @@ in
               AUTH_IS_EMAIL_VERIFICATION_REQUIRED = true;
               AUTH_IS_REGISTRATION_ENABLED = false;
 
-              DOCUMENT_STORAGE_MAX_UPLOAD_SIZE = 536870912;  # 512 MiB
+              DOCUMENT_STORAGE_MAX_UPLOAD_SIZE = 536870912; # 512 MiB
             };
           };
         };
