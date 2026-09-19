@@ -62,8 +62,8 @@
     operation = lib.mkForce "switch";
     allowReboot = true;
     rebootWindow = {
-      lower = "03:00";
-      upper = "04:00";
+      lower = "02:30";
+      upper = "05:30";
     };
   };
 
