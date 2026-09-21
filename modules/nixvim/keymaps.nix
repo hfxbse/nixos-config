@@ -43,4 +43,13 @@ in
     actions.show = mkNormal "<leader>af";
     buffer.format = mkNormal "g=";
   };
+
+  tests.keymaps = {
+    next = mkNormal "<leader>t";
+    overview = mkNormal "<leader>st";
+    previous = mkNormal "<leader>T";
+    result = mkNormal "<leader>pt";
+    run = mkNormal "<leader>rt";
+    runSuite = mkNormal "<leader>Rt";
+  };
 }
