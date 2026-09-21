@@ -13,6 +13,7 @@
     ./git.nix
     ./keymaps.nix
     ./lsp
+    ./runner
     ./whitespaces.nix
   ];
 }
