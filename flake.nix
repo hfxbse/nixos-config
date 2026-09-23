@@ -28,64 +28,75 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      ...
-    }@inputs:
+    { self, nixpkgs, ... }@inputs:
     let
-      system = "x86_64-linux";
-      lib = nixpkgs.lib;
-
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
+      mergeInputs = builtins.foldl' nixpkgs.lib.recursiveUpdate;
     in
     {
       nixosModules =
-        inputs.backups.nixosModules // inputs.servers.nixosModules // inputs.nixos.nixosModules;
+        with inputs;
+        mergeInputs backups.nixosModules [
+          servers.nixosModules
+          nixos.nixosModules
+        ];
 
-      packages.aarch64-darwin = inputs.nixvim.packages.aarch64-darwin;
-
-      packages.${system} =
-        lib.genAttrs
-          [
-            "flaketex"
-            "jeniffer2"
-            "neural-pixel"
-            "sdcpp-webui"
-            "quick-template"
-            "scan-crop"
-          ]
+      packages =
+        nixpkgs.lib.recursiveUpdate
           (
-            name:
-            with pkgs;
-            with javaPackages;
-            with python3Packages;
-            callPackage (import ./derivations/${name}.nix) {
-              latex = texliveFull;
-              stable-diffusion-cpp = stable-diffusion-cpp-vulkan;
-            }
+            with inputs;
+            mergeInputs backups.packages [
+              ci.packages
+              nixvim.packages
+            ]
           )
-        // {
-          image-nvim = pkgs.luajitPackages.image-nvim;
-          blackbox-terminal = pkgs.blackbox-terminal;
-          stable-diffusion-cpp-vulkan = pkgs.stable-diffusion-cpp-vulkan;
-        }
-        // inputs.backups.packages.${system}
-        // inputs.ci.packages.${system}
-        // inputs.nixvim.packages.${system};
+          {
+            x86_64-linux =
+              let
+                pkgs = nixpkgs.legacyPackages.x86_64-linux;
+              in
+              nixpkgs.lib.genAttrs
+                [
+                  "flaketex"
+                  "jeniffer2"
+                  "neural-pixel"
+                  "sdcpp-webui"
+                  "quick-template"
+                  "scan-crop"
+                ]
+                (
+                  name:
+                  with pkgs;
+                  with javaPackages;
+                  with python3Packages;
+                  callPackage (import ./derivations/${name}.nix) {
+                    latex = texliveFull;
+                    stable-diffusion-cpp = stable-diffusion-cpp-vulkan;
+                  }
+                )
+              // {
+                image-nvim = pkgs.luajitPackages.image-nvim;
+                blackbox-terminal = pkgs.blackbox-terminal;
+                stable-diffusion-cpp-vulkan = pkgs.stable-diffusion-cpp-vulkan;
+              };
+          };
 
       overlays =
-        (lib.genAttrs [
-          "stable-diffusion-cpp"
-        ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; })))
-        // inputs.backups.overlays
-        // inputs.nixos.overlays
-        // inputs.servers.overlays;
+        with inputs;
+        mergeInputs
+          (nixpkgs.lib.genAttrs [ "stable-diffusion-cpp" ] (
+            name:
+            ((import ./overlays/${name}.nix) {
+              inherit inputs;
+              inherit (nixpkgs) lib;
+            })
+          ))
+          [
+            backups.overlays
+            nixos.overlays
+            servers.overlays
+          ];
 
-      devShells.${system} = inputs.ci.devShells.${system};
+      devShells = with inputs; mergeInputs ci.devShells [ ];
 
       templates = {
         default = self.templates.baseline;
@@ -95,28 +106,22 @@
         };
       };
 
-      nixosConfigurations =
-        let
-          genericModules = [
-            self.nixosModules.nixos
-            self.nixosModules.restic-backups
-            self.nixosModules.servers
-
-            { user.fullName = "Fabian Haas"; }
+      nixosConfigurations = nixpkgs.lib.genAttrs [ "ice-skate" "snowball" "geras" ] (
+        name:
+        nixpkgs.lib.nixosSystem rec {
+          system = "x86_64-linux";
+          modules = (builtins.attrValues self.nixosModules) ++ [
+            ./hosts/${name}/configuration.nix
             {
-              nixpkgs.overlays = [ (final: prev: { quick-template = self.packages.${system}.quick-template; }) ];
+              user.fullName = "Fabian Haas";
+              nixpkgs.overlays = [
+                (final: prev: {
+                  quick-template = self.packages.${system}.quick-template;
+                })
+              ];
             }
           ];
-        in
-        lib.genAttrs [ "ice-skate" "snowball" "geras" ] (
-          name:
-          lib.nixosSystem {
-            specialArgs = { inherit inputs; };
-            inherit system;
-            modules = genericModules ++ [
-              ./hosts/${name}/configuration.nix
-            ];
-          }
-        );
+        }
+      );
     };
 }
