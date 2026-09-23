@@ -1,0 +1,3 @@
+{
+  viAlias = true;
+}
