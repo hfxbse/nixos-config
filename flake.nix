@@ -1,6 +1,4 @@
 {
-  description = "Nixos configuration to manage my various system configs and derivations.";
-
   nixConfig = {
     # CachyOS Kernel binary cache
     # See https://github.com/xddxdd/nix-cachyos-kernel?tab=readme-ov-file#binary-cache
@@ -20,15 +18,9 @@
     servers.url = "./modules/servers";
     servers.inputs.nixpkgs.follows = "nixpkgs";
 
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
-    disko.url = "github:nix-community/disko";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
+    nixos.url = "./modules/nixos";
+    nixos.inputs.nixpkgs.follows = "nixpkgs";
 
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
-    nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
-
-    lanzaboote.url = "github:nix-community/lanzaboote/v1.1.0";
-    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
     flake-compat.url = "github:edolstra/flake-compat";
   };
 
@@ -42,34 +34,21 @@
       system = "x86_64-linux";
       lib = nixpkgs.lib;
 
-      ownPackages =
-        let
-          packages = self.packages.${system};
-          packageNames = builtins.filter (
-            name: !(builtins.elem name (builtins.attrNames nixpkgs.legacyPackages.${system}))
-          ) (builtins.attrNames packages);
-        in
-        (final: prev: lib.genAttrs packageNames (name: packages.${name}));
-
-      overlays = builtins.attrValues self.overlays ++ [
-        ownPackages
-        inputs.nix-cachyos-kernel.overlays.pinned
-      ];
-
       pkgs = import nixpkgs {
-        inherit system overlays;
+        inherit system;
         config.allowUnfree = true;
       };
     in
     {
-      nixosModules = inputs.backups.nixosModules // inputs.servers.nixosModules;
+      nixosModules =
+        inputs.backups.nixosModules // inputs.servers.nixosModules // inputs.nixos.nixosModules;
+
       packages.aarch64-darwin = inputs.nixvim.packages.aarch64-darwin;
 
       packages.${system} =
         lib.genAttrs
           [
             "ci-version-checker"
-            "cups-brother-hl3172cdw"
             "flaketex"
             "jeniffer2"
             "neural-pixel"
@@ -97,11 +76,11 @@
 
       overlays =
         (lib.genAttrs [
-          "beszel"
           "image-nvim"
           "stable-diffusion-cpp"
         ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; })))
         // inputs.backups.overlays
+        // inputs.nixos.overlays
         // inputs.servers.overlays;
 
       devShells.${system} = {
@@ -123,22 +102,15 @@
       nixosConfigurations =
         let
           genericModules = [
+            self.nixosModules.nixos
             self.nixosModules.restic-backups
             self.nixosModules.servers
-            inputs.disko.nixosModules.disko
-            inputs.nixos-wsl.nixosModules.default
-            inputs.lanzaboote.nixosModules.lanzaboote
-            ./modules/nixos/default.nix
+
+            { user.fullName = "Fabian Haas"; }
             {
-              nixpkgs.overlays = overlays;
-              user.fullName = "Fabian Haas";
-            }
-            {
-              nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];
-              nix.settings.trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
+              nixpkgs.overlays = [ (final: prev: { quick-template = self.packages.${system}.quick-template; }) ];
             }
           ];
-
         in
         lib.genAttrs [ "ice-skate" "snowball" "geras" ] (
           name:

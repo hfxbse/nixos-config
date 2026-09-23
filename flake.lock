@@ -34,6 +34,7 @@
     "disko": {
       "inputs": {
         "nixpkgs": [
+          "nixos",
           "nixpkgs"
         ]
       },
@@ -173,6 +174,7 @@
     "gitignore": {
       "inputs": {
         "nixpkgs": [
+          "nixos",
           "lanzaboote",
           "pre-commit",
           "nixpkgs"
@@ -196,6 +198,7 @@
       "inputs": {
         "crane": "crane",
         "nixpkgs": [
+          "nixos",
           "nixpkgs"
         ],
         "pre-commit": "pre-commit",
@@ -260,10 +263,31 @@
         "type": "github"
       }
     },
+    "nixos": {
+      "inputs": {
+        "disko": "disko",
+        "lanzaboote": "lanzaboote",
+        "nix-cachyos-kernel": "nix-cachyos-kernel",
+        "nixos-wsl": "nixos-wsl",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./modules/nixos",
+        "type": "path"
+      },
+      "original": {
+        "path": "./modules/nixos",
+        "type": "path"
+      },
+      "parent": []
+    },
     "nixos-wsl": {
       "inputs": {
         "flake-compat": "flake-compat_4",
         "nixpkgs": [
+          "nixos",
           "nixpkgs"
         ]
       },
@@ -403,6 +427,7 @@
         "flake-compat": "flake-compat_2",
         "gitignore": "gitignore",
         "nixpkgs": [
+          "nixos",
           "lanzaboote",
           "nixpkgs"
         ]
@@ -424,11 +449,8 @@
     "root": {
       "inputs": {
         "backups": "backups",
-        "disko": "disko",
         "flake-compat": "flake-compat",
-        "lanzaboote": "lanzaboote",
-        "nix-cachyos-kernel": "nix-cachyos-kernel",
-        "nixos-wsl": "nixos-wsl",
+        "nixos": "nixos",
         "nixpkgs": "nixpkgs_2",
         "nixvim": "nixvim",
         "servers": "servers"
@@ -437,6 +459,7 @@
     "rust-overlay": {
       "inputs": {
         "nixpkgs": [
+          "nixos",
           "lanzaboote",
           "nixpkgs"
         ]
