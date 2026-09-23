@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "ai": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./modules/ai",
+        "type": "path"
+      },
+      "original": {
+        "path": "./modules/ai",
+        "type": "path"
+      },
+      "parent": []
+    },
     "backups": {
       "inputs": {
         "nixpkgs": [
@@ -464,6 +480,7 @@
     },
     "root": {
       "inputs": {
+        "ai": "ai",
         "backups": "backups",
         "ci": "ci",
         "flake-compat": "flake-compat",

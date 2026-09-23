@@ -1,4 +1,3 @@
-{ ... }:
 final: prev: {
   stable-diffusion-cpp = prev.stable-diffusion-cpp.overrideAttrs (
     finalAttrs: prevAttrs: rec {
@@ -16,7 +15,7 @@ final: prev: {
         "-DSDCPP_BUILD_VERSION=${version}"
       ];
 
-      # Use prepbuild frontend
+      # Use prebuild frontend
       patchPhase = ''
         cp -r ${final.sdcpp-webui} examples/server/frontend/dist
       '';

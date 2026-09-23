@@ -12,6 +12,9 @@
     nixvim.url = "./modules/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
+    ai.url = "./modules/ai";
+    ai.inputs.nixpkgs.follows = "nixpkgs";
+
     backups.url = "./modules/backups";
     backups.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -44,7 +47,8 @@
         nixpkgs.lib.recursiveUpdate
           (
             with inputs;
-            mergeInputs backups.packages [
+            mergeInputs ai.packages [
+              backups.packages
               ci.packages
               nixvim.packages
             ]
@@ -58,8 +62,6 @@
                 [
                   "flaketex"
                   "jeniffer2"
-                  "neural-pixel"
-                  "sdcpp-webui"
                   "quick-template"
                   "scan-crop"
                 ]
@@ -76,25 +78,16 @@
               // {
                 image-nvim = pkgs.luajitPackages.image-nvim;
                 blackbox-terminal = pkgs.blackbox-terminal;
-                stable-diffusion-cpp-vulkan = pkgs.stable-diffusion-cpp-vulkan;
               };
           };
 
       overlays =
         with inputs;
-        mergeInputs
-          (nixpkgs.lib.genAttrs [ "stable-diffusion-cpp" ] (
-            name:
-            ((import ./overlays/${name}.nix) {
-              inherit inputs;
-              inherit (nixpkgs) lib;
-            })
-          ))
-          [
-            backups.overlays
-            nixos.overlays
-            servers.overlays
-          ];
+        mergeInputs ai.overlays [
+          backups.overlays
+          nixos.overlays
+          servers.overlays
+        ];
 
       devShells = with inputs; mergeInputs ci.devShells [ ];
 
