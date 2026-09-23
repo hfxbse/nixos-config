@@ -161,19 +161,6 @@
               ./hosts/${name}/configuration.nix
             ];
           }
-        )
-        // {
-          iso = lib.nixosSystem {
-            modules = genericModules ++ [
-              {
-                nixpkgs = {
-                  inherit overlays;
-                  hostPlatform = system;
-                };
-              }
-              ./hosts/iso/configuration.nix
-            ];
-          };
-        };
+        );
     };
 }
