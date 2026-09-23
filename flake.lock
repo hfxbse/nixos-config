@@ -16,6 +16,22 @@
       },
       "parent": []
     },
+    "ci": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./modules/ci",
+        "type": "path"
+      },
+      "original": {
+        "path": "./modules/ci",
+        "type": "path"
+      },
+      "parent": []
+    },
     "crane": {
       "locked": {
         "lastModified": 1781825982,
@@ -449,6 +465,7 @@
     "root": {
       "inputs": {
         "backups": "backups",
+        "ci": "ci",
         "flake-compat": "flake-compat",
         "nixos": "nixos",
         "nixpkgs": "nixpkgs_2",

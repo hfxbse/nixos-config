@@ -21,6 +21,9 @@
     nixos.url = "./modules/nixos";
     nixos.inputs.nixpkgs.follows = "nixpkgs";
 
+    ci.url = "./modules/ci";
+    ci.inputs.nixpkgs.follows = "nixpkgs";
+
     flake-compat.url = "github:edolstra/flake-compat";
   };
 
@@ -48,7 +51,6 @@
       packages.${system} =
         lib.genAttrs
           [
-            "ci-version-checker"
             "flaketex"
             "jeniffer2"
             "neural-pixel"
@@ -72,6 +74,7 @@
           stable-diffusion-cpp-vulkan = pkgs.stable-diffusion-cpp-vulkan;
         }
         // inputs.backups.packages.${system}
+        // inputs.ci.packages.${system}
         // inputs.nixvim.packages.${system};
 
       overlays =
@@ -82,13 +85,7 @@
         // inputs.nixos.overlays
         // inputs.servers.overlays;
 
-      devShells.${system} = {
-        sbom = pkgs.mkShell {
-          packages = with pkgs; [
-            sbomnix
-          ];
-        };
-      };
+      devShells.${system} = inputs.ci.devShells.${system};
 
       templates = {
         default = self.templates.baseline;
