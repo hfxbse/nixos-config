@@ -2,6 +2,7 @@
 {
   _module.args.lib' = lib.extend ((import ./lib) inputs);
   imports = [
+    ./alias.nix
     ./buffers.nix
     ./clipboard.nix
     ./cmd.nix

@@ -16,7 +16,7 @@
 
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
-    nixvim.url = "github:nix-community/nixvim";
+    nixvim.url = "./modules/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
@@ -37,7 +37,6 @@
     {
       self,
       nixpkgs,
-      nixvim,
       ...
     }@inputs:
     let
@@ -65,12 +64,7 @@
       };
     in
     {
-      packages.aarch64-darwin = {
-        nvim = nixvim.legacyPackages.aarch64-darwin.makeNixvimWithModule {
-          pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-          module = ./modules/nixvim;
-        };
-      };
+      packages.aarch64-darwin = inputs.nixvim.packages.aarch64-darwin;
 
       packages.${system} =
         lib.genAttrs
@@ -98,12 +92,9 @@
         // {
           image-nvim = pkgs.luajitPackages.image-nvim;
           blackbox-terminal = pkgs.blackbox-terminal;
-          nvim = nixvim.legacyPackages.${system}.makeNixvimWithModule {
-            inherit pkgs;
-            module = ./modules/nixvim;
-          };
           stable-diffusion-cpp-vulkan = pkgs.stable-diffusion-cpp-vulkan;
-        };
+        }
+        // inputs.nixvim.packages.${system};
 
       overlays = lib.genAttrs [
         "beszel"
@@ -134,7 +125,6 @@
             inputs.nixos-wsl.nixosModules.default
             inputs.lanzaboote.nixosModules.lanzaboote
             inputs.nix-minecraft.nixosModules.minecraft-servers
-            nixvim.nixosModules.nixvim
             "${inputs.nixpkgs-container-in-vm-fix}/nixos/modules/virtualisation/nixos-containers.nix"
             ./modules/nixos/default.nix
             {

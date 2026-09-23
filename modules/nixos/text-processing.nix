@@ -10,23 +10,15 @@
     type = lib.types.str;
   };
 
+  options.text-processing.editor = lib.mkOption {
+    description = "Editor derivation";
+    type = lib.types.package;
+    default = pkgs.nixvim;
+  };
+
   config =
     let
-      editor = (
-        pkgs.stdenvNoCC.mkDerivation {
-          name = "nixvim";
-
-          dontUnpack = true;
-          installPhase = ''
-            mkdir -p $out/bin;
-            ln -s ${lib.getExe pkgs.nvim} $out/bin/nvim;
-            ln -s $out/bin/nvim $out/bin/vi;
-          '';
-
-          meta.mainProgram = "nvim";
-        }
-      );
-
+      inherit (config.text-processing) editor;
       editorPath = lib.getExe editor;
     in
     {

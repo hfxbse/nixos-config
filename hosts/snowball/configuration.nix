@@ -22,7 +22,7 @@
     loader.timeout = 2;
   };
 
-  # Should reboot the system if it the system becomes unreponsive
+  # Should reboot the system if it the system becomes unresponsive
   systemd.settings.Manager.RuntimeWatchdogSec = "30s";
 
   networking.hostName = "snowball";
@@ -50,7 +50,10 @@
     ];
   };
 
-  programs.nixvim.clipboard.providers.wl-copy.enable = false;
+  text-processing.editor = pkgs.nixvim.override {
+    extraModules = [ { clipboard.providers.wl-copy.enable = false; } ];
+  };
+
   environment.systemPackages = with pkgs; [
     btop
     dnsutils
