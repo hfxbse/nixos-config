@@ -1,4 +1,3 @@
-{ ... }:
 final: prev: {
   # TODO: Remove once merged
   # See https://github.com/NixOS/nixpkgs/issues/512864

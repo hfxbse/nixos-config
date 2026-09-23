@@ -7,7 +7,6 @@
     ./nix.nix
     ./permissions.nix
     ./printing.nix
-    ./servers
     ./user.nix
     ./workplace-compliance.nix
     ./text-processing.nix

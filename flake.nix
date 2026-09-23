@@ -10,21 +10,17 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    nixpkgs-container-in-vm-fix = {
-      url = "github:hfxbse/nixpkgs?ref=nixos-container-inside-vm-fix";
-    };
-
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     nixvim.url = "./modules/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
-    backups.url = "./modules/backups/";
+    backups.url = "./modules/backups";
     backups.inputs.nixpkgs.follows = "nixpkgs";
 
-    nix-minecraft.url = "github:Infinidoge/nix-minecraft";
-    nix-minecraft.inputs.nixpkgs.follows = "nixpkgs";
+    servers.url = "./modules/servers";
+    servers.inputs.nixpkgs.follows = "nixpkgs";
 
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -58,7 +54,6 @@
       overlays = builtins.attrValues self.overlays ++ [
         ownPackages
         inputs.nix-cachyos-kernel.overlays.pinned
-        inputs.nix-minecraft.overlay
       ];
 
       pkgs = import nixpkgs {
@@ -67,7 +62,7 @@
       };
     in
     {
-      nixosModules = inputs.backups.nixosModules;
+      nixosModules = inputs.backups.nixosModules // inputs.servers.nixosModules;
       packages.aarch64-darwin = inputs.nixvim.packages.aarch64-darwin;
 
       packages.${system} =
@@ -106,7 +101,8 @@
           "image-nvim"
           "stable-diffusion-cpp"
         ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; })))
-        // inputs.backups.overlays;
+        // inputs.backups.overlays
+        // inputs.servers.overlays;
 
       devShells.${system} = {
         sbom = pkgs.mkShell {
@@ -128,17 +124,12 @@
         let
           genericModules = [
             self.nixosModules.restic-backups
+            self.nixosModules.servers
             inputs.disko.nixosModules.disko
             inputs.nixos-wsl.nixosModules.default
             inputs.lanzaboote.nixosModules.lanzaboote
-            inputs.nix-minecraft.nixosModules.minecraft-servers
-            "${inputs.nixpkgs-container-in-vm-fix}/nixos/modules/virtualisation/nixos-containers.nix"
             ./modules/nixos/default.nix
             {
-              # Container in VM fix
-              # See https://discourse.nixos.org/t/using-changes-from-a-nixpkgs-pr-in-your-flake/60948
-              disabledModules = [ "virtualisation/nixos-containers.nix" ];
-
               nixpkgs.overlays = overlays;
               user.fullName = "Fabian Haas";
             }

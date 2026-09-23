@@ -1,6 +1,6 @@
 {
   config,
-  inputs,
+  inputs',
   lib,
   pkgs,
   ...
@@ -26,7 +26,7 @@ in
     };
 
     domain = lib.mkOption {
-      description = "The domain to responde to.";
+      description = "The domain to respond to.";
       type = types.str;
     };
 
@@ -46,7 +46,7 @@ in
           };
 
           max = lib.mkOption {
-            description = "Maxium memory allocated to the JVM heap in mebibyte (MiB)";
+            description = "Maximum memory allocated to the JVM heap in mebibyte (MiB)";
             type = types.ints.positive;
             default = 1024;
           };
@@ -90,7 +90,7 @@ in
         hostBridge = config.server.ingress.bridgeNames.wan;
 
         config = {
-          imports = [ inputs.nix-minecraft.nixosModules.minecraft-servers ];
+          imports = [ inputs'.nix-minecraft.nixosModules.minecraft-servers ];
 
           users = with minecraft-servers; rec {
             users.${user}.uid = 651;
@@ -149,7 +149,7 @@ in
               };
 
               serverProperties = {
-                # Server config
+                # Server configuration
                 enable-rcon = false;
                 enable-query = false;
                 management-server-enabled = false;
