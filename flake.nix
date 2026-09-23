@@ -19,6 +19,9 @@
     nixvim.url = "./modules/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
+    backups.url = "./modules/backups/";
+    backups.inputs.nixpkgs.follows = "nixpkgs";
+
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
     nix-minecraft.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -64,12 +67,12 @@
       };
     in
     {
+      nixosModules = inputs.backups.nixosModules;
       packages.aarch64-darwin = inputs.nixvim.packages.aarch64-darwin;
 
       packages.${system} =
         lib.genAttrs
           [
-            "by-disk-snapshotter"
             "ci-version-checker"
             "cups-brother-hl3172cdw"
             "flaketex"
@@ -94,13 +97,16 @@
           blackbox-terminal = pkgs.blackbox-terminal;
           stable-diffusion-cpp-vulkan = pkgs.stable-diffusion-cpp-vulkan;
         }
+        // inputs.backups.packages.${system}
         // inputs.nixvim.packages.${system};
 
-      overlays = lib.genAttrs [
-        "beszel"
-        "image-nvim"
-        "stable-diffusion-cpp"
-      ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; }));
+      overlays =
+        (lib.genAttrs [
+          "beszel"
+          "image-nvim"
+          "stable-diffusion-cpp"
+        ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; })))
+        // inputs.backups.overlays;
 
       devShells.${system} = {
         sbom = pkgs.mkShell {
@@ -121,6 +127,7 @@
       nixosConfigurations =
         let
           genericModules = [
+            self.nixosModules.restic-backups
             inputs.disko.nixosModules.disko
             inputs.nixos-wsl.nixosModules.default
             inputs.lanzaboote.nixosModules.lanzaboote

@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "backups": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./modules/backups/",
+        "type": "path"
+      },
+      "original": {
+        "path": "./modules/backups/",
+        "type": "path"
+      },
+      "parent": []
+    },
     "crane": {
       "locked": {
         "lastModified": 1781825982,
@@ -406,6 +422,7 @@
     },
     "root": {
       "inputs": {
+        "backups": "backups",
         "disko": "disko",
         "flake-compat": "flake-compat",
         "lanzaboote": "lanzaboote",

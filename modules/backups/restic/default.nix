@@ -27,8 +27,8 @@ in
       urlFile = lib.mkOption {
         type = lib.types.path;
         description = ''
-          Path to the file containig the URL to the backup repository.
-          Neccessary as the URL may contain the credentials.
+          Path to the file containing the URL to the backup repository.
+          Necessary as the URL may contain the credentials.
         '';
       };
     };

@@ -1,7 +1,5 @@
-{ ... }:
 {
   imports = [
-    ./backups
     ./boot.nix
     ./desktop
     ./development
