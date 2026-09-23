@@ -41,8 +41,9 @@
       nixosModules =
         with inputs;
         mergeInputs backups.nixosModules [
-          servers.nixosModules
           nixos.nixosModules
+          nixvim.nixosModules
+          servers.nixosModules
         ];
 
       packages =
@@ -77,6 +78,7 @@
         mergeInputs ai.overlays [
           backups.overlays
           nixos.overlays
+          nixvim.overlays
           servers.overlays
         ];
 

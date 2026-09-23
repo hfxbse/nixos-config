@@ -23,7 +23,9 @@
 
       _module.args.inputs' = inputs;
 
-      nixpkgs.overlays = builtins.attrValues inputs.self.overlays;
+      nixpkgs.overlays = (builtins.attrValues inputs.self.overlays) ++ [
+        inputs.nix-minecraft.overlays.default
+      ];
     };
 
     overlays = {

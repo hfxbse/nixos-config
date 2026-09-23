@@ -26,6 +26,16 @@
         ] (system: generator system inputs.nixpkgs.legacyPackages.${system});
     in
     {
+      checks = perSystem (
+        system: pkgs: {
+          nixvim = (evalConfig system).config.build.test;
+        }
+      );
+
+      nixosModules.nixvim = {
+        nixpkgs.overlays = [ inputs.self.overlays.nixvim ];
+      };
+
       packages = perSystem (
         system: pkgs: {
           nixvim = pkgs.callPackage (
@@ -34,14 +44,12 @@
               ...
             }:
             ((evalConfig system).extendModules { modules = extraModules; }).config.build.package
-          ) {};
+          ) { };
         }
       );
 
-      checks = perSystem (
-        system: pkgs: {
-          nixvim = (evalConfig system).config.build.test;
-        }
-      );
+      overlays.nixvim = final: prev: {
+        inherit (inputs.self.packages.${prev.stdenv.hostPlatform.system}) nixvim;
+      };
     };
 }
