@@ -44,20 +44,15 @@
         ];
 
       packages =
-        nixpkgs.lib.recursiveUpdate
-          (
-            with inputs;
-            mergeInputs ai.packages [
-              backups.packages
-              ci.packages
-              nixvim.packages
-            ]
-          )
+        with inputs;
+        mergeInputs ai.packages [
+          backups.packages
+          ci.packages
+          nixvim.packages
+
           {
+            # Standalone one-off packages
             x86_64-linux =
-              let
-                pkgs = nixpkgs.legacyPackages.x86_64-linux;
-              in
               nixpkgs.lib.genAttrs
                 [
                   "flaketex"
@@ -67,19 +62,13 @@
                 ]
                 (
                   name:
-                  with pkgs;
+                  with nixpkgs.legacyPackages.x86_64-linux;
                   with javaPackages;
                   with python3Packages;
-                  callPackage (import ./derivations/${name}.nix) {
-                    latex = texliveFull;
-                    stable-diffusion-cpp = stable-diffusion-cpp-vulkan;
-                  }
-                )
-              // {
-                image-nvim = pkgs.luajitPackages.image-nvim;
-                blackbox-terminal = pkgs.blackbox-terminal;
-              };
-          };
+                  callPackage (import ./derivations/${name}.nix) { latex = texliveFull; }
+                );
+          }
+        ];
 
       overlays =
         with inputs;
