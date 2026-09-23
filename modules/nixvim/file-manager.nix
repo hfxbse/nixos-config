@@ -43,6 +43,7 @@ in
       neo-tree = {
         enable = true;
         settings = {
+          log_to_file = lib'.nixvim.enableExceptInTests;  # See https://github.com/nix-community/nixvim/issues/3951
           window.position = "current";
           filesystem.filtered_items.visible = true;
         };

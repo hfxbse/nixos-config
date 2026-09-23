@@ -36,6 +36,8 @@
       mergeInputs = builtins.foldl' nixpkgs.lib.recursiveUpdate;
     in
     {
+      checks = with inputs; mergeInputs nixvim.checks [ ];
+
       nixosModules =
         with inputs;
         mergeInputs backups.nixosModules [
