@@ -76,7 +76,6 @@
 
       overlays =
         (lib.genAttrs [
-          "image-nvim"
           "stable-diffusion-cpp"
         ] (name: ((import ./overlays/${name}.nix) { inherit inputs lib; })))
         // inputs.backups.overlays
