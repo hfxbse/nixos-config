@@ -19,6 +19,7 @@
   hardware.facter.reportPath = ./facter.json;
 
   user.name = "euse";
+  user.fullName = "Eusebia Haas";
   networking.hostName = "geras";
 
   backups = {

@@ -99,7 +99,7 @@
           modules = (builtins.attrValues self.nixosModules) ++ [
             ./hosts/${name}/configuration.nix
             {
-              user.fullName = "Fabian Haas";
+              user.fullName = nixpkgs.lib.mkDefault "Fabian Haas";
               nixpkgs.overlays = [
                 (final: prev: {
                   quick-template = self.packages.${system}.quick-template;
