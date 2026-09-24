@@ -1,4 +1,7 @@
 { lib, pkgs, ... }:
+let
+  inherit (pkgs.stdenv.hostPlatform) isLinux;
+in
 {
   opts = {
     termguicolors = true;
@@ -10,9 +13,11 @@
     settings.highlight.enable = true;
   };
 
-  extraPackages = lib.mkIf pkgs.stdenv.hostPlatform.isLinux (with pkgs; [dbus]);
+  extraPackages = lib.mkIf isLinux (with pkgs; [ dbus ]);
   extraPlugins = with pkgs.vimPlugins; [ auto-dark-mode-nvim ];
-  extraConfigLua = ''
-    require("auto-dark-mode").setup({})
-  '';
+  extraConfigLua =
+    with lib;
+    optionalString (nixvim.enableExceptInTests || isLinux) ''
+      require("auto-dark-mode").setup({})
+    '';
 }
