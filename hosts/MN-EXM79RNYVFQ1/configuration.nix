@@ -1,12 +1,13 @@
 let
-  user = "fabian.haas";
+  username = "fabian.haas";
 in
 {
-  users.users.${user}.home = "/Users/${user}";
+  single-user = { inherit username; };
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users."fabian.haas" = {
+    users.${username}= {
       programs.zsh.enable = true;
       # DO NOT CHANGE AFTER INSTALLING THE SYSTEM
       home.stateVersion = "26.11"; # Did you read the comment?

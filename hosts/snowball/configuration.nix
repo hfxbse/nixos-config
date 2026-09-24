@@ -3,7 +3,7 @@
   pkgs,
   ...
 }:
-{
+rec {
   imports = [
     ./disk-config.nix
     ./remote-access.nix
@@ -27,6 +27,7 @@
 
   networking.hostName = "snowball";
   user.name = "maintainer";
+  single-user.username = user.name;
   virtualisation.vmVariant = {
     networking.hostName = lib.mkForce "vm-snowball";
     boot.initrd.services.udev.rules = ''

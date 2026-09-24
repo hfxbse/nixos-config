@@ -3,7 +3,7 @@
   pkgs,
   ...
 }:
-{
+rec {
   imports = [
     ./desktop.nix
     ./disk-config.nix
@@ -37,6 +37,7 @@
   };
 
   user.name = "fxbse";
+  single-user.username = user.name;
   networking.hostName = "ice-skate";
 
   backups = {

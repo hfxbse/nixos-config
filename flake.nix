@@ -12,9 +12,6 @@
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
-    home-manager.url = "github:nix-community/home-manager";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
     nixvim.url = "./modules/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -36,6 +33,9 @@
     nix.url = "./modules/nix";
     nix.inputs.nixpkgs.follows = "nixpkgs";
 
+    single-user.url = "./modules/single-user";
+    single-user.inputs.nixpkgs.follows = "nixpkgs";
+
     flake-compat.url = "github:edolstra/flake-compat";
   };
 
@@ -51,6 +51,7 @@
         with inputs;
         mergeInputs nix.darwinModules [
           nixvim.darwinModules
+          single-user.darwinModules
         ];
 
       homeModules = with inputs; mergeInputs nixvim.homeModules [ ];
@@ -62,6 +63,7 @@
           nixos.nixosModules
           nixvim.nixosModules
           servers.nixosModules
+          single-user.nixosModules
         ];
 
       packages =
@@ -116,6 +118,7 @@
           system = "x86_64-linux";
           modules = (builtins.attrValues self.nixosModules) ++ [
             ./hosts/${name}/configuration.nix
+            { single-user.home-manager.extraModules = builtins.attrValues self.homeModules; }
             {
               user.fullName = nixpkgs.lib.mkDefault "Fabian Haas";
               nixpkgs.overlays = [
@@ -134,13 +137,7 @@
           system = "aarch64-darwin";
           modules = (builtins.attrValues self.darwinModules) ++ [
             ./hosts/${name}/configuration.nix
-            inputs.home-manager.darwinModules.home-manager
-            {
-              # TODO extend dynamically
-              home-manager.users."fabian.haas" = {
-                imports = builtins.attrValues self.homeModules;
-              };
-            }
+            { single-user.home-manager.extraModules = builtins.attrValues self.homeModules; }
           ];
         }
       );

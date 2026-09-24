@@ -2,7 +2,7 @@
   pkgs,
   ...
 }:
-{
+rec {
   imports = [
     ./disk-config.nix
   ];
@@ -19,6 +19,7 @@
   hardware.facter.reportPath = ./facter.json;
 
   user.name = "euse";
+  single-user.username = user.name;
   user.fullName = "Eusebia Haas";
   networking.hostName = "geras";
 

@@ -5,7 +5,6 @@
     ./desktop
     ./development
     ./localization.nix
-    ./permissions.nix
     ./printing.nix
     ./user.nix
     ./workplace-compliance.nix
