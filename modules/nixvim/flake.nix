@@ -8,6 +8,7 @@
   outputs =
     inputs:
     let
+      inherit (inputs.nixpkgs.lib) recursiveUpdate;
       evalConfig =
         system:
         inputs.nixvim.lib.evalNixvim {
@@ -27,13 +28,16 @@
 
       genModule = nixvimModule: {
         imports = [ nixvimModule ];
-        nixpkgs.overlays = [ inputs.self.overlays.nixvim ];
         programs.nixvim = {
           enable = true;
           nixpkgs.source = inputs.nixpkgs;
           imports = [ ./. ];
         };
       };
+
+      mkDefaultEditor = module: recursiveUpdate module { programs.nixvim.defaultEditor = true; };
+      applyOverlay =
+        module: recursiveUpdate module { nixpkgs.overlays = [ inputs.self.overlays.nixvim ]; };
     in
     {
       checks = perSystem (
@@ -42,8 +46,9 @@
         }
       );
 
-      darwinModules.nixvim = genModule inputs.nixvim.nixDarwinModules.nixvim;
-      nixosModules.nixvim = genModule inputs.nixvim.nixosModules.nixvim;
+      darwinModules.nixvim = applyOverlay (genModule inputs.nixvim.nixDarwinModules.nixvim);
+      homeModules.nixvim = mkDefaultEditor (genModule inputs.nixvim.homeModules.nixvim);
+      nixosModules.nixvim = applyOverlay (mkDefaultEditor (genModule inputs.nixvim.nixosModules.nixvim));
 
       packages = perSystem (
         system: pkgs: {

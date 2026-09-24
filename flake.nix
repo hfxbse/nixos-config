@@ -12,6 +12,9 @@
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
     nixvim.url = "./modules/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -44,9 +47,13 @@
     {
       checks = with inputs; mergeInputs nixvim.checks [ ];
 
-      darwinModules = with inputs; mergeInputs nix.darwinModules [
+      darwinModules =
+        with inputs;
+        mergeInputs nix.darwinModules [
           nixvim.darwinModules
-      ];
+        ];
+
+      homeModules = with inputs; mergeInputs nixvim.homeModules [ ];
 
       nixosModules =
         with inputs;
@@ -127,6 +134,13 @@
           system = "aarch64-darwin";
           modules = (builtins.attrValues self.darwinModules) ++ [
             ./hosts/${name}/configuration.nix
+            inputs.home-manager.darwinModules.home-manager
+            {
+              # TODO extend dynamically
+              home-manager.users."fabian.haas" = {
+                imports = builtins.attrValues self.homeModules;
+              };
+            }
           ];
         }
       );
