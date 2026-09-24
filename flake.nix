@@ -36,6 +36,8 @@
     single-user.url = "./modules/single-user";
     single-user.inputs.nixpkgs.follows = "nixpkgs";
 
+    shell.url = "./modules/shell";
+
     flake-compat.url = "github:edolstra/flake-compat";
   };
 
@@ -51,6 +53,7 @@
         with inputs;
         mergeInputs nix.darwinModules [
           nixvim.darwinModules
+          shell.darwinModules
           single-user.darwinModules
         ];
 
@@ -63,6 +66,7 @@
           nixos.nixosModules
           nixvim.nixosModules
           servers.nixosModules
+          shell.nixosModules
           single-user.nixosModules
         ];
 
