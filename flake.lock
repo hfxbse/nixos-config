@@ -251,6 +251,22 @@
         "type": "github"
       }
     },
+    "nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./modules/nix",
+        "type": "path"
+      },
+      "original": {
+        "path": "./modules/nix",
+        "type": "path"
+      },
+      "parent": []
+    },
     "nix-cachyos-kernel": {
       "inputs": {
         "flake-compat": "flake-compat_3",
@@ -269,6 +285,27 @@
         "owner": "xddxdd",
         "ref": "release",
         "repo": "nix-cachyos-kernel",
+        "type": "github"
+      }
+    },
+    "nix-darwin": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786845137,
+        "narHash": "sha256-oQFip+v0luP8NIxJzmiW4Wu8bILsbFWom5l0zonl8hQ=",
+        "owner": "nix-darwin",
+        "repo": "nix-darwin",
+        "rev": "4cff07de74b50e64bdd68cd4e722ab5b6b35ee48",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-darwin",
+        "ref": "master",
+        "repo": "nix-darwin",
         "type": "github"
       }
     },
@@ -484,6 +521,8 @@
         "backups": "backups",
         "ci": "ci",
         "flake-compat": "flake-compat",
+        "nix": "nix",
+        "nix-darwin": "nix-darwin",
         "nixos": "nixos",
         "nixpkgs": "nixpkgs_2",
         "nixvim": "nixvim",

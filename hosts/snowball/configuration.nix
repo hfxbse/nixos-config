@@ -50,10 +50,7 @@
     ];
   };
 
-  text-processing.editor = pkgs.nixvim.override {
-    extraModules = [ { clipboard.providers.wl-copy.enable = false; } ];
-  };
-
+  programs.nixvim.clipboard.providers.wl-copy.enable = false;
   environment.systemPackages = with pkgs; [
     btop
     dnsutils

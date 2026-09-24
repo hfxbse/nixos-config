@@ -1,10 +1,10 @@
 {
   imports = [
+    ./auto-upgrade.nix
     ./boot.nix
     ./desktop
     ./development
     ./localization.nix
-    ./nix.nix
     ./permissions.nix
     ./printing.nix
     ./user.nix

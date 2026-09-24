@@ -9,6 +9,9 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
+    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+
     nixvim.url = "./modules/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -27,6 +30,9 @@
     ci.url = "./modules/ci";
     ci.inputs.nixpkgs.follows = "nixpkgs";
 
+    nix.url = "./modules/nix";
+    nix.inputs.nixpkgs.follows = "nixpkgs";
+
     flake-compat.url = "github:edolstra/flake-compat";
   };
 
@@ -38,9 +44,14 @@
     {
       checks = with inputs; mergeInputs nixvim.checks [ ];
 
+      darwinModules = with inputs; mergeInputs nix.darwinModules [
+          nixvim.darwinModules
+      ];
+
       nixosModules =
         with inputs;
         mergeInputs backups.nixosModules [
+          nix.nixosModules
           nixos.nixosModules
           nixvim.nixosModules
           servers.nixosModules
@@ -106,6 +117,16 @@
                 })
               ];
             }
+          ];
+        }
+      );
+
+      darwinConfigurations = nixpkgs.lib.genAttrs [ "MN-EXM79RNYVFQ1" ] (
+        name:
+        inputs.nix-darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          modules = (builtins.attrValues self.darwinModules) ++ [
+            ./hosts/${name}/configuration.nix
           ];
         }
       );

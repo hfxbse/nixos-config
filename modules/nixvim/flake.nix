@@ -24,6 +24,16 @@
           "x86_64-linux"
           "aarch64-darwin"
         ] (system: generator system inputs.nixpkgs.legacyPackages.${system});
+
+      genModule = nixvimModule: {
+        imports = [ nixvimModule ];
+        nixpkgs.overlays = [ inputs.self.overlays.nixvim ];
+        programs.nixvim = {
+          enable = true;
+          nixpkgs.source = inputs.nixpkgs;
+          imports = [ ./. ];
+        };
+      };
     in
     {
       checks = perSystem (
@@ -32,9 +42,8 @@
         }
       );
 
-      nixosModules.nixvim = {
-        nixpkgs.overlays = [ inputs.self.overlays.nixvim ];
-      };
+      darwinModules.nixvim = genModule inputs.nixvim.nixDarwinModules.nixvim;
+      nixosModules.nixvim = genModule inputs.nixvim.nixosModules.nixvim;
 
       packages = perSystem (
         system: pkgs: {
