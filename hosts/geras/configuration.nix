@@ -37,11 +37,29 @@ rec {
   };
 
   localization.language = "de";
-  desktop = {
-    enable = true;
-    "3d-printing".enable = true;
-    email.sieve = false;
-    office.suite.enable = true;
+  development.network.enable = true;
+  gaming.steam.enable = true;
+
+  desktop.environment.enable = true;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.${user.name} = {
+      applications = {
+        language = localization.language;
+        "3d-printing".enable = true;
+        browser.enable = true;
+        email = {
+          enable = true;
+          sieve = false;
+        };
+        multimedia.enable = true;
+        office = {
+          enable = true;
+          suite.enable = true;
+        };
+      };
+    };
   };
 
   # DO NOT CHANGE AFTER INSTALLING THE SYSTEM

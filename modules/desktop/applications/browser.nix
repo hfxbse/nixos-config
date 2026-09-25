@@ -5,30 +5,24 @@
   ...
 }:
 let
-  cfg = config.desktop.browser;
+  inherit (config.applications) language;
+  inherit (pkgs.stdenv.hostPlatform) isLinux;
+  cfg = config.applications.browser;
 in
 {
-  options.desktop.browser = {
-    enable = lib.mkEnableOption "webbrowsing" // {
-      default = config.desktop.enable;
-    };
-
-    language = lib.mkOption {
-      default = config.localization.language;
-      type = lib.types.enum [
-        "en"
-        "de"
-      ];
-    };
+  options.applications.browser = {
+    enable = lib.mkEnableOption "Whether to configure webbrowsing.";
   };
 
   config.programs.firefox = lib.mkIf cfg.enable {
     enable = true;
+    configPath = lib.mkIf isLinux "${config.xdg.configHome}/mozilla/firefox";
+    languagePacks = [ (if language == "en" then "en-US" else "de") ];
 
-    languagePacks = [ (if cfg.language == "en" then "en-US" else "de") ];
-
-    preferences = {
-      "intl.regional_prefs.use_os_locales" = true;
+    profiles.default = {
+      settings = {
+        "intl.regional_prefs.use_os_locales" = true;
+      };
     };
 
     policies = {
@@ -71,7 +65,7 @@ in
       };
 
       ExtensionSettings = {
-        "*".installation_mode = "blocked"; # blocks all addons except the ones specified below
+        "*".installation_mode = "blocked"; # Blocks all add-ons except the ones specified below
 
         "uBlock0@raymondhill.net" = {
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
@@ -178,7 +172,7 @@ in
             "en"
           ];
         in
-        builtins.concatStringsSep "," (if cfg.language == "en" then en ++ de else de ++ en);
+        builtins.concatStringsSep "," (if language == "en" then en ++ de else de ++ en);
 
       ShowHomeButton = false;
       SkipTermsOfUse = true;

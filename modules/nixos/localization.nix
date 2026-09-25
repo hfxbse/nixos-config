@@ -40,7 +40,7 @@ in
     };
 
     # Configure keymap in X11
-    services.xserver.xkb = lib.mkIf config.desktop.enable {
+    services.xserver.xkb = {
       layout = "de";
       variant = "";
     };

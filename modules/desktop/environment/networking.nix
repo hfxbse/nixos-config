@@ -4,10 +4,14 @@
   ...
 }:
 let
-  cfg = config.desktop.networking;
+  cfg = config.desktop.environment.networking;
 in
 {
-  options.desktop.networking.enable = lib.mkEnableOption "dynamic networking for interactive computers";
+  options.desktop.environment.networking.enable =
+    lib.mkEnableOption "If dynamic networking for interactive computers should be used."
+    // {
+      default = config.desktop.environment.enable;
+    };
 
   config = lib.mkIf cfg.enable {
     # Disables scripted networking configured by NixOS facter

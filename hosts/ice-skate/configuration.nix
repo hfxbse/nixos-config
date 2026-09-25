@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   ...
 }:
@@ -54,9 +53,25 @@ rec {
   };
 
   development.network.enable = true;
-  desktop."3d-printing".enable = true;
-  desktop.gaming.enable = true;
-  users.users.${config.user.name}.packages = with pkgs; [ xournalpp ];
+  gaming.steam.enable = true;
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.${user.name} = {
+      applications = {
+        "3d-printing".enable = true;
+        browser.enable = true;
+        email.enable = true;
+        multimedia.enable = true;
+        office.enable = true;
+      };
+
+      gaming.minecraft.enable = true;
+
+      home.packages = with pkgs; [ xournalpp ];
+    };
+  };
 
   # DO NOT CHANGE AFTER INSTALLING THE SYSTEM
   system.stateVersion = "25.05"; # Did you read the comment?

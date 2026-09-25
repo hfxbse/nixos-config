@@ -36,6 +36,10 @@
     single-user.url = "./modules/single-user";
     single-user.inputs.nixpkgs.follows = "nixpkgs";
 
+    desktop.url = "./modules/desktop";
+    desktop.inputs.nixpkgs.follows = "nixpkgs";
+
+    gaming.url = "./modules/gaming";
     shell.url = "./modules/shell";
 
     flake-compat.url = "github:edolstra/flake-compat";
@@ -52,16 +56,24 @@
       darwinModules =
         with inputs;
         mergeInputs nix.darwinModules [
+          desktop.darwinModules
           nixvim.darwinModules
           shell.darwinModules
           single-user.darwinModules
         ];
 
-      homeModules = with inputs; mergeInputs nixvim.homeModules [ ];
+      homeModules =
+        with inputs;
+        mergeInputs nixvim.homeModules [
+          desktop.homeModules
+          gaming.homeModules
+        ];
 
       nixosModules =
         with inputs;
         mergeInputs backups.nixosModules [
+          desktop.nixosModules
+          gaming.nixosModules
           nix.nixosModules
           nixos.nixosModules
           nixvim.nixosModules
@@ -75,6 +87,7 @@
         mergeInputs ai.packages [
           backups.packages
           ci.packages
+          desktop.packages
           nixvim.packages
 
           {
@@ -101,7 +114,7 @@
         with inputs;
         mergeInputs ai.overlays [
           backups.overlays
-          nixos.overlays
+          desktop.overlays
           nixvim.overlays
           servers.overlays
         ];

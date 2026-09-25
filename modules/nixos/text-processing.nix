@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 {
@@ -17,12 +16,5 @@
       user.name = config.user.fullName;
       pull.rebase = true;
     };
-
-    fonts.packages = lib.mkIf config.desktop.enable (
-      with pkgs;
-      [
-        nerd-fonts.jetbrains-mono
-      ]
-    );
   };
 }

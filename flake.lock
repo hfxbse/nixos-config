@@ -63,6 +63,22 @@
         "type": "github"
       }
     },
+    "desktop": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./modules/desktop",
+        "type": "path"
+      },
+      "original": {
+        "path": "./modules/desktop",
+        "type": "path"
+      },
+      "parent": []
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -202,6 +218,17 @@
         "repo": "flake-parts",
         "type": "github"
       }
+    },
+    "gaming": {
+      "locked": {
+        "path": "./modules/gaming",
+        "type": "path"
+      },
+      "original": {
+        "path": "./modules/gaming",
+        "type": "path"
+      },
+      "parent": []
     },
     "gitignore": {
       "inputs": {
@@ -541,7 +568,9 @@
         "ai": "ai",
         "backups": "backups",
         "ci": "ci",
+        "desktop": "desktop",
         "flake-compat": "flake-compat",
+        "gaming": "gaming",
         "nix": "nix",
         "nix-darwin": "nix-darwin",
         "nixos": "nixos",
