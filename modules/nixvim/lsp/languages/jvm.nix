@@ -1,6 +1,7 @@
 { lib, pkgs, ... }:
 {
   lsp.servers = {
+    jdtls.enable = true;
     kotlin_lsp = {
       enable = true;
       config.cmd = [
