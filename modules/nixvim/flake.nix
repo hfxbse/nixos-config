@@ -3,34 +3,46 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
+
+    kotlin-lsp.url = "git+https://git.poz.pet/poz/kotlin-lsp-nix";
+    kotlin-lsp.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
     inputs:
     let
       inherit (inputs.nixpkgs.lib) recursiveUpdate;
+      getPkgs = with inputs; system: nixpkgs.legacyPackages.${system}.extend self.overlays.kotlin-lsp;
+
+      nixpkgsConfig = {
+        nixpkgs = {
+          overlays = [ inputs.self.overlays.kotlin-lsp ];
+          source = inputs.nixpkgs;
+        };
+      };
+
       evalConfig =
         system:
         inputs.nixvim.lib.evalNixvim {
           inherit system;
           modules = [
             ./.
-            { nixpkgs.source = inputs.nixpkgs; }
+            nixpkgsConfig
           ];
         };
 
       perSystem =
         generator:
-        inputs.nixpkgs.lib.genAttrs [
+        with inputs;
+        nixpkgs.lib.genAttrs [
           "x86_64-linux"
           "aarch64-darwin"
-        ] (system: generator system inputs.nixpkgs.legacyPackages.${system});
+        ] (system: generator system (getPkgs system));
 
       genModule = nixvimModule: {
         imports = [ nixvimModule ];
-        programs.nixvim = {
+        programs.nixvim = nixpkgsConfig // {
           enable = true;
-          nixpkgs.source = inputs.nixpkgs;
           imports = [ ./. ];
         };
       };
@@ -62,8 +74,30 @@
         }
       );
 
-      overlays.nixvim = final: prev: {
-        inherit (inputs.self.packages.${prev.stdenv.hostPlatform.system}) nixvim;
-      };
+      overlays =
+        let
+          genOverlay =
+            generator: final: prev:
+            generator prev.stdenv.hostPlatform.system;
+        in
+        {
+          nixvim = genOverlay (system: {
+            inherit (inputs.self.packages.${system}) nixvim;
+          });
+
+          kotlin-lsp = genOverlay (system: {
+            kotlin-lsp =
+              (import inputs.nixpkgs {
+                inherit system;
+                config.allowUnfreePredicate =
+                  pkg:
+                  builtins.elem (inputs.nixpkgs.lib.getName pkg) [
+                    "kotlin-lsp"
+                  ];
+              }).callPackage
+                "${inputs.kotlin-lsp}/package.nix"
+                { };
+          });
+        };
     };
 }
