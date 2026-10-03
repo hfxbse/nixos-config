@@ -13,6 +13,9 @@
     in
     {
       nixosModules.single-user = genModule [ inputs.home-manager.nixosModules.home-manager ];
-      darwinModules.single-user = genModule [ inputs.home-manager.darwinModules.home-manager ];
+      darwinModules.single-user = genModule [
+        ./touch-id.nix
+        inputs.home-manager.darwinModules.home-manager
+      ];
     };
 }
