@@ -1,0 +1,98 @@
+diff --git a/lua/neotest-gradle/hooks/build_run_specification.lua b/lua/neotest-gradle/hooks/build_run_specification.lua
+index 7fe1f1e..2285e47 100644
+--- a/lua/neotest-gradle/hooks/build_run_specification.lua
++++ b/lua/neotest-gradle/hooks/build_run_specification.lua
+@@ -34,14 +34,14 @@ local function get_test_results_directory(gradle_executable, project_directory)
+     project_directory,
+     'properties',
+     '--property',
+-    'testResultsDir',
++    'buildDir',
+   }
+   local _, output = lib.process.run(command, { stdout = true })
+   local output_lines = vim.split(output.stdout or '', '\n')
+ 
+   for _, line in pairs(output_lines) do
+-    if line:match('testResultsDir: ') then
+-      return line:gsub('testResultsDir: ', '') .. lib.files.sep .. 'test'
++    if line:match('buildDir') then
++      return line:gsub('^%s*buildDir:%s*', '') .. lib.files.sep .. 'test-results' .. lib.files.sep .. 'test'
+     end
+   end
+ 
+@@ -100,7 +100,7 @@ end
+ ---
+ --- In its core, it builds a command to start Gradle correctly in the project
+ --- directory with a test filter based on the positions.
+---- It also determines the folder where the resulsts will be reported to, to
++--- It also determines the folder where the results will be reported to, to
+ --- collect them later on. That folder path is saved to the context object.
+ ---
+ --- @param arguments table - see neotest.RunArgs
+@@ -113,7 +113,7 @@ return function(arguments)
+   vim.list_extend(command, get_test_filter_arguments(arguments.tree, position))
+ 
+   local context = {}
+-  context.test_resuls_directory = get_test_results_directory(gradle_executable, project_directory)
++  context.test_results_directory = get_test_results_directory(gradle_executable, project_directory)
+ 
+   return { command = table.concat(command, ' '), context = context }
+ end
+diff --git a/lua/neotest-gradle/hooks/collect_results.lua b/lua/neotest-gradle/hooks/collect_results.lua
+index 834904c..df83b3c 100644
+--- a/lua/neotest-gradle/hooks/collect_results.lua
++++ b/lua/neotest-gradle/hooks/collect_results.lua
+@@ -49,7 +49,7 @@ local function find_position_for_test_case(tree, test_case_node)
+     class_name .. '.' .. test_name,                    -- JUnit4: com.example.Test.method
+     class_name:gsub('%$', '.') .. '.' .. test_name     -- Jupiter: com.example.Test$Inner -> com.example.Test.Inner.method (nested classes)
+   }
+-  
++
+   for _, position in tree:iter() do
+     if position then
+       for _, candidate_id in ipairs(candidate_ids) do
+@@ -99,13 +99,13 @@ end
+ --- It also tries to determine why and where a test possibly failed for
+ --- additional Neotest features like diagnostics.
+ ---
+---- @param build_specfication table - see neotest.RunSpec
++--- @param build_specification table - see neotest.RunSpec
+ --- @param tree table - see neotest.Tree
+ --- @return table<string, table> - see neotest.Result
+-return function(build_specfication, _, tree)
++return function(build_specification, _, tree)
+   local results = {}
+   local position = tree:data()
+-  local results_directory = build_specfication.context.test_resuls_directory
++  local results_directory = build_specification.context.test_results_directory
+   local juris_reports = parse_xml_files_from_directory(results_directory)
+ 
+   for _, juris_report in pairs(juris_reports) do
+diff --git a/lua/neotest-gradle/hooks/is_test_file.lua b/lua/neotest-gradle/hooks/is_test_file.lua
+index 683d44d..9e7b193 100644
+--- a/lua/neotest-gradle/hooks/is_test_file.lua
++++ b/lua/neotest-gradle/hooks/is_test_file.lua
+@@ -1,4 +1,9 @@
+-local TEST_FILE_PATTERNS = { 'Test.kt$', 'Test.java$' }
++local TEST_FILE_PATTERNS = {
++  'IT.java$',
++  'IT.kt$',
++  'Test.java$',
++  'Test.kt$'
++}
+ 
+ --- Predicate function to determine if a file is a test file or not
+ --- This simply checks if the file name matches certain patterns based on
+diff --git a/lua/neotest-gradle/position_queries/java.lua b/lua/neotest-gradle/position_queries/java.lua
+index be95324..16b863a 100644
+--- a/lua/neotest-gradle/position_queries/java.lua
++++ b/lua/neotest-gradle/position_queries/java.lua
+@@ -1,7 +1,7 @@
+ local class_with_name_ending_on_test = [[
+     (
+       (class_declaration name: (identifier) @namespace.name)
+-      (#match? @namespace.name "Test$")
++      (#match? @namespace.name "(Test|IT|ITTest|IntegrationTest)$")
+     ) @namespace.definition
+   ]]
+ 

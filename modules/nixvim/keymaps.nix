@@ -45,10 +45,11 @@ in
   };
 
   tests.keymaps = {
+    log = mkNormal "<leader>ot";
     next = mkNormal "<leader>t";
     overview = mkNormal "<leader>st";
+    preview = mkNormal "<leader>dt";
     previous = mkNormal "<leader>T";
-    result = mkNormal "<leader>pt";
     run = mkNormal "<leader>rt";
     runSuite = mkNormal "<leader>Rt";
   };
