@@ -20,7 +20,6 @@ rec {
 
   user.name = "euse";
   single-user.username = user.name;
-  user.fullName = "Eusebia Haas";
   networking.hostName = "geras";
 
   backups = {
@@ -59,6 +58,7 @@ rec {
           suite.enable = true;
         };
       };
+      development.user.fullName = "Eusebia Haas";
     };
   };
 

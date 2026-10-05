@@ -79,6 +79,22 @@
       },
       "parent": []
     },
+    "development": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./modules/development/",
+        "type": "path"
+      },
+      "original": {
+        "path": "./modules/development/",
+        "type": "path"
+      },
+      "parent": []
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -578,6 +594,7 @@
         "backups": "backups",
         "ci": "ci",
         "desktop": "desktop",
+        "development": "development",
         "flake-compat": "flake-compat",
         "gaming": "gaming",
         "nix": "nix",

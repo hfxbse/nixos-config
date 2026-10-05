@@ -6,6 +6,5 @@
     ./localization.nix
     ./user.nix
     ./workplace-compliance.nix
-    ./text-processing.nix
   ];
 }

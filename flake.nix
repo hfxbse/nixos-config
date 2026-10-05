@@ -39,6 +39,9 @@
     desktop.url = "./modules/desktop";
     desktop.inputs.nixpkgs.follows = "nixpkgs";
 
+    development.url = "./modules/development/";
+    development.inputs.nixpkgs.follows = "nixpkgs";
+
     gaming.url = "./modules/gaming";
     shell.url = "./modules/shell";
 
@@ -49,6 +52,12 @@
     { self, nixpkgs, ... }@inputs:
     let
       mergeInputs = builtins.foldl' nixpkgs.lib.recursiveUpdate;
+      homeManagerSetup = { config, ... }: {
+        single-user.home-manager.extraModules = builtins.attrValues self.homeModules;
+        home-manager.users.${config.single-user.username}.development.user = {
+          fullName = nixpkgs.lib.mkDefault "Fabian Haas";
+        };
+      };
     in
     {
       checks = with inputs; mergeInputs nixvim.checks [ ];
@@ -66,6 +75,7 @@
         with inputs;
         mergeInputs nixvim.homeModules [
           desktop.homeModules
+          development.homeModules
           gaming.homeModules
         ];
 
@@ -135,9 +145,8 @@
           system = "x86_64-linux";
           modules = (builtins.attrValues self.nixosModules) ++ [
             ./hosts/${name}/configuration.nix
-            { single-user.home-manager.extraModules = builtins.attrValues self.homeModules; }
+            homeManagerSetup
             {
-              user.fullName = nixpkgs.lib.mkDefault "Fabian Haas";
               nixpkgs.overlays = [
                 (final: prev: {
                   quick-template = self.packages.${system}.quick-template;
@@ -154,7 +163,7 @@
           system = "aarch64-darwin";
           modules = (builtins.attrValues self.darwinModules) ++ [
             ./hosts/${name}/configuration.nix
-            { single-user.home-manager.extraModules = builtins.attrValues self.homeModules; }
+            homeManagerSetup
           ];
         }
       );
