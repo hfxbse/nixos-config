@@ -6,12 +6,12 @@ final: prev: {
     '';
   };
 
-   # Break dependency chain on the sane backends to avoid long compilation times
+  # Break dependency chain on the sane backends to avoid long compilation times
   colord = prev.colord.override {
     sane-backends = prev.sane-backends;
   };
 
-  libreoffice = prev.libreoffice.override {
+  libreoffice-unwrapped = prev.libreoffice-unwrapped.override {
     sane-backends = prev.sane-backends;
   };
 }

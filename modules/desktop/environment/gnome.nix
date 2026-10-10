@@ -76,6 +76,7 @@ in
           blackbox-terminal
           gnome-network-displays
           papers
+          wl-clipboard
         ]
         ++ extensions
         ++ cfg.extraExtensions;
