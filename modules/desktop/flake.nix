@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+
   };
 
   outputs =
@@ -29,7 +30,7 @@
     {
       darwinModules.applications = applyOverlays (genModule [ ./nixpkgs.nix ]);
       homeModules.applications = genModule [ ./applications ];
-      nixosModules.applications = applyOverlays (genModule [ ./nixpkgs.nix ]);
+      nixosModules.applications = genModule [ ./nixpkgs.nix ];
 
       darwinModules.desktop-environments = genModule [ ./fonts/packages.nix ];
       homeModules.desktop-environments = genModule [ ./fonts/config.nix ];
