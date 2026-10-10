@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.development;
 in
@@ -11,9 +16,11 @@ in
   config.programs.git = {
     enable = true;
     settings = {
+      diff.external = lib.getExe pkgs.difftastic;
       init.defaultBranch = "main";
-      user.name = cfg.user.fullName;
+      interactive.diffFilter = "${lib.getExe pkgs.diff-so-fancy} --patch";
       pull.rebase = true;
+      user.name = cfg.user.fullName;
     };
   };
 }
