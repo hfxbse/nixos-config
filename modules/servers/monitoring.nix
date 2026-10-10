@@ -114,8 +114,9 @@ in
               host = "[::]";
               environment = {
                 APP_URL = reverse-proxy.virtualHosts.${cfg.ui.domain}.origin;
-                USER_CREATION = "true";
                 DISABLE_PASSWORD_AUTH = "true";
+                OAUTH_DISABLE_POPUP = "true";
+                USER_CREATION = "true";
               };
             };
           };
