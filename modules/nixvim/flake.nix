@@ -87,16 +87,20 @@
 
           kotlin-lsp = genOverlay (system: {
             kotlin-lsp =
-              (import inputs.nixpkgs {
-                inherit system;
-                config.allowUnfreePredicate =
-                  pkg:
-                  builtins.elem (inputs.nixpkgs.lib.getName pkg) [
-                    "kotlin-lsp"
-                  ];
-              }).callPackage
-                "${inputs.kotlin-lsp}/package.nix"
-                { };
+              let
+                pkgs = import inputs.nixpkgs {
+                  inherit system;
+                  config.allowUnfreePredicate = pkg: builtins.elem (inputs.nixpkgs.lib.getName pkg) [ "kotlin-lsp" ];
+                };
+              in
+              (pkgs.callPackage "${inputs.kotlin-lsp}/package.nix" { }).overrideAttrs (prev: {
+                src = pkgs.fetchurl {
+                  url =
+                    builtins.replaceStrings [ "download-cdn.jetbrains.com" ] [ "download.jetbrains.com" ]
+                      prev.src.url;
+                  hash = prev.src.outputHash;
+                };
+              });
           });
         };
     };
