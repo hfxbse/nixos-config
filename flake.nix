@@ -129,7 +129,11 @@
           servers.overlays
         ];
 
-      devShells = with inputs; mergeInputs ci.devShells [ ];
+      devShells =
+        with inputs;
+        mergeInputs ai.devShells [
+          ci.devShells
+        ];
 
       templates = {
         default = self.templates.baseline;

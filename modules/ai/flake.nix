@@ -49,5 +49,16 @@
         // {
           inherit (inputs.self.packages.${prev.stdenv.hostPlatform.system}) sdcpp-webui;
         };
+
+      devShells = perSystem (
+        system: pkgs: {
+          ai = pkgs.mkShell {
+            packages = with pkgs; [
+              llama-cpp-vulkan
+              inputs.self.packages.${system}.stable-diffusion-cpp-vulkan
+            ];
+          };
+        }
+      );
     };
 }

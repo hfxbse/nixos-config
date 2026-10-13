@@ -14,8 +14,8 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "hfxbse";
     repo = "sdcpp-webui";
-    rev = "6cdbbd81a679327deccc890e62f00074149319d7";
-    hash = "sha256-6FKO/YXmxv6jL1JTpeGmbUQdHPZdjZjRXjHOmC0AmI4=";
+    rev = "45b2b01d3f0ca2fc5b464efb0f6e381bc55b083b";
+    hash = "sha256-tMYXaQVEHSYgPyAzI8R2MSbh4s3/quJrVmvkOmTD6kY=";
   };
 
   nativeBuildInputs = [
@@ -27,7 +27,7 @@ stdenv.mkDerivation (finalAttrs: {
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     fetcherVersion = 4;
-    hash = "sha256-jJhUbEKYIWE4Fig/eUcYzeHkcQjyCBNxIPqdbOMoPSI=";
+    hash = "sha256-rdUNxeEojJYcbNqr8a+2UQQgVq8bGIKTmM/3eOxn45I=";
   };
 
   buildPhase = ''

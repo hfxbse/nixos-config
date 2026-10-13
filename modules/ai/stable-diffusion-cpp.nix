@@ -1,13 +1,13 @@
 final: prev: {
   stable-diffusion-cpp = prev.stable-diffusion-cpp.overrideAttrs (
     finalAttrs: prevAttrs: rec {
-      version = "master-679-f3fd359";
+      version = "master-956-1b0ba10";
 
       src = prev.fetchFromGitHub {
         owner = "leejet";
         repo = "stable-diffusion.cpp";
         tag = version;
-        hash = "sha256-CeMdXyKup/h6s/n6+jiZLWzTMp0yLUg6ZSp4xmt9sd8=";
+        hash = "sha256-EADt1ViQtbwFB0PgxsTCKnbyQ7+nlQB32h9eaDYijfk=";
         fetchSubmodules = true;
       };
 
