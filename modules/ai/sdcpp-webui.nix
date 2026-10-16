@@ -27,7 +27,11 @@ stdenv.mkDerivation (finalAttrs: {
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     fetcherVersion = 4;
-    hash = "sha256-rdUNxeEojJYcbNqr8a+2UQQgVq8bGIKTmM/3eOxn45I=";
+    hash =
+      if stdenv.hostPlatform.isDarwin then
+        "sha256-hMhCBy7t4UMOJwqzix8FCqZvQniCyKk5JXf1Gvb3/mY="
+      else
+        "sha256-rdUNxeEojJYcbNqr8a+2UQQgVq8bGIKTmM/3eOxn45I=";
   };
 
   buildPhase = ''

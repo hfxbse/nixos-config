@@ -10,7 +10,9 @@
         generator:
         inputs.nixpkgs.lib.genAttrs [
           "x86_64-linux"
+          "aarch64-darwin"
         ] (system: generator system inputs.nixpkgs.legacyPackages.${system});
+
     in
     {
       packages = perSystem (
@@ -37,9 +39,11 @@
           neural-pixel = callPackage' ./neural-pixel.nix;
           sdcpp-webui = callPackage' ./sdcpp-webui.nix;
           stable-diffusion-cpp = pkgs'.stable-diffusion-cpp;
+          stable-diffusion-cpp-vulkan = pkgs'.stable-diffusion-cpp-vulkan;
+        }
+        // inputs.nixpkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
           stable-diffusion-cpp-cuda = pkgs'.stable-diffusion-cpp-cuda;
           stable-diffusion-cpp-rocm = pkgs'.stable-diffusion-cpp-rocm;
-          stable-diffusion-cpp-vulkan = pkgs'.stable-diffusion-cpp-vulkan;
         }
       );
 
