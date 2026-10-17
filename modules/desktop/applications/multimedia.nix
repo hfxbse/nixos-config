@@ -23,15 +23,14 @@ in
 
   config = lib.mkIf cfg.enable {
     home.packages =
-      lib.optional (!isDarwin) (with pkgs;  vlc )
+      lib.optional (!isDarwin) (with pkgs; vlc)
       ++ lib.optional allowUnfree pkgs.spotify
       ++ lib.optionals cfg.imageEditing.enable (
-        with pkgs;
-        [
+        lib.optional (!isDarwin) pkgs.gimp
+        ++ (with pkgs; [
           darktable
-          (if isDarwin then gimp2 else gimp)
           inkscape
-        ]
+        ])
       )
       ++ lib.optional cfg.videoRecording.enable pkgs.obs-studio;
   };
