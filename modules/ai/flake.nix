@@ -58,9 +58,58 @@
         system: pkgs: {
           ai = pkgs.mkShell {
             packages = with pkgs; [
-              llama-cpp-vulkan
               inputs.self.packages.${system}.stable-diffusion-cpp-vulkan
+              llama-cpp-vulkan
+              mcp-searxng
+              openssl
+              searxng
             ];
+
+            shellHook =
+              let
+                mkEnvVars = env: inputs.nixpkgs.lib.mapAttrsToList (key: value: "${key}='${toString value}'") env;
+                restartExec =
+                  {
+                    cmd,
+                    env ? { },
+                  }:
+                  ''
+                    pkill -f '${cmd}' || true
+                    ${builtins.concatStringsSep " " (mkEnvVars env)} nohup ${cmd} > $LOG 2>&1 &
+                  '';
+              in
+              ''
+                export LOG=$(mktemp)
+                export SEARXNG_SETTINGS_PATH=$(mktemp)
+
+                echo "Writing server logs to $LOG"
+                echo "SearXNG settings path: $SEARXNG_SETTINGS_PATH"
+
+                cat > $SEARXNG_SETTINGS_PATH << EOF
+                  use_default_settings: true
+                  server:
+                    secret_key: "$(openssl rand -base64 32)"
+                    bind_address: "localhost"
+                    port: 8088
+                  search:
+                    formats:
+                      - html
+                      - json
+                EOF
+
+                ${restartExec {
+                  cmd = "searxng-run";
+                }}
+
+                ${restartExec {
+                  cmd = "mcp-searxng";
+                  env = {
+                    SEARXNG_URL = "http://localhost:8088";
+                    MCP_HTTP_PORT = 8089;
+                    MCP_HTTP_ALLOWED_ORIGINS = "http://localhost:8080";
+                  };
+                }}
+              '';
           };
         }
       );
