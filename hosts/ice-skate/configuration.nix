@@ -9,9 +9,6 @@ rec {
   ];
 
   boot.defaults.secureBoot = true;
-  # Latest kernel (7.1.3) breaks the interal webcam currently
-  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-lts-lto-x86_64-v4;
-
   boot.kernelParams = [
     "zswap.enabled=1"
     "zswap.compressor=zstd"

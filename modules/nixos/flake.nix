@@ -25,13 +25,6 @@
       nixpkgs.overlays = [
         inputs.nix-cachyos-kernel.overlays.pinned
       ];
-
-      # CachyOS Kernel binary cache
-      # See https://github.com/xddxdd/nix-cachyos-kernel?tab=readme-ov-file#binary-cache
-      nix.settings = {
-        substituters = [ "https://attic.xuyh0120.win/lantian" ];
-        trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
-      };
     };
   };
 }

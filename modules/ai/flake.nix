@@ -26,11 +26,13 @@
               config.allowUnfreePredicate =
                 pkg:
                 builtins.elem (inputs.nixpkgs.lib.getName pkg) [
-                  "cuda_cccl"
+                  "cccl"
+                  "cuda_crt"
                   "cuda_cudart"
                   "cuda_nvcc"
-                  "libcublas"
                   "cuda_nvrtc"
+                  "libcublas"
+                  "libnvvm"
                 ];
             }
           );

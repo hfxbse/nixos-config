@@ -1,11 +1,4 @@
 {
-  nixConfig = {
-    # CachyOS Kernel binary cache
-    # See https://github.com/xddxdd/nix-cachyos-kernel?tab=readme-ov-file#binary-cache
-    extra-substituters = [ "https://attic.xuyh0120.win/lantian" ];
-    extra-trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
-  };
-
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 

@@ -1,14 +1,9 @@
-{
-  pkgs,
-  ...
-}:
 rec {
   imports = [
     ./disk-config.nix
   ];
 
   boot.defaults.secureBoot = true;
-  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-x86_64-v3;
   boot.kernelParams = [
     "zswap.enabled=1"
     "zswap.compressor=zstd"
