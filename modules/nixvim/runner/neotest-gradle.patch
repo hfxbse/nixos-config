@@ -68,6 +68,19 @@ index 834904c..df83b3c 100644
    local juris_reports = parse_xml_files_from_directory(results_directory)
  
    for _, juris_report in pairs(juris_reports) do
+diff --git a/lua/neotest-gradle/hooks/discover_positions/build_position_identifier.lua b/lua/neotest-gradle/hooks/discover_positions/build_position_identifier.lua
+index 6bb60ad..6ca4ae9 100644
+--- a/lua/neotest-gradle/hooks/discover_positions/build_position_identifier.lua
++++ b/lua/neotest-gradle/hooks/discover_positions/build_position_identifier.lua
+@@ -21,7 +21,7 @@ local function get_namespace_name(namespaces)
+     return namespace.handle_name
+   end, namespaces)
+ 
+-  local full_namespace = table.concat(namespace_names, '.')
++  local full_namespace = table.concat(namespace_names, '$')
+   return #full_namespace > 0 and (full_namespace .. '.') or ''
+ end
+ 
 diff --git a/lua/neotest-gradle/hooks/is_test_file.lua b/lua/neotest-gradle/hooks/is_test_file.lua
 index 683d44d..9e7b193 100644
 --- a/lua/neotest-gradle/hooks/is_test_file.lua
