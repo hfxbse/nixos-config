@@ -22,33 +22,21 @@ in
   config = {
 
     plugins = {
-      jdtls.enable = false; # Required by Neotest Java adapter
-
       neotest = {
         enable = true;
         adapters = {
           gradle = {
             enable = true;
-            package = pkgs.vimPlugins.neotest-gradle.overrideAttrs (old: {
-              patches = (old.patches or [ ]) ++ [ ./neotest-gradle.patch ];
-            });
-          };
+            package = pkgs.vimPlugins.neotest-gradle.overrideAttrs {
+              version = "2026-10-19";
 
-          java = {
-            # Different test results than running through Gradle :()
-            enable = false;
-            settings.junit_jar =
-              let
-                artifactId = "junit-platform-console-standalone";
-                version = "6.0.3";
-
-                junit-platform-console-standalone = pkgs.fetchMavenArtifact {
-                  inherit artifactId version;
-                  groupId = "org.junit.platform";
-                  hash = "sha256-O6DWFQr3khShQR+eovvvhk7vaLaMiaF/ZywLib/506I";
-                };
-              in
-              "${junit-platform-console-standalone}/share/java/${artifactId}-${version}.jar";
+              src = pkgs.fetchFromGitHub {
+                owner = "hfxbse";
+                repo = "neotest-gradle";
+                rev = "520b1e7e0295bf6f48747177aca7558011a52036";
+                hash = "sha256-eZXaTZ6vo+Wv0kkSLydd11GV7pOLPb00H0NgPRxke/E=";
+              };
+            };
           };
 
           jest = {
