@@ -39,6 +39,7 @@
         in
         {
           neural-pixel = callPackage' ./neural-pixel.nix;
+          opencode = callPackage' ./opencode.nix;
           sdcpp-webui = callPackage' ./sdcpp-webui.nix;
           stable-diffusion-cpp = pkgs'.stable-diffusion-cpp;
           stable-diffusion-cpp-vulkan = pkgs'.stable-diffusion-cpp-vulkan;
