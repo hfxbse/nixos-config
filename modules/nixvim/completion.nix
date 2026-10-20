@@ -6,7 +6,8 @@
       settings = {
         keymap = {
           preset = "default";
-          "<C-j>" = [ "select_and_accept" ];
+          "<C-j>" = [ "show" "select_and_accept" ];
+          "<C-d>" = [ "show_documentation" ];
         };
       };
     };
