@@ -35,7 +35,6 @@ let
   writeJson = name: attrs: writeText name (toString (lib.toJSON attrs));
 
   srtConfigTemplate = writeJson "srt-settings.json" {
-    allowPty = true;
     filesystem = {
       allowRead = [
         "."
@@ -99,19 +98,20 @@ let
   };
 in
 writeShellScriptBin "opencode" ''
+  set -m
   WORKING_DIR=$(mktemp -d /tmp/opencode.XXXXXXX);
   WORKING_DIR_DENY="\"$WORKING_DIR/*\", \"$WORKING_DIR/*/**\""
   echo "Using $WORKING_DIR as temporary data directory";
 
   LLAMA_CMD="${llama} --host ${llamaHost} --port ${llamaPort} "$LLAMA_OPTIONS""
   echo "Starting llama-server: $LLAMA_CMD"
-  eval $LLAMA_CMD > "$WORKING_DIR/llama.log" 2>&1 &
+  eval "$LLAMA_CMD" &
 
   export SEARXNG_SETTINGS_PATH="$WORKING_DIR/searxng-settings.yml"
   ${jq'} "
     .server.secret_key= \"$(openssl rand -base64 32)\"
   " ${searxngConfigTemplate} > $SEARXNG_SETTINGS_PATH
-  ${sear} > "$WORKING_DIR/searxng.log" 2&>1 &
+  ${sear} &
 
 
   if [ -n "$EXTRACTION_LLM" ]; then
@@ -123,14 +123,14 @@ writeShellScriptBin "opencode" ''
     ";
   fi
 
-  ${lp} serve --host 127.0.0.1 --port 9222 --block-private-networks --obey-robots > "$WORKING_DIR/lightpanda.log" 2>&1 &
+  ${lp} serve --host 127.0.0.1 --port 9222 --block-private-networks --obey-robots &
   FASTCRW_CMD="${lib.getExe mcp-proxy} --port=${crwPort} --allow-origin='*' \
     --env CRW_SEARCH__SEARCH_BACKEND_URL http://localhost:8088 \
     --env CRW_RENDERER__LIGHTPANDA__WS_URL ws://127.0.0.1:9222 \
     "$CRW_LLM_OPS" \
     ${crw} mcp"
   echo "Starting fastcrw MCP: $FASTCRW_CMD";
-  eval "$FASTCRW_CMD" > "$WORKING_DIR/fastcrw.log" 2>&1 &
+  eval "$FASTCRW_CMD" &
 
   if [ -n "$FAKE_HOME" ]; then
     TARGET_HOME="$WORKING_DIR/data";
@@ -157,6 +157,6 @@ writeShellScriptBin "opencode" ''
     .provider.\"llama.cpp\".options.baseURL = \"http://${llamaHost}:${llamaPort}/v1\"
   " ${ocConfigTemplate} > $OPENCODE_CONFIG
 
-   ${srt} --settings "$SRT_SETTINGS" --\
-      HOME="$TARGET_HOME" TMPDIR="$TARGET_TMP_DIR" OPENCODE_CONFIG=$OPENCODE_CONFIG ${oc} "$@"
+   ${srt} --debug --settings "$SRT_SETTINGS" --\
+      HOME="$TARGET_HOME" TMPDIR="$TARGET_TMP_DIR" OPENCODE_CONFIG=$OPENCODE_CONFIG ${oc} web --print-logs "$@"
 ''
