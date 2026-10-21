@@ -1,18 +1,25 @@
 {
+  fastcrw,
   fetchFromGitHub,
   jq,
   lib,
+  lightpanda,
   llama-cpp,
+  mcp-proxy,
   opencode,
   sandbox-runtime,
+  searxng,
   writeShellScriptBin,
   writeText,
   ...
 }:
 let
+  crw = lib.getExe fastcrw;
   jq' = lib.getExe jq;
   llama = lib.getExe' llama-cpp "llama-server";
+  lp = lib.getExe lightpanda;
   oc = lib.getExe opencode;
+  sear = lib.getExe searxng;
   srt = lib.getExe sandbox-runtime;
 
   opencode-llama-cpp = fetchFromGitHub {
@@ -37,7 +44,9 @@ let
         "/nix/var"
         "/private/var/run"
         "/private/etc/hosts"
+        "/private/etc/ssl"
         "/etc"
+        "/etc/ssl"
         "/run"
         "/tmp"
       ];
@@ -57,9 +66,11 @@ let
     };
   };
 
+  crwPort = "3000";
   ocConfigTemplate = writeJson "opencode-config.json" {
     lsp = true;
     plugin = [ opencode-llama-cpp ];
+    skills = [ "${fastcrw.src}/skills" ];
     provider = {
       "llama.cpp" = {
         npm = "@ai-sdk/openai-compatible";
@@ -67,6 +78,24 @@ let
         options.apiKey = "not-used";
       };
     };
+    mcp.servers = {
+      fastcrw = {
+        type = "remote";
+        url = "http://localhost:3000/mcp";
+      };
+    };
+  };
+
+  searxngConfigTemplate = writeJson "searxng-settings.yml" {
+    use_default_settings = true;
+    server = {
+      bind_address = "localhost";
+      port = 8088;
+    };
+    search.formats = [
+      "html"
+      "json"
+    ];
   };
 in
 writeShellScriptBin "opencode" ''
@@ -77,6 +106,31 @@ writeShellScriptBin "opencode" ''
   LLAMA_CMD="${llama} --host ${llamaHost} --port ${llamaPort} "$LLAMA_OPTIONS""
   echo "Starting llama-server: $LLAMA_CMD"
   eval $LLAMA_CMD > "$WORKING_DIR/llama.log" 2>&1 &
+
+  export SEARXNG_SETTINGS_PATH="$WORKING_DIR/searxng-settings.yml"
+  ${jq'} "
+    .server.secret_key= \"$(openssl rand -base64 32)\"
+  " ${searxngConfigTemplate} > $SEARXNG_SETTINGS_PATH
+  ${sear} > "$WORKING_DIR/searxng.log" 2&>1 &
+
+
+  if [ -n "$EXTRACTION_LLM" ]; then
+    CRW_LLM_OPS="--env CRW_EXTRACTION__LLM__PROVIDER openai-compatible \
+    --env CRW_EXTRACTION__LLM__BASE_URL http://localhost:9931/v1 \
+    --env CRW_EXTRACTION__LLM__MODEL "$EXTRACTION_LLM" \
+    --env CRW_EXTRACTION__LLM__API_KEY dummy \
+    --env CRW_EXTRACTION__LLM__TIMEOUT_MS 300000 \
+    ";
+  fi
+
+  ${lp} serve --host 127.0.0.1 --port 9222 --block-private-networks --obey-robots > "$WORKING_DIR/lightpanda.log" 2>&1 &
+  FASTCRW_CMD="${lib.getExe mcp-proxy} --port=${crwPort} --allow-origin='*' \
+    --env CRW_SEARCH__SEARCH_BACKEND_URL http://localhost:8088 \
+    --env CRW_RENDERER__LIGHTPANDA__WS_URL ws://127.0.0.1:9222 \
+    "$CRW_LLM_OPS" \
+    ${crw} mcp"
+  echo "Starting fastcrw MCP: $FASTCRW_CMD";
+  eval "$FASTCRW_CMD" > "$WORKING_DIR/fastcrw.log" 2>&1 &
 
   if [ -n "$FAKE_HOME" ]; then
     TARGET_HOME="$WORKING_DIR/data";

@@ -1,6 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    lightpanda = {
+      url = "github:crayonnova/lightpanda-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -22,7 +26,11 @@
           pkgs' = (
             import inputs.nixpkgs {
               inherit system;
-              overlays = [ inputs.self.overlays.sdcpp ];
+              overlays = [
+                inputs.lightpanda.overlays.default
+                inputs.self.overlays.sdcpp
+              ];
+
               config.allowUnfreePredicate =
                 pkg:
                 builtins.elem (inputs.nixpkgs.lib.getName pkg) [
@@ -39,7 +47,7 @@
         in
         {
           neural-pixel = callPackage' ./neural-pixel.nix;
-          opencode = (callPackage' ./opencode.nix).override { llama-cpp = pkgs'.llama-cpp-vulkan; };
+          opencode = pkgs'.callPackage (import ./opencode.nix) { llama-cpp = pkgs'.llama-cpp-vulkan; };
           sdcpp-webui = callPackage' ./sdcpp-webui.nix;
           stable-diffusion-cpp = pkgs'.stable-diffusion-cpp;
           stable-diffusion-cpp-vulkan = pkgs'.stable-diffusion-cpp-vulkan;

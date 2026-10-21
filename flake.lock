@@ -2,6 +2,7 @@
   "nodes": {
     "ai": {
       "inputs": {
+        "lightpanda": "lightpanda",
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -333,6 +334,27 @@
         "owner": "nix-community",
         "ref": "v1.1.0",
         "repo": "lanzaboote",
+        "type": "github"
+      }
+    },
+    "lightpanda": {
+      "inputs": {
+        "nixpkgs": [
+          "ai",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792120955,
+        "narHash": "sha256-QNN5P/4jq9YhlKpjAh6vwqqNuLxqp616PSLfztadRGQ=",
+        "owner": "crayonnova",
+        "repo": "lightpanda-nix",
+        "rev": "a9e9cec682a1101bbdbde32ed377ff73b31ba246",
+        "type": "github"
+      },
+      "original": {
+        "owner": "crayonnova",
+        "repo": "lightpanda-nix",
         "type": "github"
       }
     },
