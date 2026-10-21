@@ -39,7 +39,7 @@
         in
         {
           neural-pixel = callPackage' ./neural-pixel.nix;
-          opencode = callPackage' ./opencode.nix;
+          opencode = (callPackage' ./opencode.nix).override { llama-cpp = pkgs'.llama-cpp-vulkan; };
           sdcpp-webui = callPackage' ./sdcpp-webui.nix;
           stable-diffusion-cpp = pkgs'.stable-diffusion-cpp;
           stable-diffusion-cpp-vulkan = pkgs'.stable-diffusion-cpp-vulkan;
