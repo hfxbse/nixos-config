@@ -72,19 +72,26 @@ in
 writeShellScriptBin "opencode" ''
   WORKING_DIR=$(mktemp -d /tmp/opencode.XXXXXXX);
   WORKING_DIR_DENY="\"$WORKING_DIR/*\", \"$WORKING_DIR/*/**\""
-  echo "Using $WORKING_DIR as data directory";
+  echo "Using $WORKING_DIR as temporary data directory";
 
   LLAMA_CMD="${llama} --host ${llamaHost} --port ${llamaPort} "$LLAMA_OPTIONS""
   echo "Starting llama-server: $LLAMA_CMD"
   eval $LLAMA_CMD > "$WORKING_DIR/llama.log" 2>&1 &
 
-  FAKE_HOME="$WORKING_DIR/data";
-  mkdir -p $FAKE_HOME;
+  if [ -n "$FAKE_HOME" ]; then
+    TARGET_HOME="$WORKING_DIR/data";
+  else
+    TARGET_HOME="''${XDG_DATA_HOME:-"$HOME/.local/share/opencode"}";
+    echo "Persisting data at $TARGET_HOME"
+  fi
+  mkdir -p "$TARGET_HOME"
 
   OPENCODE_CONFIG="$WORKING_DIR/opencode-config.json"
   SRT_SETTINGS="$WORKING_DIR/srt-settings.json"
+  TARGET_TMP_DIR="$WORKING_DIR/tmp"
+  mkdir -p "$TARGET_TMP_DIR"
 
-  RW_ALLOW="\"$FAKE_HOME\""
+  RW_ALLOW="\"$TARGET_HOME\", \"$TARGET_TMP_DIR\""
   R_ALLOW="$RW_ALLOW, \"$OPENCODE_CONFIG\""
   ${jq'} "
     .filesystem.allowRead = (.filesystem.allowRead // []) + [$R_ALLOW ] |
@@ -97,5 +104,5 @@ writeShellScriptBin "opencode" ''
   " ${ocConfigTemplate} > $OPENCODE_CONFIG
 
    ${srt} --settings "$SRT_SETTINGS" --\
-      HOME="$FAKE_HOME" XDG_DATA_HOME="$FAKE_HOME" TMPDIR="$FAKE_HOME/tmp" OPENCODE_CONFIG=$OPENCODE_CONFIG ${oc} "$@"
+      HOME="$TARGET_HOME" TMPDIR="$TARGET_TMP_DIR" OPENCODE_CONFIG=$OPENCODE_CONFIG ${oc} "$@"
 ''
