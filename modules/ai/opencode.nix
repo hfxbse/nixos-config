@@ -74,7 +74,9 @@ writeShellScriptBin "opencode" ''
   WORKING_DIR_DENY="\"$WORKING_DIR/*\", \"$WORKING_DIR/*/**\""
   echo "Using $WORKING_DIR as data directory";
 
-  ${llama} --host ${llamaHost} --port ${llamaPort} > "$WORKING_DIR/llama.log" 2>&1 &
+  LLAMA_CMD="${llama} --host ${llamaHost} --port ${llamaPort} "$LLAMA_OPTIONS""
+  echo "Starting llama-server: $LLAMA_CMD"
+  eval $LLAMA_CMD > "$WORKING_DIR/llama.log" 2>&1 &
 
   FAKE_HOME="$WORKING_DIR/data";
   mkdir -p $FAKE_HOME;
