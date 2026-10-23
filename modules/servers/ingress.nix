@@ -389,13 +389,17 @@ in
             config = lib.recursiveUpdate resolverFix {
               networking.firewall.interfaces.eth0.allowedUDPPorts = lib.mkIf mDNS [ 5353 ]; # mDNS
               services.avahi = lib.mkIf mDNS {
-                allowInterfaces = [ "eth0" ];
                 enable = true;
-                ipv4 = false;
                 openFirewall = false;
-                publish = {
-                  enable = true;
-                  addresses = true;
+                settings = {
+                  server = {
+                    allow-interfaces = [ "eth0" ];
+                    use-ipv4 = false;
+                  };
+                  publish = {
+                    disable-publishing = false;
+                    publish-addresses = true;
+                  };
                 };
               };
 

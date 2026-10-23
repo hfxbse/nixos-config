@@ -25,7 +25,6 @@ in
     };
 
     environment.systemPackages = lib.optional cfg.secureBoot pkgs.sbctl;
-    boot.initrd.systemd.enable = lib.mkIf cfg.secureBoot true;
     boot.loader = {
       systemd-boot.enable = !cfg.secureBoot && !config.wsl.enable;
       timeout = lib.mkDefault 0;

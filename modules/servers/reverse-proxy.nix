@@ -183,7 +183,7 @@ in
         };
 
         config = {
-          services.avahi.allowInterfaces = lib.mkForce [ lanVb ];
+          services.avahi.settings.server.allow-interfaces = lib.mkForce [ lanVb ];
 
           environment.systemPackages = with pkgs; [ dnsutils ];
           boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = true;
@@ -344,12 +344,17 @@ in
           hostBridge = bridgeName (if cfgHost.public then "wan" else "lan");
           config = {
             services.avahi = {
-              allowInterfaces = [ "eth0" ];
               enable = true;
-              ipv4 = false;
-              publish = {
-                enable = true;
-                addresses = true;
+              settings = {
+                publish = {
+                  disable-publishing = false;
+                  publish-addresses = true;
+                };
+
+                server = {
+                  allow-interfaces = [ "eth0" ];
+                  use-ipv4 = false;
+                };
               };
             };
           };
@@ -359,7 +364,7 @@ in
     ];
 
     virtualisation.vmVariant.containers.${containerName}.config = {
-      # Networking breakes without GUA
+      # Networking breaks without GUA
       # Ignore WAN interface for routing, everything has to go in via
       # a local IPv4 anyways because of QEMUs limitations
       networking.nftables.tables.http-isolation.enable = false;

@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   ...
 }:
@@ -9,6 +10,7 @@ rec {
   ];
 
   boot.defaults.secureBoot = true;
+  boot.kernelPackages = pkgs.linuxPackages_6_18; # Webcam does not work with latest 7.2
   boot.kernelParams = [
     "zswap.enabled=1"
     "zswap.compressor=zstd"
@@ -22,7 +24,10 @@ rec {
   ];
 
   hardware.facter.reportPath = ./facter.json;
-  hardware.ipu6.videoDeviceNumber = 99;
+  hardware.ipu6 = {
+    enable = lib.mkForce false;
+    videoDeviceNumber = 99;
+  };
 
   hardware.graphics = {
     enable = true;
