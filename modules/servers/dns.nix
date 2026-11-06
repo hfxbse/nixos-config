@@ -85,7 +85,7 @@ in
           settings = {
             connectIPVersion = "v6";
             ports.dns = cfg.port;
-            dnssec.validate = true;
+            dnssec.validate = false;
             upstreams = {
               init.strategy = "failOnError";
               strategy = "strict";
