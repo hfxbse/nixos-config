@@ -45,6 +45,7 @@
         }
       );
 
+      overlays.bluez = import ./overlays/bluez.nix;
       overlays.experimental-sane = import ./overlays/sane-backends.nix;
       overlays.printer-drivers =
         final: prev:
