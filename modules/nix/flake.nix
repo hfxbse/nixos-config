@@ -12,8 +12,11 @@
     darwinModules = {
       gc = ./gc.nix;
       nix-settings = ./settings.nix;
-      linux-builder = {
-        nix.linux-builder.enable = true;
+      linux-builder = { pkgs, ... }: {
+        nix.linux-builder = {
+          enable = true;
+          package = pkgs.darwin.linux-builder-vz;
+        };
       };
     };
   };
