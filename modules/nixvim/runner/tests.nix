@@ -33,8 +33,8 @@ in
               src = pkgs.fetchFromGitHub {
                 owner = "hfxbse";
                 repo = "neotest-gradle";
-                rev = "520b1e7e0295bf6f48747177aca7558011a52036";
-                hash = "sha256-eZXaTZ6vo+Wv0kkSLydd11GV7pOLPb00H0NgPRxke/E=";
+                rev = "23937a35b148e36e9423c33238f9aecf3fc0c226";
+                hash = "sha256-MwA0gcOIq/dA93ykKldUAHtVT02qx7unNGUNIPoGlkw";
               };
             };
           };
