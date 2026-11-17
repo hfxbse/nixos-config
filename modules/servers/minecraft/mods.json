@@ -1,22 +1,22 @@
 {
   "fabric-api": {
     "url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/Zns5SSRA/fabric-api-0.166.2%2B26.3.jar",
-    "hash": "sha256-6Kysx4NvOSN8g8KmZLA5ZH7jb5OCJ5esxAzaRGZgAuo="
+    "hash": "sha512-+2hqn6kjJIMoEHoSSYIp1pUeMWJX8Yt9Dky9aIW6RH7VCkQHaopbpHz+IEOzKds1h6sACuqx+s4mslh6XUumtQ=="
   },
   "lithium": {
     "url": "https://cdn.modrinth.com/data/gvQqBUqZ/versions/fWv5bnZk/lithium-fabric-0.26.3%2Bmc26.3.jar",
-    "hash": "sha256-EDtqqzky8RkVVWUlSj8zsb4Nomub96XuwkhRVCFE/Hg="
+    "hash": "sha512-LKkvtTATXSut3wukzE+Tl2I0h2o4xKoCtIeyVSQA8AWvz77r9Tc/tDlv4gIFN6QtdZe42lpSuQQ1XvUdX+8HrQ=="
   },
   "rightclickharvest": {
     "url": "https://cdn.modrinth.com/data/Cnejf5xM/versions/JqbL9uGG/rightclickharvest-fabric-4.7.1-26.3.x.jar",
-    "hash": "sha256-fA4kvFHWJPqY32lq3BqLIdILupls7JH372Bhqn1jS1Q="
+    "hash": "sha512-/bTeK329Vbo7PenCfDZIlI0puVo5i+DzP7bDy0eV+HecajCIsCA0t4iSNdA6PDjMAeCwB5dBm59QSu0pRAQDJQ=="
   },
   "jamlib": {
     "url": "https://cdn.modrinth.com/data/IYY9Siz8/versions/nlVdNwtg/jamlib-fabric-2.3.3-26.3.x.jar",
-    "hash": "sha256-usn6G3qgM4hUpUhEIkEK4njCECfN00ZQo+isNwnY64g="
+    "hash": "sha512-xh0YGiyMO3hR/U9+/ljF8urhVjVMbDxnhkITQV6uAl+T+8bWJ0V49BTnhthic9DYwvlH9d8QAge2Zj3ayxMUTQ=="
   },
   "quickleafdecay": {
     "url": "https://cdn.modrinth.com/data/3Puj7Mln/versions/NRd8xgUY/quickleafdecay-mc26.3-1.0.0.jar",
-    "hash": "sha256-mFU03dTUsk0aaBGRCFrsoaWrjfCCxR99GoeAzGfWQLo="
+    "hash": "sha512-aPuIJbkELxdMFCLfZRsXV+VmT6vnlHKLDiv1nrbhtEiooJz/nP4/26Wngh/E30IjFlf23F8oeZyhKbRCTKx6yg=="
   }
 }

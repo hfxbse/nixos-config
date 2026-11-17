@@ -92,7 +92,7 @@
           ci.packages
           desktop.packages
           nixvim.packages
-
+          servers.packages
           {
             # Standalone one-off packages
             x86_64-linux =

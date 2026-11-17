@@ -28,6 +28,22 @@
       ];
     };
 
+    packages =
+      inputs.nixpkgs.lib.genAttrs
+        [
+          "x86_64-linux"
+          "aarch64-darwin"
+        ]
+        (
+          system:
+          let
+            pkgs = inputs.nixpkgs.legacyPackages.${system};
+          in
+          {
+            mc-mod-updater = pkgs.callPackage (import ./minecraft/mod-updater.nix) {};
+          }
+        );
+
     overlays = {
       beszel = (import ./overlays/beszel.nix);
     };
