@@ -117,27 +117,12 @@ in
                 };
 
               symlinks = {
-                mods = pkgs.linkFarmFromDrvs "mods" [
-                  (fetchurl {
-                    url = "https://cdn.modrinth.com/data/P7dR8mSH/versions/Zns5SSRA/fabric-api-0.166.2%2B26.3.jar";
-                    hash = "sha256-6Kysx4NvOSN8g8KmZLA5ZH7jb5OCJ5esxAzaRGZgAuo=";
-                  })
-                  (fetchurl {
-                    url = "https://cdn.modrinth.com/data/gvQqBUqZ/versions/fWv5bnZk/lithium-fabric-0.26.3%2Bmc26.3.jar";
-                    hash = "sha256-EDtqqzky8RkVVWUlSj8zsb4Nomub96XuwkhRVCFE/Hg=";
-                  })
-                  (fetchurl {
-                    url = "https://cdn.modrinth.com/data/Cnejf5xM/versions/JqbL9uGG/rightclickharvest-fabric-4.7.1-26.3.x.jar";
-                    hash = "sha256-fA4kvFHWJPqY32lq3BqLIdILupls7JH372Bhqn1jS1Q=";
-                  })
-                  (fetchurl {
-                    url = "https://cdn.modrinth.com/data/IYY9Siz8/versions/nlVdNwtg/jamlib-fabric-2.3.3-26.3.x.jar";
-                    hash = "sha256-usn6G3qgM4hUpUhEIkEK4njCECfN00ZQo+isNwnY64g=";
-                  })
-                  (fetchurl {
-                    url = "https://cdn.modrinth.com/data/3Puj7Mln/versions/NRd8xgUY/quickleafdecay-mc26.3-1.0.0.jar";
-                    hash = "sha256-mFU03dTUsk0aaBGRCFrsoaWrjfCCxR99GoeAzGfWQLo=";
-                  })
+                mods = lib.pipe ./mods.json [
+                  builtins.readFile
+                  builtins.fromJSON
+                  builtins.attrValues
+                  (map ({ url, hash, ... }: fetchurl { inherit url hash; }))
+                  (pkgs.linkFarmFromDrvs "mods")
                 ];
 
                 "world/datapacks" = pkgs.linkFarmFromDrvs "datapacks" [

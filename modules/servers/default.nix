@@ -17,7 +17,7 @@ in
     ./dummy-http.nix
     ./gallery.nix
     ./ingress.nix
-    ./minecraft.nix
+    ./minecraft
     ./monitoring.nix
     ./oidc.nix
     ./oomd.nix
