@@ -1,15 +1,15 @@
 {
   "fabric-api": {
-    "url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/Zns5SSRA/fabric-api-0.166.2%2B26.3.jar",
-    "hash": "sha512-+2hqn6kjJIMoEHoSSYIp1pUeMWJX8Yt9Dky9aIW6RH7VCkQHaopbpHz+IEOzKds1h6sACuqx+s4mslh6XUumtQ=="
+    "url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/lPHkrIVF/fabric-api-0.167.0%2B26.3.jar",
+    "hash": "sha512-wBUyqaRq6Q+D+1feJl6IS7tGEGqETm2dsh0I0XE/Ng4KmHJV1dllaXRl/jkQeYr2xdz2TtPTToUGTKQbe/89IA=="
   },
   "lithium": {
-    "url": "https://cdn.modrinth.com/data/gvQqBUqZ/versions/fWv5bnZk/lithium-fabric-0.26.3%2Bmc26.3.jar",
-    "hash": "sha512-LKkvtTATXSut3wukzE+Tl2I0h2o4xKoCtIeyVSQA8AWvz77r9Tc/tDlv4gIFN6QtdZe42lpSuQQ1XvUdX+8HrQ=="
+    "url": "https://cdn.modrinth.com/data/gvQqBUqZ/versions/Lal8mJGR/lithium-fabric-0.26.4%2Bmc26.3.jar",
+    "hash": "sha512-Az+FgTsLyv6EilXddBubGjBoXc33dKkiUHv2Nxaxa/0PwShW/8TKPHajb23HMxCn39xLbcnjXCGkSCYnsdMLhQ=="
   },
   "rightclickharvest": {
-    "url": "https://cdn.modrinth.com/data/Cnejf5xM/versions/JqbL9uGG/rightclickharvest-fabric-4.7.1-26.3.x.jar",
-    "hash": "sha512-/bTeK329Vbo7PenCfDZIlI0puVo5i+DzP7bDy0eV+HecajCIsCA0t4iSNdA6PDjMAeCwB5dBm59QSu0pRAQDJQ=="
+    "url": "https://cdn.modrinth.com/data/Cnejf5xM/versions/UDkHxLtI/rightclickharvest-fabric-4.7.2-26.3.x.jar",
+    "hash": "sha512-HoNUlLTKaREoO4tkQGvo0L6mFFDS9dUPaDxnH+Zpgkerb+6P33Ruzq7wst4vXVzatJopvkM+62AhyL5ygrrC3Q=="
   },
   "jamlib": {
     "url": "https://cdn.modrinth.com/data/IYY9Siz8/versions/nlVdNwtg/jamlib-fabric-2.3.3-26.3.x.jar",
@@ -18,5 +18,9 @@
   "quickleafdecay": {
     "url": "https://cdn.modrinth.com/data/3Puj7Mln/versions/NRd8xgUY/quickleafdecay-mc26.3-1.0.0.jar",
     "hash": "sha512-aPuIJbkELxdMFCLfZRsXV+VmT6vnlHKLDiv1nrbhtEiooJz/nP4/26Wngh/E30IjFlf23F8oeZyhKbRCTKx6yg=="
+  },
+  "DistantHorizons": {
+    "url": "https://cdn.modrinth.com/data/uCdwusMi/versions/TGgEbP9A/DistantHorizons-3.3.4-26.3-fabric-neoforge.jar",
+    "hash": "sha512-C5CxsI2Zl0v8PI6Gss6yUuL5FxXtZrklAEwoM1+0Thvdu7a4BD5NTVPIftJHeJzReIsbpOP0OU7+FU4MWc/yNg=="
   }
 }
